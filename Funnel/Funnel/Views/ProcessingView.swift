@@ -5,8 +5,8 @@
 //  Created by Claude on 6/17/25.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ProcessingView: View {
     @ObservedObject var recordingProcessor: RecordingProcessor
@@ -73,8 +73,10 @@ struct ProcessingView: View {
         }
         .ignoresSafeArea()
         .onChange(of: recordingProcessor.isProcessing) { _, isProcessing in
+            print("ProcessingView: isProcessing changed to \(isProcessing), error: \(recordingProcessor.processingError?.localizedDescription ?? "none")")
             if !isProcessing && recordingProcessor.processingError == nil {
                 // Processing completed successfully
+                print("ProcessingView: Calling onDismiss")
                 onDismiss()
             }
         }

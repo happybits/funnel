@@ -2,6 +2,17 @@
 
 All notable changes to the Funnel project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- Recording functionality now properly handles completion callbacks
+- Added minimum recording duration check (0.5s) to prevent API errors
+- Fixed CurrentRecordingProvider type casting for SwiftUI previews
+- Fixed ProcessingView UI not updating after successful API response
+- Added file location logging for recorded audio files
+- Reverted AudioRecorderManager from async/await to callback-based approach for simplicity
+- Fixed server tests for updated API types
+
 ## [0.1.0] - 2025-06-16
 
 ### Added
@@ -184,3 +195,29 @@ All notable changes to the Funnel project will be documented in this file.
 - Recording state is now centralized in CurrentRecordingProvider EnvironmentObject
 - Single view architecture with conditional UI based on recording state
 - Improved animation and transition smoothness between recording states
+
+## [0.9.0] - 2025-06-17
+
+### Changed
+- **Simplified API to single endpoint**: Removed individual `/api/transcribe`, `/api/summarize`, and `/api/diagram` endpoints
+- **Renamed endpoint**: Changed `/api/process` to `/api/new-recording` for better clarity
+- **Updated iOS app**: Now uses the single `/api/new-recording` endpoint exclusively
+- **Simplified test structure**: Consolidated test commands to single `deno task test`
+
+### Added
+- Comprehensive test suite for `/api/new-recording` endpoint
+- Test fixture with sample audio recording at `server/tests/fixtures/sample-audio-recording.m4a`
+- Error handling tests for missing files and invalid file types
+- Test scripts for manual testing with curl
+
+### Removed
+- Individual API endpoints (`/api/transcribe`, `/api/summarize`, `/api/diagram`)
+- Unused API request/response types from both server and iOS
+- Test with synthetic WAV file (now only testing with real audio)
+- Multiple test commands (consolidated to single `deno task test`)
+
+### Technical Details
+- Server now has single endpoint that handles complete audio processing pipeline
+- Parallel processing of summary and diagram generation for better performance
+- All tests use real audio file for more realistic validation
+- Simplified API reduces network calls from 3 to 1

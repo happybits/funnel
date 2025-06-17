@@ -18,7 +18,7 @@ struct GlassmorphicModifier: ViewModifier {
                     // Backdrop blur
                     RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(.ultraThinMaterial)
-                    
+
                     // Gradient overlay
                     LinearGradient(
                         colors: [

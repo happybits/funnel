@@ -3,11 +3,25 @@ import {
   assertExists,
 } from "https://deno.land/std@0.215.0/assert/mod.ts";
 import type {
-  DiagramResponse,
   ErrorResponse,
-  SummarizeResponse,
-  TranscribeResponse,
+  NewRecordingResponse,
 } from "../types/api.ts";
+
+// Legacy types for testing (no longer in actual API)
+interface TranscribeResponse {
+  transcript: string;
+  duration: number;
+}
+
+interface SummarizeResponse {
+  bulletSummary: string[];
+}
+
+interface DiagramResponse {
+  title: string;
+  description: string;
+  diagram: string;
+}
 
 // Test data
 const longTranscript =
@@ -56,7 +70,7 @@ Deno.test("API Response Shapes - SummarizeResponse validation", () => {
   assertExists(mockResponse.bulletSummary);
   assertEquals(Array.isArray(mockResponse.bulletSummary), true);
   assertEquals(mockResponse.bulletSummary.length > 0, true);
-  mockResponse.bulletSummary.forEach((bullet) => {
+  mockResponse.bulletSummary.forEach((bullet: string) => {
     assertEquals(typeof bullet, "string");
   });
 });
@@ -82,7 +96,7 @@ Deno.test("Summarize Endpoint - produces concise summary from long transcript", 
   assertEquals(expectedSummary.bulletSummary.length >= 3, true);
 
   // Each bullet should be concise (under 100 chars)
-  expectedSummary.bulletSummary.forEach((bullet) => {
+  expectedSummary.bulletSummary.forEach((bullet: string) => {
     assertEquals(bullet.length < 100, true);
   });
 });

@@ -37,13 +37,15 @@ deno test tests/new-recording-test.ts --allow-all --filter "test audio file"
 echo -e "\n${GREEN}2. Testing error handling...${NC}"
 deno test tests/new-recording-test.ts --allow-all --filter "error handling"
 
-# Test with real audio if provided
-if [ -n "$1" ]; then
-    echo -e "\n${GREEN}3. Testing with real audio file: $1${NC}"
-    TEST_AUDIO_PATH="$1" deno test tests/new-recording-test.ts --allow-all --filter "real audio"
+# Test with real audio (fixture or provided file)
+AUDIO_FILE="${1:-tests/fixtures/sample-audio-recording.m4a}"
+
+if [ -f "$AUDIO_FILE" ]; then
+    echo -e "\n${GREEN}3. Testing with real audio file: $AUDIO_FILE${NC}"
+    TEST_AUDIO_PATH="$AUDIO_FILE" deno test tests/new-recording-test.ts --allow-all --filter "real audio"
 else
-    echo -e "\n${YELLOW}💡 Tip: Pass an audio file path as argument to test with real audio${NC}"
-    echo "   Example: ./test-endpoint.sh /path/to/audio.m4a"
+    echo -e "\n${YELLOW}⚠️  Audio file not found: $AUDIO_FILE${NC}"
+    echo "   Using default fixture: tests/fixtures/sample-audio-recording.m4a"
 fi
 
 echo -e "\n${GREEN}✨ Test complete!${NC}"

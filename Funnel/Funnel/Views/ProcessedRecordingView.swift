@@ -5,8 +5,8 @@
 //  Created by Claude on 6/17/25.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ProcessedRecordingView: View {
     let processedRecording: ProcessedRecording
@@ -124,7 +124,7 @@ struct ProcessedRecordingView: View {
         title: "Sample Recording",
         processingStatus: .completed
     )
-    
+
     let processedRecording = ProcessedRecording(
         transcript: sampleRecording.transcript ?? "This is a sample transcript",
         duration: sampleRecording.duration,
@@ -135,7 +135,7 @@ struct ProcessedRecordingView: View {
             content: sampleRecording.diagramContent ?? "Sample content"
         )
     )
-    
+
     ProcessedRecordingView(processedRecording: processedRecording)
         .funnelPreviewEnvironment()
 }

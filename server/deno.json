@@ -6,7 +6,6 @@
     "lint": "deno lint",
     "check": "deno check main.ts",
     "test": "deno test --allow-all tests/",
-    "test:new-recording": "deno test --allow-all tests/new-recording-test.ts",
     "precommit": "deno fmt && deno lint && deno check main.ts"
   },
   "imports": {

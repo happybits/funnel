@@ -41,16 +41,16 @@ extension ModelContainer {
         title: String? = nil,
         processingStatus: ProcessingStatus = .completed
     ) -> Recording {
-        let index = Int.random(in: 0..<sampleTranscripts.count)
-        
+        let index = Int.random(in: 0 ..< sampleTranscripts.count)
+
         let recording = Recording(
             audioFileName: "recording_\(UUID().uuidString).m4a",
-            duration: TimeInterval.random(in: 30...180)
+            duration: TimeInterval.random(in: 30 ... 180)
         )
-        
-        recording.title = title ?? "Recording \(Int.random(in: 1...100))"
+
+        recording.title = title ?? "Recording \(Int.random(in: 1 ... 100))"
         recording.processingStatus = processingStatus
-        
+
         if processingStatus == .completed {
             recording.transcript = sampleTranscripts[index]
             recording.bulletSummary = sampleBulletSummaries[index]
@@ -66,43 +66,43 @@ extension ModelContainer {
             ```
             """
         }
-        
+
         container.mainContext.insert(recording)
         return recording
     }
-    
+
     @MainActor
     static let previewContainer: ModelContainer = {
         do {
             let schema = Schema([Recording.self])
             let config = ModelConfiguration(isStoredInMemoryOnly: true)
             let container = try ModelContainer(for: schema, configurations: config)
-            
+
             // Create sample recordings
-            let _ = createSampleRecording(
+            _ = createSampleRecording(
                 container: container,
                 title: "Morning Standup Notes",
                 processingStatus: .completed
             )
-            
-            let _ = createSampleRecording(
+
+            _ = createSampleRecording(
                 container: container,
                 title: "Feature Brainstorm",
                 processingStatus: .completed
             )
-            
-            let _ = createSampleRecording(
+
+            _ = createSampleRecording(
                 container: container,
                 title: "Bug Report",
                 processingStatus: .transcribing
             )
-            
-            let _ = createSampleRecording(
+
+            _ = createSampleRecording(
                 container: container,
                 title: "Design Review",
                 processingStatus: .failed
             )
-            
+
             return container
         } catch {
             fatalError("Failed to create preview container: \(error.localizedDescription)")
@@ -114,9 +114,8 @@ extension ModelContainer {
 extension View {
     @ViewBuilder
     func funnelPreviewEnvironment() -> some View {
-        self
-            .modelContainer(ModelContainer.previewContainer)
-            .environmentObject(MockCurrentRecordingProvider())
+        modelContainer(ModelContainer.previewContainer)
+            .environmentObject(MockCurrentRecordingProvider() as CurrentRecordingProvider)
     }
 }
 
@@ -129,8 +128,8 @@ var isRunningInPreview: Bool {
 class MockCurrentRecordingProvider: CurrentRecordingProvider {
     private var mockTimer: Timer?
     private var mockWaveformTimer: Timer?
-    
-    override func startRecording(completion: @escaping (Result<URL, Error>) -> Void) {
+
+    override func startRecording(completion _: @escaping (Result<URL, Error>) -> Void) {
         // Simulate recording start
         DispatchQueue.main.async { [weak self] in
             self?.isRecording = true
@@ -139,7 +138,7 @@ class MockCurrentRecordingProvider: CurrentRecordingProvider {
             self?.startMockTimers()
         }
     }
-    
+
     override func stopRecording() {
         mockTimer?.invalidate()
         mockWaveformTimer?.invalidate()
@@ -147,22 +146,22 @@ class MockCurrentRecordingProvider: CurrentRecordingProvider {
         recordingTime = 0
         waveformValues = []
     }
-    
+
     private func startMockTimers() {
         // Mock recording time
         mockTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             self?.recordingTime += 0.1
         }
-        
+
         // Mock waveform animation
         mockWaveformTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            
+
             withAnimation(.linear(duration: 0.05)) {
                 // Generate random waveform values to simulate audio
-                let randomLevel = CGFloat.random(in: 0.1...0.8)
+                let randomLevel = CGFloat.random(in: 0.1 ... 0.8)
                 self.waveformValues.append(randomLevel)
-                
+
                 if self.waveformValues.count > 50 {
                     self.waveformValues.removeFirst()
                 }
