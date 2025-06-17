@@ -2,6 +2,17 @@
 
 All notable changes to the Funnel project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- Recording functionality now properly handles completion callbacks
+- Added minimum recording duration check (0.5s) to prevent API errors
+- Fixed CurrentRecordingProvider type casting for SwiftUI previews
+- Fixed ProcessingView UI not updating after successful API response
+- Added file location logging for recorded audio files
+- Reverted AudioRecorderManager from async/await to callback-based approach for simplicity
+- Fixed server tests for updated API types
+
 ## [0.1.0] - 2025-06-16
 
 ### Added
