@@ -13,6 +13,42 @@ All notable changes to the Funnel project will be documented in this file.
 - Reverted AudioRecorderManager from async/await to callback-based approach for simplicity
 - Fixed server tests for updated API types
 
+## [0.10.0] - 2025-06-17
+
+### Changed
+- **Major State Management Refactoring**: Implemented centralized state management
+  - Created `AppState` class as single source of truth for all app state
+  - Consolidated recording, processing, and navigation state management
+  - Replaced multiple `@StateObject` instances with single `AppState` environment object
+  - Simplified navigation using enum-based `NavigationState` (.recording, .processing, .viewing)
+
+### Added
+- **AppState.swift**: Centralized state management class that combines:
+  - Recording functionality from `CurrentRecordingProvider`
+  - Processing functionality from `RecordingProcessor`
+  - Navigation state management
+  - Error handling and retry logic
+
+### Removed
+- Removed `ProcessedRecording` struct (now using `Recording` model directly)
+- Removed duplicate `RecordingProcessor` instances in views
+- Removed complex state management from `ContentView`
+- Removed initialization workarounds for `ModelContext`
+
+### Fixed
+- Fixed state synchronization issues between recording and processing
+- Fixed multiple instances of state objects causing inconsistencies
+- Fixed navigation flow with cleaner state-based transitions
+- Fixed Equatable conformance for NavigationState enum
+- Fixed main actor isolation warnings in timer callbacks
+
+### Technical Details
+- All state management now flows through single `AppState` instance
+- Views no longer create their own state objects
+- Navigation is handled via state changes rather than boolean flags
+- Improved error handling with user-friendly error states
+- Better separation of concerns between views and state management
+
 ## [0.1.0] - 2025-06-16
 
 ### Added

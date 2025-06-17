@@ -22,6 +22,7 @@
 		33CC15DCFE85EC397EB4D216 /* CurrentRecordingProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942C69A9CCBFD948E0FD46AD /* CurrentRecordingProvider.swift */; };
 		3B088700D74F9F0DFE4A58D1 /* Nunito-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 38CAFFF8CF396D51A0A6F7CC /* Nunito-ExtraBold.ttf */; };
 		403FEF6A7EE0C6D2ADE5817C /* Nunito-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D53DCCDDE8428E544B9B71A6 /* Nunito-ExtraLightItalic.ttf */; };
+		404F0B61E0355E92E0EFCD09 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C63506A860C1CF89D1B444 /* AppState.swift */; };
 		4A27381C242E8783F42417DA /* MicrophoneHero.svg in Resources */ = {isa = PBXBuildFile; fileRef = 81C6A681E708E861469AE5D1 /* MicrophoneHero.svg */; };
 		5A020F1350502C7C88CCDCEF /* Nunito-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B0E31E1221A78230A10F4A09 /* Nunito-Bold.ttf */; };
 		5B3A95492C6344EB560E05C0 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D4AFD58BDCF44BEC1546B6 /* APIModels.swift */; };
@@ -80,6 +81,7 @@
 		D5424E4CE20B8D581455C484 /* ProcessingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingView.swift; sourceTree = "<group>"; };
 		D9CA3D079CCF7A290A56E257 /* GlassmorphicModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassmorphicModifier.swift; sourceTree = "<group>"; };
 		DFA84A494681135066AEAE77 /* Nunito-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Light.ttf"; sourceTree = "<group>"; };
+		E3C63506A860C1CF89D1B444 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		E9C130CA0032922A6E2E6544 /* ProcessedRecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessedRecordingView.swift; sourceTree = "<group>"; };
 		F5B72DEF79584DE473F21A46 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FDFD23FBC18A1EFDA80BC789 /* Recording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recording.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 		D18B633BDA53E8618606319F /* Funnel */ = {
 			isa = PBXGroup;
 			children = (
+				E3C63506A860C1CF89D1B444 /* AppState.swift */,
 				F5B72DEF79584DE473F21A46 /* Assets.xcassets */,
 				13CE9BA59D57F670FDD59369 /* AudioRecorderManager.swift */,
 				B6A4FD49AC8F3C015D15F7D4 /* ContentView.swift */,
@@ -326,6 +329,7 @@
 			files = (
 				08A70A259BB9DB98B9DB8EAD /* APIClient.swift in Sources */,
 				5B3A95492C6344EB560E05C0 /* APIModels.swift in Sources */,
+				404F0B61E0355E92E0EFCD09 /* AppState.swift in Sources */,
 				104C5642942B28C612C03B47 /* AudioRecorderManager.swift in Sources */,
 				FD3868466CE1ACC0CA11E44A /* ContentView.swift in Sources */,
 				33CC15DCFE85EC397EB4D216 /* CurrentRecordingProvider.swift in Sources */,

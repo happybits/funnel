@@ -11,7 +11,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-enum NavigationState {
+enum NavigationState: Equatable {
     case recording
     case processing
     case viewing(Recording)
@@ -221,20 +221,24 @@ class AppState: ObservableObject {
     private func startTimers() {
         // Timer for recording duration
         recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            self?.recordingTime = self?.audioRecorder.recordingTime ?? 0
+            DispatchQueue.main.async {
+                self?.recordingTime = self?.audioRecorder.recordingTime ?? 0
+            }
         }
 
         // Timer for waveform animation
         levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
             guard let self = self else { return }
 
-            withAnimation(.linear(duration: 0.05)) {
-                let normalizedLevel = CGFloat(self.audioRecorder.audioLevel)
-                let visualLevel = max(0.05, normalizedLevel)
-                self.waveformValues.append(visualLevel)
+            DispatchQueue.main.async {
+                withAnimation(.linear(duration: 0.05)) {
+                    let normalizedLevel = CGFloat(self.audioRecorder.audioLevel)
+                    let visualLevel = max(0.05, normalizedLevel)
+                    self.waveformValues.append(visualLevel)
 
-                if self.waveformValues.count > 50 {
-                    self.waveformValues.removeFirst()
+                    if self.waveformValues.count > 50 {
+                        self.waveformValues.removeFirst()
+                    }
                 }
             }
         }
