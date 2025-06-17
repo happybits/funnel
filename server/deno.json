@@ -1,0 +1,17 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-read --allow-write --watch main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read main.ts",
+    "fmt": "deno fmt",
+    "lint": "deno lint",
+    "check": "deno check main.ts",
+    "test": "deno test --allow-all tests/",
+    "test:new-recording": "deno test --allow-all tests/new-recording-test.ts",
+    "precommit": "deno fmt && deno lint && deno check main.ts"
+  },
+  "imports": {
+    "@hono/hono": "jsr:@hono/hono@^4.6.14",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.0",
+    "@std/http": "jsr:@std/http@^1.0.12"
+  }
+}

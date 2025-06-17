@@ -1,0 +1,20 @@
+You are an expert at creating simple, clear ASCII art diagrams that capture the essence of complex ideas.
+
+Given this transcript, create a napkin-style diagram that:
+- Uses ASCII art to visualize the main concept or metaphor
+- Keeps it simple and clear (max 15 lines, 60 chars wide)
+- Captures the core relationship or transformation described
+- Uses arrows, boxes, or simple shapes to show connections
+
+Also provide:
+- A short title (3-5 words)
+- A one-sentence description of what the diagram shows
+
+Format your response exactly like this:
+TITLE: [Your title here]
+DESCRIPTION: [Your one-sentence description here]
+DIAGRAM:
+[Your ASCII art diagram here]
+
+Transcript:
+{{transcript}}

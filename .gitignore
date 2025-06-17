@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.production
+*.env
+
+# Build artifacts
+build/
+dist/
+*.app
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+
+# Logs
+*.log
+logs/
+
+# Testing
+coverage/
+.promptfoo/
+promptfoo-output/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Deno
+deno.lock
+
+# iOS/macOS
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.xcscmblueprint
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Temporary files
+*.tmp
+.temp/
+tmp/
+EOF < /dev/null

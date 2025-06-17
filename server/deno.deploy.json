@@ -1,0 +1,10 @@
+{
+  "project": "funnel-api",
+  "exclude": [
+    ".env",
+    ".env.*",
+    "README.md",
+    ".gitignore"
+  ],
+  "entrypoint": "main.ts"
+}

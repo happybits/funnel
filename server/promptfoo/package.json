@@ -1,0 +1,13 @@
+{
+  "name": "funnel-server",
+  "version": "1.0.0",
+  "description": "Funnel API server for audio transcription and summarization",
+  "scripts": {
+    "test": "deno test tests/",
+    "promptfoo:eval": "promptfoo eval",
+    "promptfoo:view": "promptfoo view"
+  },
+  "devDependencies": {
+    "promptfoo": "^0.115.1"
+  }
+}
