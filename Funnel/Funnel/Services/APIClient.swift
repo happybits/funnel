@@ -102,7 +102,7 @@ class APIClient {
         guard let url = URL(string: "\(baseURL)\(endpoint)") else {
             throw APIError.invalidURL
         }
-        
+
         print("APIClient: Uploading to \(url.absoluteString)")
 
         let boundary = UUID().uuidString
@@ -147,7 +147,7 @@ class APIClient {
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw APIError.networkError("Invalid response")
             }
-            
+
             print("APIClient: Response status code: \(httpResponse.statusCode)")
 
             if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {

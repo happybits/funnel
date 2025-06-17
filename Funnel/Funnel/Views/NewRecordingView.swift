@@ -243,4 +243,3 @@ struct WaveformView: View {
     )
     .funnelPreviewEnvironment()
 }
-

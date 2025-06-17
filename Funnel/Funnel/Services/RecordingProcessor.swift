@@ -51,7 +51,7 @@ class RecordingProcessor: ObservableObject {
             recording.processingStatus = .uploading
             processingStatus = "Uploading audio..."
             try? modelContext.save()
-            
+
             print("RecordingProcessor: Starting upload to API")
 
             // Process audio through combined endpoint

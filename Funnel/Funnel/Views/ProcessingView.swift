@@ -5,8 +5,8 @@
 //  Created by Claude on 6/17/25.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ProcessingView: View {
     @ObservedObject var recordingProcessor: RecordingProcessor

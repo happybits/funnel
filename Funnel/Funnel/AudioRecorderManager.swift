@@ -46,7 +46,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
 
     func startRecording(completion: @escaping (Result<URL, Error>) -> Void) {
         print("AudioRecorderManager: startRecording called")
-        
+
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let audioFilename = documentsPath.appendingPathComponent("\(Date().timeIntervalSince1970).m4a")
 
@@ -63,30 +63,30 @@ class AudioRecorderManager: NSObject, ObservableObject {
         do {
             // Ensure audio session is active
             try AVAudioSession.sharedInstance().setActive(true)
-            
+
             audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
             audioRecorder?.delegate = self
             audioRecorder?.isMeteringEnabled = true
             audioRecorder?.prepareToRecord()
-            
+
             let recordingStarted = audioRecorder?.record() ?? false
             print("AudioRecorderManager: Recording started: \(recordingStarted)")
             print("AudioRecorderManager: Recording to file: \(audioFilename.path)")
-            
+
             if recordingStarted {
                 isRecording = true
                 recordingTime = 0
-                
+
                 // Timer for recording duration
                 timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
                     self.recordingTime += 0.1
                 }
-                
+
                 // Timer for audio level monitoring
                 levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
                     self.updateAudioLevel()
                 }
-                
+
                 completion(.success(audioFilename))
             } else {
                 print("AudioRecorderManager: Failed to start recording")
