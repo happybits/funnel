@@ -9,85 +9,71 @@ import SwiftData
 import SwiftUI
 
 struct ProcessingView: View {
-    @ObservedObject var recordingProcessor: RecordingProcessor
-    let onDismiss: () -> Void
+    @EnvironmentObject var appState: AppState
+
+    private var logo: some View {
+        HStack {
+            FunnelLogo()
+                .padding(.leading, 30)
+                .padding(.top, 89)
+            Spacer()
+        }
+    }
+
+    private var processingBox: some View {
+        VStack(spacing: 8) {
+            // Processing animation
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+
+            let funnelText = "Processing - Hang tight!"
+            Text(funnelText)
+                .funnelTitle()
+                .multilineTextAlignment(.center)
+                .funnelTextOverlay(funnelText, font: .nunitoExtraBold, size: 18)
+
+            if let error = appState.processingError {
+                Text("Error: \(error.localizedDescription)")
+                    .font(.system(size: 14))
+                    .foregroundColor(.red)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 10)
+
+                Button(action: { appState.resetToRecording() }) {
+                    Text("Dismiss")
+                        .funnelBody()
+                        .padding(.horizontal, 30)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 25)
+                                .fill(Color.white.opacity(0.2))
+                        )
+                }
+                .padding(.top, 20)
+            }
+        }
+        .padding()
+        .frame(maxWidth: 350)
+        .glassmorphic(cornerRadius: 15, gradientOpacity: (0.1, 0.4))
+    }
 
     var body: some View {
-        ZStack {
-            GradientBackground()
-
-            VStack(spacing: 30) {
-                // Logo
-                HStack {
-                    FunnelLogo()
-                        .padding(.leading, 30)
-                    Spacer()
-                }
-                .padding(.top, 89)
-
-                Spacer()
-
-                VStack(spacing: 25) {
-                    // Processing animation
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(2)
-
-                    Text("Processing Your Recording")
-                        .funnelTitle()
-                        .funnelTextOverlay("Processing Your Recording", font: .nunitoExtraBold, size: 18)
-
-                    Text(recordingProcessor.processingStatus)
-                        .funnelBody()
-                        .funnelTextOverlay(recordingProcessor.processingStatus, font: .nunitoRegular, size: 15)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
-
-                    if let error = recordingProcessor.processingError {
-                        Text("Error: \(error.localizedDescription)")
-                            .font(.system(size: 14))
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 40)
-                            .padding(.top, 10)
-
-                        Button(action: onDismiss) {
-                            Text("Dismiss")
-                                .funnelBody()
-                                .padding(.horizontal, 30)
-                                .padding(.vertical, 12)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 25)
-                                        .fill(Color.white.opacity(0.2))
-                                )
-                        }
-                        .padding(.top, 20)
-                    }
-                }
-                .padding()
-                .frame(maxWidth: 350)
-                .glassmorphic(cornerRadius: 15, gradientOpacity: (0.1, 0.4))
-
-                Spacer()
+        GradientBackground()
+            .overlay(alignment: .topLeading) {
+                logo
             }
-        }
-        .ignoresSafeArea()
-        .onChange(of: recordingProcessor.isProcessing) { _, isProcessing in
-            print("ProcessingView: isProcessing changed to \(isProcessing), error: \(recordingProcessor.processingError?.localizedDescription ?? "none")")
-            if !isProcessing && recordingProcessor.processingError == nil {
-                // Processing completed successfully
-                print("ProcessingView: Calling onDismiss")
-                onDismiss()
+            .overlay {
+                VStack {
+                    processingBox
+                }
             }
-        }
+            .ignoresSafeArea()
     }
 }
 
 #Preview {
-    let processor = RecordingProcessor(modelContext: ModelContainer.previewContainer.mainContext)
-    ProcessingView(
-        recordingProcessor: processor,
-        onDismiss: {}
-    )
-    .funnelPreviewEnvironment()
+    ProcessingView()
+        .funnelPreviewEnvironment()
+        .environmentObject(AppState(modelContext: ModelContainer.previewContainer.mainContext))
 }
