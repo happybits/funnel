@@ -28,10 +28,11 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private func setupAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playAndRecord, mode: .default)
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
             try audioSession.setActive(true)
+            print("AudioRecorderManager: Audio session setup completed")
         } catch {
-            print("Failed to set up audio session: \(error)")
+            print("AudioRecorderManager: Failed to set up audio session: \(error)")
         }
     }
 
@@ -44,6 +45,8 @@ class AudioRecorderManager: NSObject, ObservableObject {
     }
 
     func startRecording(completion: @escaping (Result<URL, Error>) -> Void) {
+        print("AudioRecorderManager: startRecording called")
+        
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let audioFilename = documentsPath.appendingPathComponent("\(Date().timeIntervalSince1970).m4a")
 
@@ -58,25 +61,41 @@ class AudioRecorderManager: NSObject, ObservableObject {
         ]
 
         do {
+            // Ensure audio session is active
+            try AVAudioSession.sharedInstance().setActive(true)
+            
             audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
             audioRecorder?.delegate = self
             audioRecorder?.isMeteringEnabled = true
-            audioRecorder?.record()
-
-            isRecording = true
-            recordingTime = 0
-
-            // Timer for recording duration
-            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-                self.recordingTime += 0.1
-            }
-
-            // Timer for audio level monitoring
-            levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-                self.updateAudioLevel()
+            audioRecorder?.prepareToRecord()
+            
+            let recordingStarted = audioRecorder?.record() ?? false
+            print("AudioRecorderManager: Recording started: \(recordingStarted)")
+            print("AudioRecorderManager: Recording to file: \(audioFilename.path)")
+            
+            if recordingStarted {
+                isRecording = true
+                recordingTime = 0
+                
+                // Timer for recording duration
+                timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                    self.recordingTime += 0.1
+                }
+                
+                // Timer for audio level monitoring
+                levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+                    self.updateAudioLevel()
+                }
+                
+                completion(.success(audioFilename))
+            } else {
+                print("AudioRecorderManager: Failed to start recording")
+                let error = NSError(domain: "AudioRecorder", code: -3, userInfo: [NSLocalizedDescriptionKey: "Failed to start recording"])
+                completion(.failure(error))
+                recordingCompletion = nil
             }
         } catch {
-            print("Could not start recording: \(error)")
+            print("AudioRecorderManager: Could not start recording: \(error)")
             recordingCompletion?(.failure(error))
             recordingCompletion = nil
         }
@@ -119,8 +138,9 @@ class AudioRecorderManager: NSObject, ObservableObject {
 extension AudioRecorderManager: AVAudioRecorderDelegate {
     func audioRecorderDidFinishRecording(_: AVAudioRecorder, successfully flag: Bool) {
         if flag {
-            print("Recording finished successfully")
+            print("AudioRecorderManager: Recording finished successfully")
             if let url = currentRecordingURL {
+                print("AudioRecorderManager: Saved recording to: \(url.path)")
                 recordingCompletion?(.success(url))
             }
         } else {

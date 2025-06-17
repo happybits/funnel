@@ -42,8 +42,14 @@ struct ContentView: View {
                     withAnimation {
                         showProcessing = false
                         // For debug purposes, show processed recording view if we have the latest recording
+                        print("ContentView: Processing complete, recordings count: \(recordings.count)")
                         if let latestRecording = recordings.first {
+                            print("ContentView: Latest recording status: \(latestRecording.processingStatus)")
+                            print("ContentView: Has transcript: \(latestRecording.transcript != nil)")
+                            print("ContentView: Has bullet summary: \(latestRecording.bulletSummary != nil)")
                             showProcessedRecordingAfterProcessing(recording: latestRecording)
+                        } else {
+                            print("ContentView: No recordings found after processing")
                         }
                     }
                 }

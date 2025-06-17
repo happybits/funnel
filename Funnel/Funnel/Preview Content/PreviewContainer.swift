@@ -116,7 +116,7 @@ extension View {
     func funnelPreviewEnvironment() -> some View {
         self
             .modelContainer(ModelContainer.previewContainer)
-            .environmentObject(MockCurrentRecordingProvider())
+            .environmentObject(MockCurrentRecordingProvider() as CurrentRecordingProvider)
     }
 }
 

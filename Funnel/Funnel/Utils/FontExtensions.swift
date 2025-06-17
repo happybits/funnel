@@ -67,6 +67,7 @@ extension View {
         overlay(
             Text(text)
                 .font(.custom(font.rawValue, size: size))
+                .multilineTextAlignment(.center)
                 .foregroundColor(.white)
                 .blendMode(.overlay)
                 .shadow(color: .white, radius: 12, x: 0, y: 4)

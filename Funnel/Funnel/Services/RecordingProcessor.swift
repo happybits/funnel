@@ -51,6 +51,8 @@ class RecordingProcessor: ObservableObject {
             recording.processingStatus = .uploading
             processingStatus = "Uploading audio..."
             try? modelContext.save()
+            
+            print("RecordingProcessor: Starting upload to API")
 
             // Process audio through combined endpoint
             recording.processingStatus = .transcribing
@@ -58,6 +60,7 @@ class RecordingProcessor: ObservableObject {
             try? modelContext.save()
 
             let processedData = try await apiService.processAudio(fileURL: recording.audioFileURL)
+            print("RecordingProcessor: API processing complete")
 
             // Update recording with all data from combined response
             recording.transcript = processedData.transcript
@@ -81,6 +84,7 @@ class RecordingProcessor: ObservableObject {
 
         } catch {
             // Handle error
+            print("RecordingProcessor: Processing failed with error: \(error)")
             recording.processingStatus = .failed
             recording.errorMessage = error.localizedDescription
             processingError = error
@@ -89,6 +93,7 @@ class RecordingProcessor: ObservableObject {
             try? modelContext.save()
         }
 
+        print("RecordingProcessor: Setting isProcessing to false")
         isProcessing = false
     }
 

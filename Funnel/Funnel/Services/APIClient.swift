@@ -26,8 +26,12 @@ class APIClient {
 
         // Use environment-based URL
         #if DEBUG
-            // For local development
-            baseURL = "http://localhost:8000"
+            // For local development - use 127.0.0.1 for simulator
+            #if targetEnvironment(simulator)
+                baseURL = "http://127.0.0.1:8000"
+            #else
+                baseURL = "http://localhost:8000"
+            #endif
         #else
             // TODO: Update with production URL when deployed
             baseURL = "https://funnel-api.deno.dev"
@@ -98,6 +102,8 @@ class APIClient {
         guard let url = URL(string: "\(baseURL)\(endpoint)") else {
             throw APIError.invalidURL
         }
+        
+        print("APIClient: Uploading to \(url.absoluteString)")
 
         let boundary = UUID().uuidString
         var request = URLRequest(url: url)
@@ -135,19 +141,27 @@ class APIClient {
         request.httpBody = body
 
         do {
+            print("APIClient: Starting upload with request to \(request.url?.absoluteString ?? "unknown")")
             let (data, response) = try await session.data(for: request)
 
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw APIError.networkError("Invalid response")
             }
+            
+            print("APIClient: Response status code: \(httpResponse.statusCode)")
 
             if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
                 do {
-                    return try decoder.decode(T.self, from: data)
+                    let result = try decoder.decode(T.self, from: data)
+                    print("APIClient: Successfully decoded response")
+                    return result
                 } catch {
+                    print("APIClient: Decoding error: \(error)")
+                    print("APIClient: Response data: \(String(data: data, encoding: .utf8) ?? "unable to decode")")
                     throw APIError.decodingError(error.localizedDescription)
                 }
             } else {
+                print("APIClient: Server error response: \(String(data: data, encoding: .utf8) ?? "unable to decode")")
                 if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
                     throw APIError.serverError(errorResponse.error, details: errorResponse.details)
                 } else {
@@ -155,8 +169,10 @@ class APIClient {
                 }
             }
         } catch let error as APIError {
+            print("APIClient: API error: \(error)")
             throw error
         } catch {
+            print("APIClient: Network error: \(error)")
             throw APIError.networkError(error.localizedDescription)
         }
     }

@@ -65,17 +65,28 @@ After recording, view your content in different formats via fullscreen swipeable
 
 ## API Design
 
-### MVP Endpoints
+### Endpoint
 
-**POST /api/transcribe**
+**POST /api/new-recording**
 - Input: Audio file (multipart/form-data)
-- Process: Send to OpenAI Whisper API
-- Output: `{ transcript: string, duration: number }`
-
-**POST /api/summarize**
-- Input: `{ transcript: string }`
-- Process: Send to Anthropic Claude API with prompt to create bullet summary
-- Output: `{ bulletSummary: string[] }`
+- Process: 
+  1. Send audio to OpenAI Whisper API for transcription
+  2. Send transcript to Anthropic Claude API (in parallel):
+     - Generate bullet point summary
+     - Generate diagram/visual representation
+- Output: 
+```json
+{
+  "transcript": "string",
+  "duration": number,
+  "bulletSummary": ["string"],
+  "diagram": {
+    "title": "string",
+    "description": "string",
+    "content": "string"
+  }
+}
+```
 
 ## Future Enhancements
 - More card format options (flowchart, outline, etc.)
@@ -114,6 +125,39 @@ When setting up code signing in `project.yml`, use the Apple Developer Team ID (
 DEVELOPMENT_TEAM: 6L379HCV5Q  # Use Team ID, not "Joya Communications, Inc."
 ```
 The Team ID can be found in Xcode's signing settings or the Apple Developer portal.
+
+### Running the Application
+
+1. **Start the server**:
+   ```bash
+   cd server
+   deno task dev
+   ```
+
+2. **Run the iOS app**:
+   ```bash
+   make run
+   ```
+
+### Testing
+
+The server includes comprehensive tests for the API endpoint:
+
+```bash
+cd server
+deno task test
+```
+
+The tests validate:
+- Successful audio transcription and processing
+- Error handling for missing/invalid files
+- Response format and data types
+- Real audio file processing using `tests/fixtures/sample-audio-recording.m4a`
+
+For manual testing with curl:
+```bash
+./test-curl.sh tests/fixtures/sample-audio-recording.m4a
+```
 
 ## Figma to Code Workflow
 

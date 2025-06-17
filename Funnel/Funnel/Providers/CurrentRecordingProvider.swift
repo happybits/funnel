@@ -22,15 +22,18 @@ class CurrentRecordingProvider: ObservableObject {
     private var recordingCompletion: ((Result<URL, Error>) -> Void)?
     
     func startRecording(completion: @escaping (Result<URL, Error>) -> Void) {
+        print("CurrentRecordingProvider: startRecording called")
         recordingCompletion = completion
         
         audioRecorder.requestMicrophonePermission { [weak self] granted in
+            print("CurrentRecordingProvider: Microphone permission granted: \(granted)")
             guard let self = self, granted else {
                 completion(.failure(NSError(domain: "AudioRecorder", code: -2, userInfo: [NSLocalizedDescriptionKey: "Microphone permission denied"])))
                 return
             }
             
             self.audioRecorder.startRecording { result in
+                print("CurrentRecordingProvider: Recording result: \(result)")
                 switch result {
                 case .success:
                     // Recording started successfully
@@ -39,8 +42,10 @@ class CurrentRecordingProvider: ObservableObject {
                         self.recordingTime = 0
                         self.waveformValues = []
                         self.startTimers()
+                        print("CurrentRecordingProvider: Recording state updated, isRecording: \(self.isRecording)")
                     }
                 case let .failure(error):
+                    print("CurrentRecordingProvider: Recording failed: \(error)")
                     completion(.failure(error))
                 }
             }
@@ -54,10 +59,8 @@ class CurrentRecordingProvider: ObservableObject {
         isRecording = false
         audioLevel = 0
         
-        // The completion will be called from the audio recorder delegate
-        if let completion = recordingCompletion {
-            completion(.success(audioRecorder.currentRecordingURL ?? URL(fileURLWithPath: "")))
-        }
+        // Note: The actual completion is handled in the view after stop is called
+        // This ensures the audio file is properly finalized
     }
     
     private func startTimers() {

@@ -13,17 +13,17 @@ struct NewRecordingView: View {
     @StateObject private var recordingProcessor: RecordingProcessor
     let modelContext: ModelContext
     let onRecordingComplete: () -> Void
-    
+
     init(modelContext: ModelContext, onRecordingComplete: @escaping () -> Void) {
         self.modelContext = modelContext
         self.onRecordingComplete = onRecordingComplete
         _recordingProcessor = StateObject(wrappedValue: RecordingProcessor(modelContext: modelContext))
     }
-    
+
     var body: some View {
         ZStack {
             GradientBackground()
-            
+
             VStack(spacing: 0) {
                 // Logo aligned to left
                 HStack {
@@ -32,24 +32,26 @@ struct NewRecordingView: View {
                     Spacer()
                 }
                 .padding(.top, 89)
-                
+
                 Spacer()
-                
+
                 VStack(spacing: 20) {
                     MicrophoneButton()
-                    
+
                     Text("Record Your First Message")
                         .funnelTitle()
                         .funnelTextOverlay("Record Your First Message", font: .nunitoExtraBold, size: 18)
-                    
-                    Text("Speak your thoughts — we'll turn them into something magical. Tap below to record.")
+
+                    let speakText = "Speak your thoughts — we'll turn them into something magical."
+
+                    Text(speakText)
                         .funnelBody()
                         .multilineTextAlignment(.center)
-                        .funnelTextOverlay("Speak your thoughts — we'll turn them into something magical. Tap below to record.", font: .nunitoRegular, size: 15)
+                        .funnelTextOverlay(speakText, font: .nunitoRegular, size: 15)
                         .padding(.horizontal, 40)
                 }
                 .padding(.bottom, currentRecording.isRecording ? 156 : 179)
-                
+
                 RecordingControls(
                     recordingProcessor: recordingProcessor,
                     onRecordingComplete: onRecordingComplete
@@ -67,7 +69,7 @@ struct RecordingControls: View {
     @State private var isPressed = false
     let recordingProcessor: RecordingProcessor
     let onRecordingComplete: () -> Void
-    
+
     var body: some View {
         VStack(spacing: 0) {
             if currentRecording.isRecording {
@@ -76,19 +78,19 @@ struct RecordingControls: View {
                     Text("Voice Recording 1")
                         .funnelTitle()
                         .funnelTextOverlay("Voice Recording 1", font: .nunitoExtraBold, size: 18)
-                    
+
                     Text(formatTime(currentRecording.recordingTime))
                         .funnelBody()
                         .funnelTextOverlay(formatTime(currentRecording.recordingTime), font: .nunitoRegular, size: 15)
-                    
+
                     WaveformView(values: currentRecording.waveformValues)
                         .frame(height: 37)
                         .padding(.horizontal, 25)
                 }
                 .padding(.top, 30)
-                
+
                 Spacer()
-                
+
                 StopButton(isPressed: $isPressed) {
                     handleStopRecording()
                 }
@@ -109,17 +111,27 @@ struct RecordingControls: View {
         )
         .animation(.easeInOut(duration: 0.3), value: currentRecording.isRecording)
     }
-    
+
     private func handleStartRecording() {
+        print("RecordingControls: handleStartRecording called")
         currentRecording.startRecording { result in
+            print("RecordingControls: Recording completion result: \(result)")
             // Completion will be handled in stop recording
         }
     }
-    
+
     private func handleStopRecording() {
         let recordingDuration = currentRecording.recordingTime
+
+        // Ensure minimum recording duration to avoid API errors
+        guard recordingDuration >= 0.5 else {
+            print("RecordingControls: Recording too short (\(recordingDuration)s), minimum is 0.5s")
+            // Could show an alert here, but for now just ignore
+            return
+        }
+
         currentRecording.stopRecording()
-        
+
         // Get the recording URL from the audio recorder
         if let audioURL = currentRecording.audioRecorder.currentRecordingURL {
             Task {
@@ -135,7 +147,7 @@ struct RecordingControls: View {
             onRecordingComplete()
         }
     }
-    
+
     private func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
@@ -159,7 +171,7 @@ struct MicrophoneButton: View {
 struct RecordButton: View {
     @Binding var isPressed: Bool
     let onTap: () -> Void
-    
+
     var body: some View {
         Button(action: onTap) {
             Image("RecordButton")
@@ -177,7 +189,7 @@ struct RecordButton: View {
 struct StopButton: View {
     @Binding var isPressed: Bool
     let onTap: () -> Void
-    
+
     var body: some View {
         Button(action: onTap) {
             Image("StopRecordBtn")
@@ -194,7 +206,7 @@ struct StopButton: View {
 
 struct WaveformView: View {
     let values: [CGFloat]
-    
+
     var body: some View {
         HStack(spacing: 2) {
             ForEach(Array(values.enumerated()), id: \.offset) { _, value in
@@ -212,7 +224,7 @@ struct WaveformView: View {
                     .frame(width: 4, height: 37 * value)
                     .animation(.easeInOut(duration: 0.1), value: value)
             }
-            
+
             if values.count < 50 {
                 ForEach(0 ..< (50 - values.count), id: \.self) { _ in
                     RoundedRectangle(cornerRadius: 2)
@@ -231,3 +243,4 @@ struct WaveformView: View {
     )
     .funnelPreviewEnvironment()
 }
+
