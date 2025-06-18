@@ -47,6 +47,8 @@ struct FunnelApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(appState)
+                .preferredColorScheme(.dark)
+                .colorScheme(.light)
         }
         .modelContainer(sharedModelContainer)
     }
