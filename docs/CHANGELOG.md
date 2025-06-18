@@ -8,6 +8,12 @@ All notable changes to the Funnel project will be documented in this file.
 - **Updated app display name**: Changed from "Funnel" to "Funnel - Think Better" for Xcode Cloud compatibility
   - Added INFOPLIST_KEY_CFBundleDisplayName to project.yml
   - Updated microphone usage description to use new app name
+- **Migrated to Xcode folder-based project structure**: Removed XcodeGen dependency
+  - Converted project to use Xcode's new automatic file referencing feature
+  - Deleted project.yml configuration file
+  - Updated Makefile to remove xcodegen commands
+  - Updated all documentation to reflect the new workflow
+  - Files are now automatically included when added to project folders
 
 ### Added
 - **Card Peek Effect**: Implemented adjacent card visibility in SwipeableCardsView

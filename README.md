@@ -82,8 +82,8 @@ Funnel is a SwiftUI app that captures spontaneous audio recordings and transform
 
 2. **Set up the iOS app**
    ```bash
-   make install  # Install xcodegen and swiftformat
-   make build    # Generate project and build
+   make install  # Install swiftformat
+   make build    # Build the app
    ```
 
 3. **Configure the backend**
@@ -109,7 +109,7 @@ Funnel is a SwiftUI app that captures spontaneous audio recordings and transform
 
 ```bash
 make help       # Show all available commands
-make build      # Generate and build the app
+make build      # Build the app
 make run        # Run on simulator
 make format     # Format Swift code
 make test       # Run tests
@@ -161,7 +161,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ### Development Best Practices
 - Follow the [SwiftUI Layout Best Practices](docs/swiftui-layout-best-practices.md)
-- Use XcodeGen for project management
+- The project uses Xcode's new folder-based structure (files are automatically referenced)
 - Run `make format` before committing
 - Write tests for new features
 

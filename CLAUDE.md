@@ -104,7 +104,7 @@ After recording, view your content in different formats via fullscreen swipeable
 The project includes a Makefile for simplified building and development:
 
 ```bash
-make build      # Generate project and build the app
+make build      # Build the app
 make clean      # Clean build artifacts and DerivedData
 make run        # Build and run on simulator
 make format     # Format all Swift code
@@ -114,16 +114,18 @@ make help       # Show all available commands
 
 Other useful commands:
 - `make` or `make all` - Same as `make build`
-- `make install` - Installs required tools (xcodegen, swiftformat)
-- `make deep-clean` - Removes everything including generated project files
+- `make install` - Installs required tools (swiftformat)
+- `make deep-clean` - Removes everything including DerivedData
 - `make watch` - Watches for changes and rebuilds automatically
 - `make release` - Creates a release build
 
-### Code Signing with XcodeGen
-When setting up code signing in `project.yml`, use the Apple Developer Team ID (10-character alphanumeric code) rather than the team name:
-```yaml
-DEVELOPMENT_TEAM: 6L379HCV5Q  # Use Team ID, not "Joya Communications, Inc."
-```
+### Code Signing
+With the new Xcode folder-based project structure, code signing is configured directly in Xcode:
+1. Open the project in Xcode
+2. Select the Funnel target
+3. Go to Signing & Capabilities
+4. Set your Team ID: `6L379HCV5Q`
+
 The Team ID can be found in Xcode's signing settings or the Apple Developer portal.
 
 ### Running the Application
