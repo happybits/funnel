@@ -11,6 +11,7 @@
 		045A1000397F9C94253533FE /* BottomDrawerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AAB828A9FBD5945A13181C /* BottomDrawerModifier.swift */; };
 		08A70A259BB9DB98B9DB8EAD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7AF1FAB5B1AD84E3F67170 /* APIClient.swift */; };
 		0ECDD8E1316E8E88E4CA4000 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777CAC53A23DFBF48296AF6 /* PreviewContainer.swift */; };
+		0FB47137286FE555F54A240F /* SwipeableCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51088A016D67D12F8DCAC75A /* SwipeableCardsView.swift */; };
 		104C5642942B28C612C03B47 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CE9BA59D57F670FDD59369 /* AudioRecorderManager.swift */; };
 		178880166BE28DE40B64F02D /* Nunito-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53132E9E8D1C20615FC05391 /* Nunito-Italic.ttf */; };
 		1E2305CB2F143F2C11B53F7D /* Nunito-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90255D182D1C2180B1544F5A /* Nunito-ExtraBoldItalic.ttf */; };
@@ -61,6 +62,7 @@
 		43F025480FAC7913DBA3C137 /* Nunito-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-MediumItalic.ttf"; sourceTree = "<group>"; };
 		44AAB828A9FBD5945A13181C /* BottomDrawerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomDrawerModifier.swift; sourceTree = "<group>"; };
 		4B4E7F7387AF9B8949C514E7 /* Nunito-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Medium.ttf"; sourceTree = "<group>"; };
+		51088A016D67D12F8DCAC75A /* SwipeableCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeableCardsView.swift; sourceTree = "<group>"; };
 		53132E9E8D1C20615FC05391 /* Nunito-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Italic.ttf"; sourceTree = "<group>"; };
 		5A8354E0183372FB7EEA0032 /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
 		5B7AF1FAB5B1AD84E3F67170 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
@@ -156,6 +158,7 @@
 				BCA26CD148EA5F0D04460E9B /* NewRecordingView.swift */,
 				E9C130CA0032922A6E2E6544 /* ProcessedRecordingView.swift */,
 				D5424E4CE20B8D581455C484 /* ProcessingView.swift */,
+				51088A016D67D12F8DCAC75A /* SwipeableCardsView.swift */,
 				356A4BA7BE1D890E8A6B58C1 /* Components */,
 			);
 			path = Views;
@@ -356,6 +359,7 @@
 				5C82FA9B47CDF7042D73A1DA /* ProcessingView.swift in Sources */,
 				F9272A71A0F1D0B8F437D9DA /* Recording.swift in Sources */,
 				1E83F7FE0CD0D139C603C504 /* RecordingProcessor.swift in Sources */,
+				0FB47137286FE555F54A240F /* SwipeableCardsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

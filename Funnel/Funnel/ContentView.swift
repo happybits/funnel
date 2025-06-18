@@ -33,6 +33,10 @@ struct ContentView: View {
                 case let .viewing(recording):
                     ProcessedRecordingView(recording: recording)
                         .transition(.move(edge: .bottom))
+                        
+                case let .cards(recording):
+                    SwipeableCardsView(recording: recording)
+                        .transition(.move(edge: .trailing))
                 }
             }
         }

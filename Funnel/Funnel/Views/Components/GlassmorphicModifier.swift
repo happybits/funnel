@@ -68,4 +68,8 @@ extension View {
     func glassmorphic(cornerRadius: CGFloat = 15, gradientOpacity: (start: Double, end: Double) = (0.0, 0.3)) -> some View {
         modifier(GlassmorphicModifier(cornerRadius: cornerRadius, gradientOpacity: gradientOpacity))
     }
+    
+    func glassmorphic(cornerRadius: CGFloat = 15, blurRadius: CGFloat = 10) -> some View {
+        modifier(GlassmorphicModifier(cornerRadius: cornerRadius, gradientOpacity: (0.1, 0.4)))
+    }
 }

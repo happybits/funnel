@@ -4,12 +4,28 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **Swipeable Cards View**: New screen for viewing recording results
+  - Horizontal swipeable cards with paging (TabView)
+  - Three card types: Bullet Summary, Diagram, and Transcript
+  - Dynamic gradient background that transitions between cards
+  - Back button navigation to return to recording screen
+  - "Add Voice" button for future enhancements
+  - Custom glassmorphic card designs matching Figma specifications
+  - Page indicators showing current card position
+
 ### Enhanced
 - **Gradient Background Animation**: Added breathing effect to gradient background
   - Increased color shift intensity from 5% to 15% for better visibility
   - Added subtle saturation wave effect using cosine function
   - Implemented gradient angle rotation for fluid movement
   - Adjusted animation durations: 6s for color breathing, 8s for rotation
+- **Font Extensions**: Added new text style modifiers
+  - Added funnelBodyBold, funnelSubheadlineBold, funnelCallout, and funnelCalloutBold styles
+  - Support for all text variations used in the new cards UI
+- **Navigation State**: Added new `.cards(Recording)` state
+  - Processing now navigates directly to cards view instead of debug view
+  - Smooth transition animations between screens
 
 ### Changed
 - **Updated APIClient to use production server**: Default URL now points to https://funnel-api.deno.dev

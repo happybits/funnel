@@ -79,9 +79,29 @@ extension Text {
         funnelFont(.nunitoRegular, size: .body)
             .funnelTextStyle()
     }
+    
+    func funnelBodyBold() -> some View {
+        funnelFont(.nunitoBold, size: .title)
+            .funnelTextStyle()
+    }
 
     func funnelSmall() -> some View {
         funnelFont(.nunitoRegular, size: .small)
+            .funnelTextStyle()
+    }
+    
+    func funnelSubheadlineBold() -> some View {
+        funnelFont(.nunitoExtraBold, size: 14)
+            .funnelTextStyle()
+    }
+    
+    func funnelCallout() -> some View {
+        funnelFont(.nunitoSemiBold, size: 16)
+            .funnelTextStyle()
+    }
+    
+    func funnelCalloutBold() -> some View {
+        funnelFont(.nunitoExtraBold, size: 16)
             .funnelTextStyle()
     }
 }
