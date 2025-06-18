@@ -93,6 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				28F2911B4878A502D8CBBF3C /* Info.plist */,
+				17113091109A1CAE56126067 /* Components */,
 				D18B633BDA53E8618606319F /* Funnel */,
 				E7BB27446E14412980A7526E /* Resources */,
 			);
@@ -120,6 +121,13 @@
 				6209C33DBA3FCB7C2FA07B1A /* Nunito-SemiBoldItalic.ttf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		17113091109A1CAE56126067 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		30EF63C64EAF6A14571B0920 /* Products */ = {

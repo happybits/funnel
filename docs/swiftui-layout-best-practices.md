@@ -2,6 +2,12 @@
 
 This document captures learnings from real-world SwiftUI development to help create cleaner, more maintainable layouts.
 
+## Key Principles
+
+1. **Break complex views into private computed properties** - Keep your `body` focused on layout structure
+2. **Prefer overlay/background modifiers over ZStack** - More precise positioning without Spacer complexity  
+3. **Avoid GeometryReader unless necessary** - Often leads to layout issues; use frame modifiers instead
+
 ## 1. Prefer Overlay Modifiers Over ZStack for Positioned Elements
 
 ### ❌ Avoid: Using ZStack with Spacers
@@ -57,27 +63,43 @@ var body: some View {
 
 ### ✅ Prefer: Decomposed Views
 ```swift
-private var headerSection: some View {
-    HStack {
-        Logo()
-        Spacer()
+struct ProcessingView: View {
+    private var logo: some View {
+        HStack {
+            FunnelLogo()
+                .padding(.leading, 30)
+                .padding(.top, 89)
+            Spacer()
+        }
     }
-}
-
-private var contentSection: some View {
-    VStack(spacing: 8) {
-        // Focused content
+    
+    private var processingBox: some View {
+        VStack(spacing: 8) {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+            
+            Text("Processing - Hang tight!")
+                .funnelTitle()
+            // Additional UI elements...
+        }
+        .frame(maxWidth: 350)
+        .glassmorphic()
     }
-}
-
-var body: some View {
-    BackgroundView()
-        .overlay(alignment: .top) { headerSection }
-        .overlay { contentSection }
+    
+    var body: some View {
+        GradientBackground()
+            .overlay(alignment: .topLeading) {
+                logo
+            }
+            .overlay {
+                processingBox
+            }
+            .ignoresSafeArea()
+    }
 }
 ```
 
-**Why:** Smaller, named components are easier to understand, modify, and debug.
+**Why:** Breaking complex views into private computed properties makes the main `body` easy to understand at a glance - it clearly shows the overall layout structure. The individual components are separated, making them easier to modify, test, and reason about. This pattern is especially valuable when views have multiple distinct sections or complex nested structures.
 
 ## 3. Use Appropriate Spacing Values
 
@@ -177,7 +199,9 @@ ContentView()
 
 When reviewing SwiftUI layouts, ask yourself:
 
-- [ ] Can I replace any ZStack + Spacer combinations with overlay modifiers?
+- [ ] Can I replace any ZStack + Spacer combinations with overlay/background modifiers?
+- [ ] Should complex views be broken into private computed properties?
+- [ ] Can I avoid GeometryReader by using frame modifiers or other techniques?
 - [ ] Are there logical groupings I can extract into computed properties?
 - [ ] Is my spacing intentional and consistent?
 - [ ] Have I avoided string duplication?
@@ -185,4 +209,4 @@ When reviewing SwiftUI layouts, ask yourself:
 - [ ] Is all displayed information essential?
 - [ ] Do I have appropriate frame constraints?
 
-Remember: The best SwiftUI code reads like a description of what you want, not instructions for how to build it.
+Remember: The best SwiftUI code reads like a description of what you want, not instructions for how to build it. A clean `body` property that clearly shows the layout structure is a sign of well-organized SwiftUI code.
