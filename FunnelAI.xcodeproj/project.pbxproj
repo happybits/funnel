@@ -3,129 +3,28 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 70;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		0437B81C3828F850C20D0764 /* Nunito-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43F025480FAC7913DBA3C137 /* Nunito-MediumItalic.ttf */; };
-		08A70A259BB9DB98B9DB8EAD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7AF1FAB5B1AD84E3F67170 /* APIClient.swift */; };
-		0ECDD8E1316E8E88E4CA4000 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777CAC53A23DFBF48296AF6 /* PreviewContainer.swift */; };
-		0FB47137286FE555F54A240F /* SwipeableCardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51088A016D67D12F8DCAC75A /* SwipeableCardsView.swift */; };
-		104C5642942B28C612C03B47 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CE9BA59D57F670FDD59369 /* AudioRecorderManager.swift */; };
-		178880166BE28DE40B64F02D /* Nunito-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 53132E9E8D1C20615FC05391 /* Nunito-Italic.ttf */; };
-		1E2305CB2F143F2C11B53F7D /* Nunito-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90255D182D1C2180B1544F5A /* Nunito-ExtraBoldItalic.ttf */; };
-		1E83F7FE0CD0D139C603C504 /* RecordingProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842BF659CB95D4AF4CD40882 /* RecordingProcessor.swift */; };
-		2984C6E4974CDEC7F21C0956 /* Nunito-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 398EF193DD579FB675446D66 /* Nunito-SemiBold.ttf */; };
-		29B98A657E9CF363026306CA /* GradientBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45B9D96819890EFCF4CC5BC /* GradientBackground.swift */; };
-		2B8FC3DF6252B3A1DEA930E6 /* NewRecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCA26CD148EA5F0D04460E9B /* NewRecordingView.swift */; };
-		31227AD0D9289FA6AA899E5D /* GlassmorphicModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CA3D079CCF7A290A56E257 /* GlassmorphicModifier.swift */; };
-		339D6A8C2E3B1560A74C99CA /* ProcessedRecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C130CA0032922A6E2E6544 /* ProcessedRecordingView.swift */; };
-		33CC15DCFE85EC397EB4D216 /* CurrentRecordingProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942C69A9CCBFD948E0FD46AD /* CurrentRecordingProvider.swift */; };
-		3B088700D74F9F0DFE4A58D1 /* Nunito-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 38CAFFF8CF396D51A0A6F7CC /* Nunito-ExtraBold.ttf */; };
-		403FEF6A7EE0C6D2ADE5817C /* Nunito-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D53DCCDDE8428E544B9B71A6 /* Nunito-ExtraLightItalic.ttf */; };
-		404F0B61E0355E92E0EFCD09 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3C63506A860C1CF89D1B444 /* AppState.swift */; };
-		4A27381C242E8783F42417DA /* MicrophoneHero.svg in Resources */ = {isa = PBXBuildFile; fileRef = 81C6A681E708E861469AE5D1 /* MicrophoneHero.svg */; };
-		5A020F1350502C7C88CCDCEF /* Nunito-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B0E31E1221A78230A10F4A09 /* Nunito-Bold.ttf */; };
-		5B3A95492C6344EB560E05C0 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D4AFD58BDCF44BEC1546B6 /* APIModels.swift */; };
-		5C82FA9B47CDF7042D73A1DA /* ProcessingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5424E4CE20B8D581455C484 /* ProcessingView.swift */; };
-		73F2936B10A509375A69A27F /* Nunito-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFA9EA5414D6B2E1CEE8B296 /* Nunito-Black.ttf */; };
-		79019349B468D47695C9A09C /* StopButton.svg in Resources */ = {isa = PBXBuildFile; fileRef = D384658E4B7F6EA08387AA75 /* StopButton.svg */; };
-		791FC6AE44FBE2A45B060AF7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5B72DEF79584DE473F21A46 /* Assets.xcassets */; };
-		838E28A61EA207F48C942504 /* Nunito-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6209C33DBA3FCB7C2FA07B1A /* Nunito-SemiBoldItalic.ttf */; };
-		91434B4845ACDE2AA2F86D88 /* FunnelAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0EF7026AFE8960B50ED98C1 /* FunnelAPIService.swift */; };
-		9F08DEBDF478ADBAE040CB63 /* Nunito-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6EBB63FC3AAEC1718C313975 /* Nunito-LightItalic.ttf */; };
-		A0F76F732686B47C68EFD70B /* FigmaTextEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F9BD6033D18B130CFF59C4 /* FigmaTextEffect.swift */; };
-		AB60F4E03997414E6952C507 /* Nunito-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0587BC79A7CC21940BF6B410 /* Nunito-BoldItalic.ttf */; };
-		BD938328990AC158B0B29BB6 /* Nunito-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 906FD696D5B396EE8A7B198D /* Nunito-BlackItalic.ttf */; };
-		C059F771CD8E574B4554ACF4 /* Nunito-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8615478C930CB56A540019D3 /* Nunito-ExtraLight.ttf */; };
-		CF9BF894EF984D320B33555D /* sample-audio-recording.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 293ADD91D6F94B436D567743 /* sample-audio-recording.m4a */; };
-		D2722619F89C83E045B28292 /* FontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8354E0183372FB7EEA0032 /* FontExtensions.swift */; };
-		D43B04EA52E78418917E8327 /* Nunito-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 03A09A3E36525BBAD132DE67 /* Nunito-Regular.ttf */; };
-		D8D09675A871FB45F4D284F9 /* Nunito-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DFA84A494681135066AEAE77 /* Nunito-Light.ttf */; };
-		DA207DC60C1E428493514C90 /* Nunito-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B4E7F7387AF9B8949C514E7 /* Nunito-Medium.ttf */; };
-		F56B8190EC44FE19C0859E00 /* FunnelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037DB23ED099CBFE44D5BE94 /* FunnelApp.swift */; };
-		F9272A71A0F1D0B8F437D9DA /* Recording.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDFD23FBC18A1EFDA80BC789 /* Recording.swift */; };
-		FD3868466CE1ACC0CA11E44A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A4FD49AC8F3C015D15F7D4 /* ContentView.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
-		037DB23ED099CBFE44D5BE94 /* FunnelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunnelApp.swift; sourceTree = "<group>"; };
-		03A09A3E36525BBAD132DE67 /* Nunito-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Regular.ttf"; sourceTree = "<group>"; };
-		0587BC79A7CC21940BF6B410 /* Nunito-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-BoldItalic.ttf"; sourceTree = "<group>"; };
 		0A9BC078DD4AC38F123687A2 /* FunnelAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunnelAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13CE9BA59D57F670FDD59369 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
-		2777CAC53A23DFBF48296AF6 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
-		28F2911B4878A502D8CBBF3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		293ADD91D6F94B436D567743 /* sample-audio-recording.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "sample-audio-recording.m4a"; sourceTree = "<group>"; };
-		38CAFFF8CF396D51A0A6F7CC /* Nunito-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraBold.ttf"; sourceTree = "<group>"; };
-		398EF193DD579FB675446D66 /* Nunito-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-SemiBold.ttf"; sourceTree = "<group>"; };
-		43F025480FAC7913DBA3C137 /* Nunito-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-MediumItalic.ttf"; sourceTree = "<group>"; };
-		4B4E7F7387AF9B8949C514E7 /* Nunito-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Medium.ttf"; sourceTree = "<group>"; };
-		51088A016D67D12F8DCAC75A /* SwipeableCardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeableCardsView.swift; sourceTree = "<group>"; };
-		53132E9E8D1C20615FC05391 /* Nunito-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Italic.ttf"; sourceTree = "<group>"; };
-		5A8354E0183372FB7EEA0032 /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
-		5B7AF1FAB5B1AD84E3F67170 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
-		6209C33DBA3FCB7C2FA07B1A /* Nunito-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
-		6EBB63FC3AAEC1718C313975 /* Nunito-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-LightItalic.ttf"; sourceTree = "<group>"; };
-		81C6A681E708E861469AE5D1 /* MicrophoneHero.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = MicrophoneHero.svg; sourceTree = "<group>"; };
-		842BF659CB95D4AF4CD40882 /* RecordingProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingProcessor.swift; sourceTree = "<group>"; };
-		8615478C930CB56A540019D3 /* Nunito-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraLight.ttf"; sourceTree = "<group>"; };
-		90255D182D1C2180B1544F5A /* Nunito-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
-		906FD696D5B396EE8A7B198D /* Nunito-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-BlackItalic.ttf"; sourceTree = "<group>"; };
-		942C69A9CCBFD948E0FD46AD /* CurrentRecordingProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentRecordingProvider.swift; sourceTree = "<group>"; };
-		A45B9D96819890EFCF4CC5BC /* GradientBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBackground.swift; sourceTree = "<group>"; };
-		B0D4AFD58BDCF44BEC1546B6 /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
-		B0E31E1221A78230A10F4A09 /* Nunito-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Bold.ttf"; sourceTree = "<group>"; };
-		B6A4FD49AC8F3C015D15F7D4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		BCA26CD148EA5F0D04460E9B /* NewRecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRecordingView.swift; sourceTree = "<group>"; };
-		D0EF7026AFE8960B50ED98C1 /* FunnelAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunnelAPIService.swift; sourceTree = "<group>"; };
-		D384658E4B7F6EA08387AA75 /* StopButton.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = StopButton.svg; sourceTree = "<group>"; };
-		D53DCCDDE8428E544B9B71A6 /* Nunito-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
-		D5424E4CE20B8D581455C484 /* ProcessingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingView.swift; sourceTree = "<group>"; };
-		D9CA3D079CCF7A290A56E257 /* GlassmorphicModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassmorphicModifier.swift; sourceTree = "<group>"; };
-		DFA84A494681135066AEAE77 /* Nunito-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Light.ttf"; sourceTree = "<group>"; };
-		E3C63506A860C1CF89D1B444 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
-		E4F9BD6033D18B130CFF59C4 /* FigmaTextEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FigmaTextEffect.swift; sourceTree = "<group>"; };
-		E9C130CA0032922A6E2E6544 /* ProcessedRecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessedRecordingView.swift; sourceTree = "<group>"; };
-		F5B72DEF79584DE473F21A46 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		FDFD23FBC18A1EFDA80BC789 /* Recording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recording.swift; sourceTree = "<group>"; };
-		FFA9EA5414D6B2E1CEE8B296 /* Nunito-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Black.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E705CE53ADF353E0B1DC4CDB /* FunnelAI */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		49E8777E2E03892C00721933 /* Funnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Funnel; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXGroup section */
-		14E9CD72EC480AAF8488D9B7 /* Funnel */ = {
-			isa = PBXGroup;
-			children = (
-				28F2911B4878A502D8CBBF3C /* Info.plist */,
-				D18B633BDA53E8618606319F /* Funnel */,
-				E7BB27446E14412980A7526E /* Resources */,
-			);
-			path = Funnel;
-			sourceTree = "<group>";
-		};
-		157A7DB1DD51FB28453449FA /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-				FFA9EA5414D6B2E1CEE8B296 /* Nunito-Black.ttf */,
-				906FD696D5B396EE8A7B198D /* Nunito-BlackItalic.ttf */,
-				B0E31E1221A78230A10F4A09 /* Nunito-Bold.ttf */,
-				0587BC79A7CC21940BF6B410 /* Nunito-BoldItalic.ttf */,
-				38CAFFF8CF396D51A0A6F7CC /* Nunito-ExtraBold.ttf */,
-				90255D182D1C2180B1544F5A /* Nunito-ExtraBoldItalic.ttf */,
-				8615478C930CB56A540019D3 /* Nunito-ExtraLight.ttf */,
-				D53DCCDDE8428E544B9B71A6 /* Nunito-ExtraLightItalic.ttf */,
-				53132E9E8D1C20615FC05391 /* Nunito-Italic.ttf */,
-				DFA84A494681135066AEAE77 /* Nunito-Light.ttf */,
-				6EBB63FC3AAEC1718C313975 /* Nunito-LightItalic.ttf */,
-				4B4E7F7387AF9B8949C514E7 /* Nunito-Medium.ttf */,
-				43F025480FAC7913DBA3C137 /* Nunito-MediumItalic.ttf */,
-				03A09A3E36525BBAD132DE67 /* Nunito-Regular.ttf */,
-				398EF193DD579FB675446D66 /* Nunito-SemiBold.ttf */,
-				6209C33DBA3FCB7C2FA07B1A /* Nunito-SemiBoldItalic.ttf */,
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
 		30EF63C64EAF6A14571B0920 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -134,114 +33,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		356A4BA7BE1D890E8A6B58C1 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				D9CA3D079CCF7A290A56E257 /* GlassmorphicModifier.swift */,
-				A45B9D96819890EFCF4CC5BC /* GradientBackground.swift */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		635C7366DC84FA0CC6BD7ACA /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				BCA26CD148EA5F0D04460E9B /* NewRecordingView.swift */,
-				E9C130CA0032922A6E2E6544 /* ProcessedRecordingView.swift */,
-				D5424E4CE20B8D581455C484 /* ProcessingView.swift */,
-				51088A016D67D12F8DCAC75A /* SwipeableCardsView.swift */,
-				356A4BA7BE1D890E8A6B58C1 /* Components */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		89BBE059E5C68428174DB11D /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				E4F9BD6033D18B130CFF59C4 /* FigmaTextEffect.swift */,
-				5A8354E0183372FB7EEA0032 /* FontExtensions.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		8CACB5032C81146B2BF6CE85 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				2777CAC53A23DFBF48296AF6 /* PreviewContainer.swift */,
-				293ADD91D6F94B436D567743 /* sample-audio-recording.m4a */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		975EA9C79F5B179A92E87B85 /* Assets */ = {
-			isa = PBXGroup;
-			children = (
-				81C6A681E708E861469AE5D1 /* MicrophoneHero.svg */,
-				D384658E4B7F6EA08387AA75 /* StopButton.svg */,
-			);
-			path = Assets;
-			sourceTree = "<group>";
-		};
-		9F9D1EF782FE631EF9577F22 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				B0D4AFD58BDCF44BEC1546B6 /* APIModels.swift */,
-				FDFD23FBC18A1EFDA80BC789 /* Recording.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		D18B633BDA53E8618606319F /* Funnel */ = {
-			isa = PBXGroup;
-			children = (
-				E3C63506A860C1CF89D1B444 /* AppState.swift */,
-				F5B72DEF79584DE473F21A46 /* Assets.xcassets */,
-				13CE9BA59D57F670FDD59369 /* AudioRecorderManager.swift */,
-				B6A4FD49AC8F3C015D15F7D4 /* ContentView.swift */,
-				037DB23ED099CBFE44D5BE94 /* FunnelApp.swift */,
-				975EA9C79F5B179A92E87B85 /* Assets */,
-				9F9D1EF782FE631EF9577F22 /* Models */,
-				8CACB5032C81146B2BF6CE85 /* Preview Content */,
-				F848176B52A7F1E6BDF735DB /* Providers */,
-				E2473F84B3BC54F9D82FEB53 /* Services */,
-				89BBE059E5C68428174DB11D /* Utils */,
-				635C7366DC84FA0CC6BD7ACA /* Views */,
-			);
-			path = Funnel;
-			sourceTree = "<group>";
-		};
 		D9581316AE7A5E7CB95F6728 = {
 			isa = PBXGroup;
 			children = (
-				14E9CD72EC480AAF8488D9B7 /* Funnel */,
+				49E8777E2E03892C00721933 /* Funnel */,
 				30EF63C64EAF6A14571B0920 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		E2473F84B3BC54F9D82FEB53 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				5B7AF1FAB5B1AD84E3F67170 /* APIClient.swift */,
-				D0EF7026AFE8960B50ED98C1 /* FunnelAPIService.swift */,
-				842BF659CB95D4AF4CD40882 /* RecordingProcessor.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		E7BB27446E14412980A7526E /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				157A7DB1DD51FB28453449FA /* Fonts */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		F848176B52A7F1E6BDF735DB /* Providers */ = {
-			isa = PBXGroup;
-			children = (
-				942C69A9CCBFD948E0FD46AD /* CurrentRecordingProvider.swift */,
-			);
-			path = Providers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -257,6 +54,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				49E8777E2E03892C00721933 /* Funnel */,
 			);
 			name = FunnelAI;
 			packageProductDependencies = (
@@ -302,26 +102,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				791FC6AE44FBE2A45B060AF7 /* Assets.xcassets in Resources */,
-				4A27381C242E8783F42417DA /* MicrophoneHero.svg in Resources */,
-				73F2936B10A509375A69A27F /* Nunito-Black.ttf in Resources */,
-				BD938328990AC158B0B29BB6 /* Nunito-BlackItalic.ttf in Resources */,
-				5A020F1350502C7C88CCDCEF /* Nunito-Bold.ttf in Resources */,
-				AB60F4E03997414E6952C507 /* Nunito-BoldItalic.ttf in Resources */,
-				3B088700D74F9F0DFE4A58D1 /* Nunito-ExtraBold.ttf in Resources */,
-				1E2305CB2F143F2C11B53F7D /* Nunito-ExtraBoldItalic.ttf in Resources */,
-				C059F771CD8E574B4554ACF4 /* Nunito-ExtraLight.ttf in Resources */,
-				403FEF6A7EE0C6D2ADE5817C /* Nunito-ExtraLightItalic.ttf in Resources */,
-				178880166BE28DE40B64F02D /* Nunito-Italic.ttf in Resources */,
-				D8D09675A871FB45F4D284F9 /* Nunito-Light.ttf in Resources */,
-				9F08DEBDF478ADBAE040CB63 /* Nunito-LightItalic.ttf in Resources */,
-				DA207DC60C1E428493514C90 /* Nunito-Medium.ttf in Resources */,
-				0437B81C3828F850C20D0764 /* Nunito-MediumItalic.ttf in Resources */,
-				D43B04EA52E78418917E8327 /* Nunito-Regular.ttf in Resources */,
-				2984C6E4974CDEC7F21C0956 /* Nunito-SemiBold.ttf in Resources */,
-				838E28A61EA207F48C942504 /* Nunito-SemiBoldItalic.ttf in Resources */,
-				79019349B468D47695C9A09C /* StopButton.svg in Resources */,
-				CF9BF894EF984D320B33555D /* sample-audio-recording.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,25 +112,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				08A70A259BB9DB98B9DB8EAD /* APIClient.swift in Sources */,
-				5B3A95492C6344EB560E05C0 /* APIModels.swift in Sources */,
-				404F0B61E0355E92E0EFCD09 /* AppState.swift in Sources */,
-				104C5642942B28C612C03B47 /* AudioRecorderManager.swift in Sources */,
-				FD3868466CE1ACC0CA11E44A /* ContentView.swift in Sources */,
-				33CC15DCFE85EC397EB4D216 /* CurrentRecordingProvider.swift in Sources */,
-				A0F76F732686B47C68EFD70B /* FigmaTextEffect.swift in Sources */,
-				D2722619F89C83E045B28292 /* FontExtensions.swift in Sources */,
-				91434B4845ACDE2AA2F86D88 /* FunnelAPIService.swift in Sources */,
-				F56B8190EC44FE19C0859E00 /* FunnelApp.swift in Sources */,
-				31227AD0D9289FA6AA899E5D /* GlassmorphicModifier.swift in Sources */,
-				29B98A657E9CF363026306CA /* GradientBackground.swift in Sources */,
-				2B8FC3DF6252B3A1DEA930E6 /* NewRecordingView.swift in Sources */,
-				0ECDD8E1316E8E88E4CA4000 /* PreviewContainer.swift in Sources */,
-				339D6A8C2E3B1560A74C99CA /* ProcessedRecordingView.swift in Sources */,
-				5C82FA9B47CDF7042D73A1DA /* ProcessingView.swift in Sources */,
-				F9272A71A0F1D0B8F437D9DA /* Recording.swift in Sources */,
-				1E83F7FE0CD0D139C603C504 /* RecordingProcessor.swift in Sources */,
-				0FB47137286FE555F54A240F /* SwipeableCardsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
