@@ -14,6 +14,17 @@ All notable changes to the Funnel project will be documented in this file.
   - Custom glassmorphic card designs matching Figma specifications
   - Page indicators showing current card position
 
+### Fixed
+- **Card gradient colors**: Updated gradient backgrounds to match exact Figma design specifications
+  - Bullet Summary card: Orange gradient (RGB 0.972,0.698,0.459 to 0.976,0.843,0.459)
+  - Diagram card: Pink to red gradient (RGB 0.827,0.435,0.757 to 0.969,0.290,0.286)
+  - Transcript card: Blue to teal gradient (RGB 0.580,0.651,0.882 to 0.400,0.820,0.796)
+- **Screen transitions**: Improved navigation animations
+  - Processing view now appears as an overlay instead of sliding up from bottom
+  - Recording screen remains visible in background during processing
+  - Gradient background stays in place during screen transitions
+  - Cards view transitions with swipe while gradient shifts colors smoothly
+
 ### Enhanced
 - **Gradient Background Animation**: Added breathing effect to gradient background
   - Increased color shift intensity from 5% to 15% for better visibility

@@ -43,28 +43,18 @@ extension View {
 // Text style modifiers with the layered effect from the design
 extension View {
     func funnelTextStyle(opacity: (CGFloat, CGFloat) = (0.1, 0.4)) -> some View {
-        foregroundStyle(
-            LinearGradient(
-                colors: [
-                    Color.white.opacity(opacity.0),
-                    Color.white.opacity(opacity.1),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-        .shadow(color: .black.opacity(0.12), radius: 20, x: 0, y: 4)
-    }
-
-    func funnelTextOverlay(_ text: String, font: FunnelFont, size: CGFloat) -> some View {
-        overlay(
-            Text(text)
-                .font(.custom(font.rawValue, size: size))
-                .multilineTextAlignment(.center)
-                .foregroundColor(.white)
-                .blendMode(.overlay)
-                .shadow(color: .white, radius: 12, x: 0, y: 4)
-        )
+//        foregroundStyle(
+//            LinearGradient(
+//                colors: [
+//                    Color.white.opacity(opacity.0),
+//                    Color.white.opacity(opacity.1),
+//                ],
+//                startPoint: .top,
+//                endPoint: .bottom
+//            )
+//        )
+//        self.shadow(color: .black.opacity(0.12), radius: 20, x: 0, y: 4)
+        self
     }
 }
 

@@ -20,6 +20,7 @@ struct GlassmorphicModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .preferredColorScheme(.light)
             .background(
                 ZStack {
                     // Pure backdrop blur without material effects

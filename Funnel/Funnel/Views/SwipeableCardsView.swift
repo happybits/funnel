@@ -8,23 +8,24 @@ struct SwipeableCardsView: View {
     @State private var dragOffset: CGSize = .zero
     
     let recording: Recording
+    var hideBackground: Bool = false
     
     // Gradient colors for each card
     private let gradientColors: [[Color]] = [
-        // Bullet Summary - Orange to Yellow
+        // Bullet Summary - Orange gradient
         [
-            Color(red: 0.97, green: 0.70, blue: 0.46),
-            Color(red: 0.98, green: 0.84, blue: 0.46)
+            Color(red: 0.972, green: 0.698, blue: 0.459),
+            Color(red: 0.976, green: 0.843, blue: 0.459)
         ],
-        // Diagram - Blue to Purple
+        // Diagram - Pink to Red gradient
         [
-            Color(red: 0.58, green: 0.65, blue: 0.88),
-            Color(red: 0.83, green: 0.44, blue: 0.75)
+            Color(red: 0.827, green: 0.435, blue: 0.757),
+            Color(red: 0.969, green: 0.290, blue: 0.286)
         ],
-        // Transcript - Cyan to Green
+        // Transcript - Blue to Teal gradient
         [
-            Color(red: 0.40, green: 0.82, blue: 0.80),
-            Color(red: 0.56, green: 0.93, blue: 0.56)
+            Color(red: 0.580, green: 0.651, blue: 0.882),
+            Color(red: 0.400, green: 0.820, blue: 0.796)
         ]
     ]
     
@@ -32,13 +33,15 @@ struct SwipeableCardsView: View {
         GeometryReader { geometry in
             ZStack {
                 // Animated gradient background
-                LinearGradient(
-                    colors: gradientColors[currentPage],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                .animation(.easeInOut(duration: 0.5), value: currentPage)
+                if !hideBackground {
+                    LinearGradient(
+                        colors: gradientColors[currentPage],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 0.5), value: currentPage)
+                }
                 
                 VStack(spacing: 0) {
                     // Header with back button and add voice button
@@ -173,7 +176,22 @@ struct SwipeableCardsView: View {
                 }
             }
         }
-        .preferredColorScheme(.dark)
+        .onChange(of: currentPage) { oldValue, newValue in
+            // Notify parent view of gradient change
+            NotificationCenter.default.post(
+                name: Notification.Name("CardGradientChanged"),
+                object: nil,
+                userInfo: ["colors": gradientColors[newValue]]
+            )
+        }
+        .onAppear {
+            // Set initial gradient
+            NotificationCenter.default.post(
+                name: Notification.Name("CardGradientChanged"),
+                object: nil,
+                userInfo: ["colors": gradientColors[currentPage]]
+            )
+        }
     }
 }
 
@@ -199,6 +217,7 @@ struct BulletSummaryCard: View {
                             .funnelCallout()
                             .foregroundColor(.white.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
+                        
                     }
                 }
             }
@@ -207,14 +226,6 @@ struct BulletSummaryCard: View {
         }
         .padding(25)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            LinearGradient(
-                colors: [Color.white.opacity(0.1), Color.white.opacity(0.4)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .opacity(0.5)
-        )
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(

@@ -24,7 +24,6 @@ struct ProcessingView: View {
             Text(funnelText)
                 .funnelTitle()
                 .multilineTextAlignment(.center)
-                .funnelTextOverlay(funnelText, font: .nunitoExtraBold, size: 18)
 
             if let error = appState.processingError {
                 Text("Error: \(error.localizedDescription)")
@@ -53,16 +52,18 @@ struct ProcessingView: View {
     }
 
     var body: some View {
-        GradientBackground()
-            .overlay(alignment: .topLeading) {
+        VStack {
+            HStack {
                 logo
+                Spacer()
             }
-            .overlay {
-                VStack {
-                    processingBox
-                }
-            }
-            .ignoresSafeArea()
+            
+            Spacer()
+            
+            processingBox
+            
+            Spacer()
+        }
     }
 }
 
