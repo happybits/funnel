@@ -57,4 +57,5 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown"
         SWIFT_EMIT_LOC_STRINGS: YES
         SWIFT_VERSION: 5.0
-        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Funnel needs access to your microphone to record voice notes."
+        INFOPLIST_KEY_CFBundleDisplayName: "Funnel - Think Better"
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Funnel - Think Better needs access to your microphone to record voice notes."

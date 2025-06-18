@@ -8,13 +8,13 @@ struct ContentView: View {
     @State private var showFontDebug = false
     @State private var currentGradientColors: [Color] = [
         Color(red: 0.972, green: 0.698, blue: 0.459),
-        Color(red: 0.976, green: 0.843, blue: 0.459)
+        Color(red: 0.976, green: 0.843, blue: 0.459),
     ]
-    
+
     // Default gradient for recording state
     private let recordingGradientColors = [
         Color(red: 0.972, green: 0.698, blue: 0.459),
-        Color(red: 0.976, green: 0.843, blue: 0.459)
+        Color(red: 0.976, green: 0.843, blue: 0.459),
     ]
 
     var body: some View {
@@ -27,7 +27,7 @@ struct ContentView: View {
             )
             .ignoresSafeArea()
             .animation(.easeInOut(duration: 0.5), value: currentGradientColors)
-            
+
             if showFontDebug {
                 // Temporary debug view - triple tap to toggle
                 VStack {
@@ -52,7 +52,7 @@ struct ContentView: View {
                                 insertion: .move(edge: .trailing),
                                 removal: .move(edge: .leading)
                             ))
-                            
+
                     case let .cards(recording):
                         SwipeableCardsView(recording: recording, hideBackground: true)
                             .transition(.asymmetric(
@@ -65,7 +65,7 @@ struct ContentView: View {
                                 }
                             }
                     }
-                    
+
                     // Processing overlay
                     if case .processing = appState.navigationState {
                         ProcessingOverlay()
@@ -90,7 +90,7 @@ struct ContentView: View {
                 // Start with the first card's gradient (orange)
                 currentGradientColors = [
                     Color(red: 0.972, green: 0.698, blue: 0.459),
-                    Color(red: 0.976, green: 0.843, blue: 0.459)
+                    Color(red: 0.976, green: 0.843, blue: 0.459),
                 ]
             }
         }

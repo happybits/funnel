@@ -8,7 +8,7 @@ struct WhiteSandGradientEffect: ViewModifier {
                 LinearGradient(
                     colors: [
                         Color.white.opacity(0.1),
-                        Color.white.opacity(0.4)
+                        Color.white.opacity(0.4),
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing

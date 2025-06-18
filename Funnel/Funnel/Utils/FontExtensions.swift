@@ -42,7 +42,7 @@ extension View {
 
 // Text style modifiers with the layered effect from the design
 extension View {
-    func funnelTextStyle(opacity: (CGFloat, CGFloat) = (0.1, 0.4)) -> some View {
+    func funnelTextStyle(opacity _: (CGFloat, CGFloat) = (0.1, 0.4)) -> some View {
 //        foregroundStyle(
 //            LinearGradient(
 //                colors: [
@@ -69,7 +69,7 @@ extension Text {
         funnelFont(.nunitoRegular, size: .body)
             .funnelTextStyle()
     }
-    
+
     func funnelBodyBold() -> some View {
         funnelFont(.nunitoBold, size: .title)
             .funnelTextStyle()
@@ -79,17 +79,17 @@ extension Text {
         funnelFont(.nunitoRegular, size: .small)
             .funnelTextStyle()
     }
-    
+
     func funnelSubheadlineBold() -> some View {
         funnelFont(.nunitoExtraBold, size: 14)
             .funnelTextStyle()
     }
-    
+
     func funnelCallout() -> some View {
         funnelFont(.nunitoSemiBold, size: 16)
             .funnelTextStyle()
     }
-    
+
     func funnelCalloutBold() -> some View {
         funnelFont(.nunitoExtraBold, size: 16)
             .funnelTextStyle()

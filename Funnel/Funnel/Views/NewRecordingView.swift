@@ -64,6 +64,7 @@ struct RecordingControls: View {
 
                     Text(formatTime(appState.recordingTime))
                         .funnelBody()
+                        .whiteSandGradientEffect()
 
                     WaveformView(values: appState.waveformValues)
                         .frame(height: 37)

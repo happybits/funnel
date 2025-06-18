@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -52,11 +52,11 @@
 		037DB23ED099CBFE44D5BE94 /* FunnelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunnelApp.swift; sourceTree = "<group>"; };
 		03A09A3E36525BBAD132DE67 /* Nunito-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Regular.ttf"; sourceTree = "<group>"; };
 		0587BC79A7CC21940BF6B410 /* Nunito-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-BoldItalic.ttf"; sourceTree = "<group>"; };
-		0A9BC078DD4AC38F123687A2 /* Funnel.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Funnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A9BC078DD4AC38F123687A2 /* FunnelAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunnelAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13CE9BA59D57F670FDD59369 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		2777CAC53A23DFBF48296AF6 /* PreviewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewContainer.swift; sourceTree = "<group>"; };
 		28F2911B4878A502D8CBBF3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		293ADD91D6F94B436D567743 /* sample-audio-recording.m4a */ = {isa = PBXFileReference; path = "sample-audio-recording.m4a"; sourceTree = "<group>"; };
+		293ADD91D6F94B436D567743 /* sample-audio-recording.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "sample-audio-recording.m4a"; sourceTree = "<group>"; };
 		38CAFFF8CF396D51A0A6F7CC /* Nunito-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraBold.ttf"; sourceTree = "<group>"; };
 		398EF193DD579FB675446D66 /* Nunito-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-SemiBold.ttf"; sourceTree = "<group>"; };
 		43F025480FAC7913DBA3C137 /* Nunito-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-MediumItalic.ttf"; sourceTree = "<group>"; };
@@ -67,7 +67,7 @@
 		5B7AF1FAB5B1AD84E3F67170 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		6209C33DBA3FCB7C2FA07B1A /* Nunito-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		6EBB63FC3AAEC1718C313975 /* Nunito-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-LightItalic.ttf"; sourceTree = "<group>"; };
-		81C6A681E708E861469AE5D1 /* MicrophoneHero.svg */ = {isa = PBXFileReference; path = MicrophoneHero.svg; sourceTree = "<group>"; };
+		81C6A681E708E861469AE5D1 /* MicrophoneHero.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = MicrophoneHero.svg; sourceTree = "<group>"; };
 		842BF659CB95D4AF4CD40882 /* RecordingProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingProcessor.swift; sourceTree = "<group>"; };
 		8615478C930CB56A540019D3 /* Nunito-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraLight.ttf"; sourceTree = "<group>"; };
 		90255D182D1C2180B1544F5A /* Nunito-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
@@ -79,7 +79,7 @@
 		B6A4FD49AC8F3C015D15F7D4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BCA26CD148EA5F0D04460E9B /* NewRecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRecordingView.swift; sourceTree = "<group>"; };
 		D0EF7026AFE8960B50ED98C1 /* FunnelAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunnelAPIService.swift; sourceTree = "<group>"; };
-		D384658E4B7F6EA08387AA75 /* StopButton.svg */ = {isa = PBXFileReference; path = StopButton.svg; sourceTree = "<group>"; };
+		D384658E4B7F6EA08387AA75 /* StopButton.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = StopButton.svg; sourceTree = "<group>"; };
 		D53DCCDDE8428E544B9B71A6 /* Nunito-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
 		D5424E4CE20B8D581455C484 /* ProcessingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessingView.swift; sourceTree = "<group>"; };
 		D9CA3D079CCF7A290A56E257 /* GlassmorphicModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassmorphicModifier.swift; sourceTree = "<group>"; };
@@ -97,7 +97,6 @@
 			isa = PBXGroup;
 			children = (
 				28F2911B4878A502D8CBBF3C /* Info.plist */,
-				17113091109A1CAE56126067 /* Components */,
 				D18B633BDA53E8618606319F /* Funnel */,
 				E7BB27446E14412980A7526E /* Resources */,
 			);
@@ -127,17 +126,10 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
-		17113091109A1CAE56126067 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
 		30EF63C64EAF6A14571B0920 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0A9BC078DD4AC38F123687A2 /* Funnel.app */,
+				0A9BC078DD4AC38F123687A2 /* FunnelAI.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -255,9 +247,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E705CE53ADF353E0B1DC4CDB /* Funnel */ = {
+		E705CE53ADF353E0B1DC4CDB /* FunnelAI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FCB18D299A4B72C484FECEBA /* Build configuration list for PBXNativeTarget "Funnel" */;
+			buildConfigurationList = FCB18D299A4B72C484FECEBA /* Build configuration list for PBXNativeTarget "FunnelAI" */;
 			buildPhases = (
 				DACB6B35E162417B9E12F0EF /* Sources */,
 				C671E455E945581A2E307E36 /* Resources */,
@@ -266,11 +258,11 @@
 			);
 			dependencies = (
 			);
-			name = Funnel;
+			name = FunnelAI;
 			packageProductDependencies = (
 			);
 			productName = Funnel;
-			productReference = 0A9BC078DD4AC38F123687A2 /* Funnel.app */;
+			productReference = 0A9BC078DD4AC38F123687A2 /* FunnelAI.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -287,7 +279,7 @@
 					};
 				};
 			};
-			buildConfigurationList = CB3ABF991FBF2692B01ADB52 /* Build configuration list for PBXProject "Funnel" */;
+			buildConfigurationList = CB3ABF991FBF2692B01ADB52 /* Build configuration list for PBXProject "FunnelAI" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -297,11 +289,10 @@
 			);
 			mainGroup = D9581316AE7A5E7CB95F6728;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 54;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E705CE53ADF353E0B1DC4CDB /* Funnel */,
+				E705CE53ADF353E0B1DC4CDB /* FunnelAI */,
 			);
 		};
 /* End PBXProject section */
@@ -499,7 +490,8 @@
 				DEVELOPMENT_TEAM = 6L379HCV5Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Funnel/Info.plist;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Funnel needs access to your microphone to record voice notes.";
+				INFOPLIST_KEY_CFBundleDisplayName = "Funnel - Think Better";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Funnel - Think Better needs access to your microphone to record voice notes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -525,7 +517,8 @@
 				DEVELOPMENT_TEAM = 6L379HCV5Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Funnel/Info.plist;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Funnel needs access to your microphone to record voice notes.";
+				INFOPLIST_KEY_CFBundleDisplayName = "Funnel - Think Better";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Funnel - Think Better needs access to your microphone to record voice notes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -546,7 +539,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CB3ABF991FBF2692B01ADB52 /* Build configuration list for PBXProject "Funnel" */ = {
+		CB3ABF991FBF2692B01ADB52 /* Build configuration list for PBXProject "FunnelAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				41474B8474F2F99D20E98F10 /* Debug */,
@@ -555,7 +548,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		FCB18D299A4B72C484FECEBA /* Build configuration list for PBXNativeTarget "Funnel" */ = {
+		FCB18D299A4B72C484FECEBA /* Build configuration list for PBXNativeTarget "FunnelAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8440D62CD32492C03CDC0E30 /* Debug */,

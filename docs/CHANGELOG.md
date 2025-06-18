@@ -4,10 +4,31 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **Updated app display name**: Changed from "Funnel" to "Funnel - Think Better" for Xcode Cloud compatibility
+  - Added INFOPLIST_KEY_CFBundleDisplayName to project.yml
+  - Updated microphone usage description to use new app name
+
+### Added
+- **Card Peek Effect**: Implemented adjacent card visibility in SwipeableCardsView
+  - Shows 15 pixels of adjacent cards on left and right edges
+  - Provides visual cue that cards are swipeable
+  - Replaced TabView with custom ScrollView implementation
+  - Maintains smooth paging behavior with gesture controls
+  - Card width adjusted to screen width minus 30px (15px peek on each side)
+
 ### Added
 - **Swipeable Cards View**: New screen for viewing recording results
   - Horizontal swipeable cards with paging (TabView)
   - Three card types: Bullet Summary, Diagram, and Transcript
+- **Figma Asset Exports**: Exported SVG icons from Figma design
+  - `chevron-left.svg` - Back button icon with gradient fill and stroke
+  - `microphone-icon.svg` - Voice/microphone icon with gradient effects and filters
+  - Located key Figma nodes:
+    - Transcript Mode frame (node 67:398) - Main swipeable card view
+    - Back button component (node 67:407) - Navigation back button
+    - Add Voice button (node 67:408) - Button with microphone icon
+    - Index Mode frame (node 67:367) - Alternative card layout with summary view
   - Dynamic gradient background that transitions between cards
   - Back button navigation to return to recording screen
   - "Add Voice" button for future enhancements
@@ -15,6 +36,11 @@ All notable changes to the Funnel project will be documented in this file.
   - Page indicators showing current card position
 
 ### Fixed
+- **Button visibility in SwipeableCardsView**: Improved visibility of back button and add voice button
+  - Increased opacity values from 0.1-0.4 to 0.2-0.3 for backgrounds
+  - Changed button text to solid white color instead of low-opacity gradients
+  - Increased stroke opacity from 0 to 0.8 for better definition
+  - Simplified shadow effects and reduced blur radius for cleaner appearance
 - **Card gradient colors**: Updated gradient backgrounds to match exact Figma design specifications
   - Bullet Summary card: Orange gradient (RGB 0.972,0.698,0.459 to 0.976,0.843,0.459)
   - Diagram card: Pink to red gradient (RGB 0.827,0.435,0.757 to 0.969,0.290,0.286)

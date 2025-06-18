@@ -206,3 +206,21 @@ ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 ALWAYS update /docs/CHANGELOG.md when making significant changes to the codebase, including new features, bug fixes, or architectural changes.
 **STOP adding SwiftUI materials when matching Figma designs** - If Figma specifies "background blur", implement ONLY blur, NOT .ultraThinMaterial or any material effects. Read the exact Figma properties and implement only those.
+**ALWAYS use Assets.xcassets for image resources** - When exporting images from Figma or any other source, add them to Assets.xcassets in Xcode. Do NOT create loose image files in the project directory. This ensures proper asset management, resolution support (@1x, @2x, @3x), and easy reference in SwiftUI.
+**USE idiomatic Swift trailing closure syntax** - When a function's last parameter is a closure, use trailing closure syntax. For SwiftUI views with multiple closures like Button, use multiple trailing closures:
+```swift
+// Good - idiomatic SwiftUI
+Button {
+    // action here
+} label: {
+    // content here
+}
+
+// Avoid - verbose
+Button(action: {
+    // action
+}, label: {
+    // content
+})
+```
+This applies to all SwiftUI views and Swift functions where trailing closures make the code more readable.

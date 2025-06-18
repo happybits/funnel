@@ -23,6 +23,7 @@ struct ProcessingView: View {
             let funnelText = "Processing - Hang tight!"
             Text(funnelText)
                 .funnelTitle()
+                .whiteSandGradientEffect()
                 .multilineTextAlignment(.center)
 
             if let error = appState.processingError {
@@ -57,11 +58,11 @@ struct ProcessingView: View {
                 logo
                 Spacer()
             }
-            
+
             Spacer()
-            
+
             processingBox
-            
+
             Spacer()
         }
     }
