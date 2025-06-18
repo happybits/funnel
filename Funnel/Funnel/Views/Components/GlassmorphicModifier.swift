@@ -1,11 +1,18 @@
-//
-//  GlassmorphicModifier.swift
-//  Funnel
-//
-//  Created by Joel Drotleff on 6/16/25.
-//
 
 import SwiftUI
+
+// Reusable pure blur view without material effects
+struct VisualEffectView: UIViewRepresentable {
+    var effect: UIVisualEffect?
+
+    func makeUIView(context _: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
+        UIVisualEffectView()
+    }
+
+    func updateUIView(_ uiView: UIVisualEffectView, context _: UIViewRepresentableContext<Self>) {
+        uiView.effect = effect
+    }
+}
 
 struct GlassmorphicModifier: ViewModifier {
     let cornerRadius: CGFloat
@@ -15,9 +22,9 @@ struct GlassmorphicModifier: ViewModifier {
         content
             .background(
                 ZStack {
-                    // Backdrop blur
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(.ultraThinMaterial)
+                    // Pure backdrop blur without material effects
+                    VisualEffectView(effect: UIBlurEffect(style: .regular))
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
 
                     // Gradient overlay
                     LinearGradient(
@@ -28,9 +35,6 @@ struct GlassmorphicModifier: ViewModifier {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
-                    .blur(radius: 0.5)
-
-                    Color.white.opacity(0.1)
                 }
             )
             .overlay(

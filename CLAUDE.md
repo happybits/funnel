@@ -205,3 +205,4 @@ NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 ALWAYS update /docs/CHANGELOG.md when making significant changes to the codebase, including new features, bug fixes, or architectural changes.
+**STOP adding SwiftUI materials when matching Figma designs** - If Figma specifies "background blur", implement ONLY blur, NOT .ultraThinMaterial or any material effects. Read the exact Figma properties and implement only those.

@@ -1,9 +1,3 @@
-//
-//  NewRecordingView.swift
-//  Funnel
-//
-//  Created by Claude on 6/17/25.
-//
 
 import SwiftData
 import SwiftUI
@@ -124,7 +118,7 @@ struct RecordButton: View {
 
     var body: some View {
         Button(action: onTap) {
-            Image("RecordButton")
+            Image("RecordBtn")
                 .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())

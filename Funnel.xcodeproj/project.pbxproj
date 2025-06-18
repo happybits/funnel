@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0437B81C3828F850C20D0764 /* Nunito-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43F025480FAC7913DBA3C137 /* Nunito-MediumItalic.ttf */; };
+		045A1000397F9C94253533FE /* BottomDrawerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AAB828A9FBD5945A13181C /* BottomDrawerModifier.swift */; };
 		08A70A259BB9DB98B9DB8EAD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7AF1FAB5B1AD84E3F67170 /* APIClient.swift */; };
 		0ECDD8E1316E8E88E4CA4000 /* PreviewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2777CAC53A23DFBF48296AF6 /* PreviewContainer.swift */; };
 		104C5642942B28C612C03B47 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13CE9BA59D57F670FDD59369 /* AudioRecorderManager.swift */; };
@@ -58,6 +59,7 @@
 		38CAFFF8CF396D51A0A6F7CC /* Nunito-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-ExtraBold.ttf"; sourceTree = "<group>"; };
 		398EF193DD579FB675446D66 /* Nunito-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-SemiBold.ttf"; sourceTree = "<group>"; };
 		43F025480FAC7913DBA3C137 /* Nunito-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-MediumItalic.ttf"; sourceTree = "<group>"; };
+		44AAB828A9FBD5945A13181C /* BottomDrawerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomDrawerModifier.swift; sourceTree = "<group>"; };
 		4B4E7F7387AF9B8949C514E7 /* Nunito-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Medium.ttf"; sourceTree = "<group>"; };
 		53132E9E8D1C20615FC05391 /* Nunito-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nunito-Italic.ttf"; sourceTree = "<group>"; };
 		5A8354E0183372FB7EEA0032 /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 		356A4BA7BE1D890E8A6B58C1 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				44AAB828A9FBD5945A13181C /* BottomDrawerModifier.swift */,
 				D9CA3D079CCF7A290A56E257 /* GlassmorphicModifier.swift */,
 				A45B9D96819890EFCF4CC5BC /* GradientBackground.swift */,
 			);
@@ -339,6 +342,7 @@
 				5B3A95492C6344EB560E05C0 /* APIModels.swift in Sources */,
 				404F0B61E0355E92E0EFCD09 /* AppState.swift in Sources */,
 				104C5642942B28C612C03B47 /* AudioRecorderManager.swift in Sources */,
+				045A1000397F9C94253533FE /* BottomDrawerModifier.swift in Sources */,
 				FD3868466CE1ACC0CA11E44A /* ContentView.swift in Sources */,
 				33CC15DCFE85EC397EB4D216 /* CurrentRecordingProvider.swift in Sources */,
 				D2722619F89C83E045B28292 /* FontExtensions.swift in Sources */,

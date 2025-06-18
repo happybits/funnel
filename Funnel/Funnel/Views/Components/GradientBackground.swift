@@ -1,132 +1,56 @@
-//
-//  GradientBackground.swift
-//  Funnel
-//
-//  Created by Joel Drotleff on 6/16/25.
-//
-
 import SwiftUI
 
 struct GradientBackground: View {
     @State private var animationPhase: Double = 0
-    @State private var colorShift: Double = 0
-    
-    private let baseColors: [Color] = [
-        Color(red: 0.98, green: 0.78, blue: 0.82),  // Soft pink
-        Color(red: 0.95, green: 0.80, blue: 0.88),  // Light lavender
-        Color(red: 0.88, green: 0.85, blue: 0.98),  // Soft purple
-        Color(red: 0.82, green: 0.88, blue: 0.98),  // Light blue
-        Color(red: 0.80, green: 0.92, blue: 0.95),  // Soft cyan
-        Color(red: 0.82, green: 0.95, blue: 0.88),  // Light mint
-        Color(red: 0.90, green: 0.95, blue: 0.82),  // Soft lime
-        Color(red: 0.98, green: 0.92, blue: 0.82),  // Light peach
-        Color(red: 0.98, green: 0.85, blue: 0.80),  // Soft coral
+    @State private var gradientRotation: Double = 0
+
+    // Base colors from Figma - using exact values
+    private let baseColors: [(red: Double, green: Double, blue: Double)] = [
+        (0.5764706134796143, 0.6509804129600525, 0.8784313797950745), // Light blue/purple
+        (0.40392157435417175, 0.8156862854957581, 0.7960784435272217), // Cyan/turquoise
+        (0.9764705896377563, 0.8392156958580017, 0.4588235318660736), // Yellow
+        (0.9686274528503418, 0.6980392336845398, 0.4588235318660736), // Orange
+        (0.9647058844566345, 0.29411765933036804, 0.2980392277240753), // Red/coral
+        (0.8274509906768799, 0.43529412150382996, 0.7490196228027344), // Purple/magenta
     ]
-    
-    private func shiftedColors(offset: Double) -> [Color] {
-        let count = baseColors.count
-        let shift = Int(offset * Double(count)) % count
-        
-        var shifted = baseColors
-        for _ in 0..<shift {
-            shifted.append(shifted.removeFirst())
-        }
-        
-        // Blend between adjacent colors for smooth transitions
-        let fraction = (offset * Double(count)).truncatingRemainder(dividingBy: 1.0)
-        if fraction > 0 {
-            shifted = shifted.enumerated().map { index, color in
-                let nextIndex = (index + 1) % shifted.count
-                return Color(
-                    red: color.red * (1 - fraction) + shifted[nextIndex].red * fraction,
-                    green: color.green * (1 - fraction) + shifted[nextIndex].green * fraction,
-                    blue: color.blue * (1 - fraction) + shifted[nextIndex].blue * fraction
-                )
-            }
-        }
-        
-        return shifted
+
+    private let positions: [Double] = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+
+    private func shiftedColor(baseColor: (red: Double, green: Double, blue: Double), phase: Double) -> Color {
+        // Create a breathing effect by shifting brightness and saturation
+        let breathingIntensity = sin(phase) * 0.15 // 15% maximum shift for more visibility
+        let saturationShift = cos(phase * 0.5) * 0.1 // Subtle saturation wave
+
+        return Color(
+            red: min(1, max(0, baseColor.red + breathingIntensity - saturationShift)),
+            green: min(1, max(0, baseColor.green + breathingIntensity)),
+            blue: min(1, max(0, baseColor.blue + breathingIntensity + saturationShift))
+        )
     }
-    
+
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Base gradient layer
-                LinearGradient(
-                    colors: shiftedColors(offset: colorShift),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+        LinearGradient(
+            stops: zip(baseColors, positions).map { color, position in
+                Gradient.Stop(
+                    color: shiftedColor(baseColor: color, phase: animationPhase + position * .pi),
+                    location: position
                 )
-                
-                // Animated overlay gradients for lava lamp effect
-                ForEach(0..<3) { index in
-                    RadialGradient(
-                        colors: [
-                            shiftedColors(offset: colorShift + Double(index) * 0.3)[index * 3 % baseColors.count].opacity(0.6),
-                            Color.clear
-                        ],
-                        center: UnitPoint(
-                            x: 0.5 + 0.3 * cos(animationPhase + Double(index) * .pi * 0.7),
-                            y: 0.5 + 0.3 * sin(animationPhase * 0.8 + Double(index) * .pi * 0.5)
-                        ),
-                        startRadius: geometry.size.width * 0.1,
-                        endRadius: geometry.size.width * 0.8
-                    )
-                    .blendMode(.overlay)
-                }
-                
-                // Subtle noise overlay for texture
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.05),
-                        Color.clear,
-                        Color.white.opacity(0.03)
-                    ],
-                    startPoint: UnitPoint(
-                        x: 0.5 + 0.2 * cos(animationPhase * 1.2),
-                        y: 0
-                    ),
-                    endPoint: UnitPoint(
-                        x: 0.5 + 0.2 * sin(animationPhase * 0.9),
-                        y: 1
-                    )
-                )
-                .blendMode(.overlay)
-            }
-            .ignoresSafeArea()
-        }
+            },
+            startPoint: UnitPoint(x: 0.1 + cos(gradientRotation) * 0.1, y: 0),
+            endPoint: UnitPoint(x: 0.9 + sin(gradientRotation) * 0.1, y: 1)
+        )
+        .ignoresSafeArea()
         .onAppear {
-            withAnimation(.linear(duration: 30).repeatForever(autoreverses: false)) {
+            // Breathing animation with color shifts
+            withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: true)) {
                 animationPhase = .pi * 2
             }
-            withAnimation(.linear(duration: 45).repeatForever(autoreverses: false)) {
-                colorShift = 1.0
+
+            // Subtle gradient angle rotation for fluid movement
+            withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
+                gradientRotation = .pi * 2
             }
         }
-    }
-}
-
-// Color extension for component access
-extension Color {
-    var red: Double {
-        let uiColor = UIColor(self)
-        var r: CGFloat = 0
-        uiColor.getRed(&r, green: nil, blue: nil, alpha: nil)
-        return Double(r)
-    }
-    
-    var green: Double {
-        let uiColor = UIColor(self)
-        var g: CGFloat = 0
-        uiColor.getRed(nil, green: &g, blue: nil, alpha: nil)
-        return Double(g)
-    }
-    
-    var blue: Double {
-        let uiColor = UIColor(self)
-        var b: CGFloat = 0
-        uiColor.getRed(nil, green: nil, blue: &b, alpha: nil)
-        return Double(b)
     }
 }
 

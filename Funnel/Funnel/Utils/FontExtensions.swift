@@ -1,10 +1,3 @@
-//
-//  FontExtensions.swift
-//  Funnel
-//
-//  Created by Claude on 6/16/25.
-//
-
 import SwiftUI
 
 // Font names enum for type safety

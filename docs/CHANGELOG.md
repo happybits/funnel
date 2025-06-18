@@ -4,6 +4,47 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Enhanced
+- **Gradient Background Animation**: Added breathing effect to gradient background
+  - Increased color shift intensity from 5% to 15% for better visibility
+  - Added subtle saturation wave effect using cosine function
+  - Implemented gradient angle rotation for fluid movement
+  - Adjusted animation durations: 6s for color breathing, 8s for rotation
+
+### Changed
+- **Updated APIClient to use production server**: Default URL now points to https://funnel-api.deno.dev
+- **Added server toggle**: Added `useLocalServer` boolean flag in APIClient for easy switching between local development and production servers
+- **Removed Xcode file headers**: Cleaned up all Swift files by removing standard Xcode-generated headers (file name, project name, creation date) to reduce clutter and improve code readability
+
+### Added
+- **Deployed server to Deno Deploy**: Production deployment at https://funnel-api.deno.dev
+  - Created new project "funnel-api" on Deno Deploy
+  - Configured deployment settings in deno.deploy.json
+  - Added deployment configuration to deno.json
+  - Environment variables need to be configured in Deno Deploy dashboard:
+    - OPENAI_API_KEY - Required for audio transcription
+    - ANTHROPIC_API_KEY - Required for content generation
+    - CORS_ORIGIN - Optional, defaults to "*"
+    - PORT - Automatically set by Deno Deploy
+- **Bottom Drawer Component**: Created reusable `BottomDrawerModifier` matching Figma design
+  - Found in Figma file as "Bottom Drawer" component (node ID: 67:356)
+  - Glassmorphic style with rounded top corners only (15px radius)
+  - Gradient background (white 0% to 30% opacity)
+  - Complex gradient stroke with opacity variations
+  - Multiple drawer variations found across different screens
+
+### Changed
+- **Updated Bottom Drawer UI**: Matched Figma design specifications exactly
+  - Created custom `BottomDrawerModifier` with proper blur effect (radius 10)
+  - Updated gradient background to match Figma (0.1 to 0.4 opacity)
+  - Fixed corner radius to only round top corners (15px)
+  - Added proper shadows: drop shadow (black 12%, offset y:4, radius:12) and inner shadow (white 25%, offset y:4, radius:8)
+  - Updated gradient stroke with varying opacity
+  - Changed title text from "Voice Recording 1" to "Adding Context" during recording
+  - Updated fonts to use correct Nunito font family names
+  - Fixed waveform bars to 2px width with 10px corner radius and proper shadows
+  - Created custom stop button matching Figma design with gradient background and red square
+
 ### Fixed
 - Recording functionality now properly handles completion callbacks
 - Added minimum recording duration check (0.5s) to prevent API errors
