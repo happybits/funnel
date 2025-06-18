@@ -42,7 +42,7 @@ struct GradientBackground: View {
         .ignoresSafeArea()
         .onAppear {
             // Breathing animation with color shifts
-            withAnimation(.easeInOut(duration: 6).repeatForever(autoreverses: true)) {
+            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
                 animationPhase = .pi * 2
             }
 

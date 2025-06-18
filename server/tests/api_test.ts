@@ -2,10 +2,7 @@ import {
   assertEquals,
   assertExists,
 } from "https://deno.land/std@0.215.0/assert/mod.ts";
-import type {
-  ErrorResponse,
-  NewRecordingResponse,
-} from "../types/api.ts";
+import type { ErrorResponse } from "../types/api.ts";
 
 // Legacy types for testing (no longer in actual API)
 interface TranscribeResponse {
@@ -77,7 +74,7 @@ Deno.test("API Response Shapes - SummarizeResponse validation", () => {
 
 Deno.test("Summarize Endpoint - produces concise summary from long transcript", () => {
   // Expected behavior: long transcript should produce 3-5 bullet points
-  const mockRequest = { transcript: longTranscript };
+  const _mockRequest = { transcript: longTranscript };
 
   // Mock what the API should return for the test case
   const expectedSummary: SummarizeResponse = {
@@ -111,7 +108,7 @@ Deno.test("Summarize Endpoint - handles empty transcript", () => {
 });
 
 Deno.test("Summarize Endpoint - handles extremely long transcript", () => {
-  const veryLongTranscript = longTranscript.repeat(100); // ~50k chars
+  const _veryLongTranscript = longTranscript.repeat(100); // ~50k chars
 
   // Should either succeed or return appropriate error
   const mockError: ErrorResponse = {

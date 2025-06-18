@@ -1,10 +1,12 @@
 # Promptfoo Setup and Usage Guide
 
-This guide documents how to set up and use promptfoo for testing LLM prompts, based on the official documentation and practical experience.
+This guide documents how to set up and use promptfoo for testing LLM prompts,
+based on the official documentation and practical experience.
 
 ## What is Promptfoo?
 
 Promptfoo is a testing framework for LLM prompts that allows you to:
+
 - Test prompts across multiple providers
 - Validate outputs with assertions
 - Track performance and cost metrics
@@ -28,7 +30,7 @@ description: "Your test suite description"
 prompts:
   # Option 1: Direct file reference (recommended)
   - file://./path/to/prompt.txt
-  
+
   # Option 2: With ID (avoid if causing issues)
   - id: prompt-name
     file: file://./path/to/prompt.txt
@@ -37,7 +39,7 @@ prompts:
 providers:
   - openai:gpt-4
   - anthropic:claude-3-5-sonnet-20241022
-  
+
 # Define test cases
 tests:
   - description: "Test case description"
@@ -63,6 +65,7 @@ Please provide {{outputFormat}}.
 ### File References
 
 Always use the `file://` prefix when referencing prompt files:
+
 - ✅ `file://./prompts/summarize.txt`
 - ❌ `./prompts/summarize.txt`
 
@@ -72,7 +75,8 @@ Always use the `file://` prefix when referencing prompt files:
 
 **Problem**: Prompt shows `{{variable}}` instead of actual value.
 
-**Solution**: 
+**Solution**:
+
 1. Use `file://` prefix for prompt files
 2. Remove `id` field if it's causing conflicts
 3. Ensure variables are defined in test `vars` section
@@ -82,6 +86,7 @@ Always use the `file://` prefix when referencing prompt files:
 **Problem**: Assertions like `not-empty` or `is-not-empty` fail.
 
 **Solution**: Use simpler assertion types or remove default assertions:
+
 ```yaml
 # Instead of:
 defaultTest:
@@ -96,6 +101,7 @@ defaultTest:
 **Problem**: Only prompt ID shows instead of content.
 
 **Solution**: Use direct file references without IDs:
+
 ```yaml
 prompts:
   - file://./prompts/prompt1.txt
@@ -116,6 +122,7 @@ ln -s ../lib/prompts/actual-prompt.txt prompts/prompt.txt
 ### 2. Keep Configuration Simple
 
 Start with a minimal configuration:
+
 ```yaml
 description: "Basic prompt testing"
 
@@ -140,6 +147,7 @@ export ANTHROPIC_API_KEY=your-key
 ### 4. Test Incrementally
 
 Run with limited tests first:
+
 ```bash
 promptfoo eval --filter-first-n 1
 ```
@@ -186,10 +194,10 @@ tests:
       - type: javascript
         value: |
           output.includes('keyword')
-      
+
       # Contains JSON
       - type: contains-json
-      
+
       # Semantic similarity
       - type: similar
         value: "expected output"
@@ -204,7 +212,7 @@ assert:
     value: |
       // Check multiple conditions
       const lines = output.split('\n');
-      return lines.length >= 3 && 
+      return lines.length >= 3 &&
              lines.every(line => line.length < 80);
 ```
 
@@ -229,7 +237,8 @@ project/
 
 1. **Check what's being sent**: Use `-o debug.json` and examine the output
 2. **Verbose mode**: Add `-v` flag for more details
-3. **Test prompt loading**: Check if `prompt.raw` contains full prompt or just ID
+3. **Test prompt loading**: Check if `prompt.raw` contains full prompt or just
+   ID
 4. **API errors**: Ensure API keys are set correctly
 
 ## Integration with CI/CD
