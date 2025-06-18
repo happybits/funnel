@@ -9,7 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct ProcessedRecordingView: View {
-    let processedRecording: ProcessedRecording
+    let recording: Recording
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -21,7 +22,7 @@ struct ProcessedRecordingView: View {
                         Text("Duration")
                             .font(.headline)
                             .foregroundColor(.secondary)
-                        Text("\(formatDuration(processedRecording.duration))")
+                        Text("\(formatDuration(recording.duration))")
                             .font(.title3)
                     }
                     .padding(.horizontal)
@@ -33,7 +34,7 @@ struct ProcessedRecordingView: View {
                         Text("Transcript")
                             .font(.headline)
                             .foregroundColor(.secondary)
-                        Text(processedRecording.transcript)
+                        Text(recording.transcript ?? "No transcript available")
                             .font(.body)
                             .textSelection(.enabled)
                     }
@@ -47,7 +48,7 @@ struct ProcessedRecordingView: View {
                             .font(.headline)
                             .foregroundColor(.secondary)
 
-                        ForEach(Array(processedRecording.bulletSummary.enumerated()), id: \.offset) { _, bullet in
+                        ForEach(Array((recording.bulletSummary ?? []).enumerated()), id: \.offset) { _, bullet in
                             HStack(alignment: .top, spacing: 8) {
                                 Text("•")
                                     .font(.body)
@@ -69,11 +70,11 @@ struct ProcessedRecordingView: View {
                             .foregroundColor(.secondary)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Title: \(processedRecording.diagram.title)")
+                            Text("Title: \(recording.diagramTitle ?? "No title")")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
 
-                            Text("Description: \(processedRecording.diagram.description)")
+                            Text("Description: \(recording.diagramDescription ?? "No description")")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
 
@@ -82,7 +83,7 @@ struct ProcessedRecordingView: View {
                                 .fontWeight(.medium)
                                 .padding(.top, 4)
 
-                            Text(processedRecording.diagram.content)
+                            Text(recording.diagramContent ?? "No content")
                                 .font(.system(.body, design: .monospaced))
                                 .textSelection(.enabled)
                                 .padding()
@@ -102,7 +103,7 @@ struct ProcessedRecordingView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        dismiss()
+                        appState.resetToRecording()
                     }
                 }
             }
@@ -118,24 +119,13 @@ struct ProcessedRecordingView: View {
 }
 
 #Preview {
-    // Create a sample ProcessedRecording from our preview data
     let sampleRecording = ModelContainer.createSampleRecording(
         container: ModelContainer.previewContainer,
         title: "Sample Recording",
         processingStatus: .completed
     )
 
-    let processedRecording = ProcessedRecording(
-        transcript: sampleRecording.transcript ?? "This is a sample transcript",
-        duration: sampleRecording.duration,
-        bulletSummary: sampleRecording.bulletSummary ?? ["Sample bullet point"],
-        diagram: ProcessedRecording.DiagramData(
-            title: sampleRecording.diagramTitle ?? "Sample Diagram",
-            description: sampleRecording.diagramDescription ?? "A sample diagram",
-            content: sampleRecording.diagramContent ?? "Sample content"
-        )
-    )
-
-    ProcessedRecordingView(processedRecording: processedRecording)
+    ProcessedRecordingView(recording: sampleRecording)
         .funnelPreviewEnvironment()
+        .environmentObject(AppState(modelContext: ModelContainer.previewContainer.mainContext))
 }
