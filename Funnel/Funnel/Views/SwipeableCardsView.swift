@@ -11,7 +11,7 @@ struct SwipeableCardsView: View {
 
     let recording: Recording
     var hideBackground: Bool = false
-    
+
     // Computed property for truncated title
     private var truncatedTitle: String {
         if let firstBullet = recording.bulletSummary?.first {
@@ -94,9 +94,9 @@ struct SwipeableCardsView: View {
                                         .frame(width: geometry.size.width - 30)
                                         .id(2)
                                 }
-                                .padding(.horizontal, 15) // This creates the peek effect
-                                .scrollTargetLayout() // This makes each card a scroll target
+                                .scrollTargetLayout()
                             }
+                            .contentMargins(.horizontal, 15, for: .scrollContent)
                             .scrollTargetBehavior(.viewAligned)
                             .scrollPosition(id: $scrolledID)
                             .onAppear {

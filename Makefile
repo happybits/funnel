@@ -3,8 +3,8 @@
 
 # Default simulator device
 SIMULATOR = iPhone 16 Pro
-SCHEME = Funnel
-PROJECT = Funnel.xcodeproj
+SCHEME = FunnelAI
+PROJECT = FunnelAI.xcodeproj
 
 # Colors for output
 GREEN = \033[0;32m
@@ -40,7 +40,7 @@ build:
 # Clean build artifacts
 clean:
 	@echo "$(YELLOW)Cleaning build artifacts...$(NC)"
-	@rm -rf ~/Library/Developer/Xcode/DerivedData/Funnel-*
+	@rm -rf ~/Library/Developer/Xcode/DerivedData/FunnelAI-*
 	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) clean -quiet 2>/dev/null || true
 	@echo "$(GREEN)✅ Clean complete$(NC)"
 

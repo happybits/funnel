@@ -71,7 +71,7 @@ struct InnerShadowModifier: ViewModifier {
     let radius: CGFloat
     let x: CGFloat
     let y: CGFloat
-    
+
     func body(content: Content) -> some View {
         content
             .overlay(

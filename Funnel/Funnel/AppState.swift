@@ -100,7 +100,6 @@ class AppState: ObservableObject {
         audioRecorder.stopRecording()
         recordingTimer?.invalidate()
         levelTimer?.invalidate()
-        isRecording = false
         audioLevel = 0
 
         // Process the recording
@@ -110,6 +109,9 @@ class AppState: ObservableObject {
                 await processRecording(audioURL: audioURL, duration: recordingDuration)
             }
         }
+
+        // Set isRecording to false after navigation state change
+        isRecording = false
     }
 
     // MARK: - Processing Methods

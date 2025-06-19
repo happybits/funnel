@@ -73,19 +73,27 @@ struct RecordingControls: View {
                 .padding(.top, 30)
 
                 Spacer()
+            }
 
-                StopButton(isPressed: $isPressed) {
+            // Single button that changes based on state
+            Button {
+                if appState.isRecording && appState.navigationState != .processing {
                     appState.stopRecording()
-                }
-                .padding(.bottom, 46)
-            } else {
-                // Not recording state
-                RecordButton(isPressed: $isPressed) {
+                } else {
                     appState.startRecording()
                 }
-                .padding(.top, 15)
-                .padding(.bottom, 61)
+            } label: {
+                Image(appState.isRecording && appState.navigationState != .processing ? "StopRecordBtn" : "RecordBtn")
+                    .scaleEffect(isPressed ? 0.95 : 1.0)
             }
+            .buttonStyle(PlainButtonStyle())
+            .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    isPressed = pressing
+                }
+            }, perform: {})
+            .padding(.top, 15)
+            .padding(.bottom, 61)
         }
         .frame(width: 372, height: appState.isRecording ? 350 : 179)
         .glassmorphic(
@@ -112,42 +120,6 @@ struct FunnelLogo: View {
 struct MicrophoneButton: View {
     var body: some View {
         Image("MicHero")
-    }
-}
-
-struct RecordButton: View {
-    @Binding var isPressed: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            Image("RecordBtn")
-                .scaleEffect(isPressed ? 0.95 : 1.0)
-        }
-        .buttonStyle(PlainButtonStyle())
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
-            withAnimation(.easeInOut(duration: 0.1)) {
-                isPressed = pressing
-            }
-        }, perform: {})
-    }
-}
-
-struct StopButton: View {
-    @Binding var isPressed: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            Image("StopRecordBtn")
-                .scaleEffect(isPressed ? 0.95 : 1.0)
-        }
-        .buttonStyle(PlainButtonStyle())
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
-            withAnimation(.easeInOut(duration: 0.1)) {
-                isPressed = pressing
-            }
-        }, perform: {})
     }
 }
 
