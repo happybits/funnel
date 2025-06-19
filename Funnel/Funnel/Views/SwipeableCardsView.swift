@@ -11,6 +11,19 @@ struct SwipeableCardsView: View {
 
     let recording: Recording
     var hideBackground: Bool = false
+    
+    // Computed property for truncated title
+    private var truncatedTitle: String {
+        if let firstBullet = recording.bulletSummary?.first {
+            // Take first 30 characters and add ellipsis if needed
+            let maxLength = 30
+            if firstBullet.count > maxLength {
+                return String(firstBullet.prefix(maxLength - 3)) + "..."
+            }
+            return firstBullet
+        }
+        return "Recording"
+    }
 
     // Gradient colors for each card
     private let gradientColors: [[Color]] = [
@@ -51,10 +64,7 @@ struct SwipeableCardsView: View {
                         Button {
                             appState.resetToRecording()
                         } label: {
-                            Image("backbtn")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 44, height: 44)
+                            Image("BackBtn")
                         }
 
                         Spacer()
@@ -62,10 +72,7 @@ struct SwipeableCardsView: View {
                         Button {
                             // TODO: Add voice action
                         } label: {
-                            Image("addbtn")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 44)
+                            Image("AddBtn")
                         }
                     }
                     .padding(.horizontal, 20)

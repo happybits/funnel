@@ -65,6 +65,26 @@ struct GlassmorphicModifier: ViewModifier {
     }
 }
 
+// Inner shadow modifier for text effects
+struct InnerShadowModifier: ViewModifier {
+    let color: Color
+    let radius: CGFloat
+    let x: CGFloat
+    let y: CGFloat
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                content
+                    .foregroundColor(color)
+                    .blur(radius: radius)
+                    .offset(x: x, y: y)
+                    .blendMode(.plusLighter)
+                    .allowsHitTesting(false)
+            )
+    }
+}
+
 extension View {
     func glassmorphic(cornerRadius: CGFloat = 15, gradientOpacity: (start: Double, end: Double) = (0.0, 0.3)) -> some View {
         modifier(GlassmorphicModifier(cornerRadius: cornerRadius, gradientOpacity: gradientOpacity))

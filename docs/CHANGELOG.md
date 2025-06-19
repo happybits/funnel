@@ -4,6 +4,21 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- **Button asset references in SwipeableCardsView**: Fixed incorrect image names
+  - Changed "backbtn" to "BackBtn" to match actual asset names
+  - Changed "addbtn" to "AddBtn" to match actual asset names
+  - Fixed case sensitivity issue preventing buttons from displaying
+
+### Enhanced
+- **Header design in SwipeableCardsView**: Improved header layout to match Figma design
+  - Added truncated recording title between Back and Add buttons
+  - Title displays first 30 characters of first bullet point with ellipsis if needed
+  - Applied proper text styling with gradient effect and shadows
+  - Added InnerShadowModifier for text inner shadow effect
+  - Adjusted padding and spacing to match Figma specifications
+  - Header now shows contextual title instead of being empty
+
 ### Changed
 - **Updated app display name**: Changed from "Funnel" to "Funnel - Think Better" for Xcode Cloud compatibility
   - Added INFOPLIST_KEY_CFBundleDisplayName to project.yml
