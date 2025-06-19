@@ -75,7 +75,6 @@ struct SwipeableCardsView: View {
                             Image("AddBtn")
                         }
                     }
-                    .padding(.horizontal, 20)
                     .padding(.top, 10)
 
                     // Cards Container with custom scroll view for peek effect
