@@ -7,6 +7,7 @@ struct SwipeableCardsView: View {
     @State private var currentPage = 0
     @State private var dragOffset: CGSize = .zero
     @State private var scrollOffset: CGFloat = 0
+    @State private var scrolledID: Int? = 0
 
     let recording: Recording
     var hideBackground: Bool = false
@@ -88,30 +89,18 @@ struct SwipeableCardsView: View {
                                         .id(2)
                                 }
                                 .padding(.horizontal, 15) // This creates the peek effect
+                                .scrollTargetLayout() // This makes each card a scroll target
                             }
-                            .scrollTargetBehavior(.paging)
-                            .contentMargins(.horizontal, 15, for: .scrollContent)
+                            .scrollTargetBehavior(.viewAligned)
+                            .scrollPosition(id: $scrolledID)
                             .onAppear {
                                 scrollProxy.scrollTo(currentPage, anchor: .center)
                             }
-                            .onChange(of: currentPage) { _, newValue in
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    scrollProxy.scrollTo(newValue, anchor: .center)
+                            .onChange(of: scrolledID) { _, newValue in
+                                if let page = newValue {
+                                    currentPage = page
                                 }
                             }
-                            .gesture(
-                                DragGesture()
-                                    .onEnded { value in
-                                        let threshold: CGFloat = 50
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            if value.translation.width > threshold, currentPage > 0 {
-                                                currentPage -= 1
-                                            } else if value.translation.width < -threshold, currentPage < 2 {
-                                                currentPage += 1
-                                            }
-                                        }
-                                    }
-                            )
                         }
                     }
                     .padding(.top, 20)

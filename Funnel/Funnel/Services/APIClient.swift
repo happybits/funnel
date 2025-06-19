@@ -18,16 +18,9 @@ class APIClient {
         decoder = JSONDecoder()
         encoder = JSONEncoder()
 
-        // Use environment-based URL
-        #if DEBUG
-            // For local development - use 127.0.0.1 for simulator
-            #if targetEnvironment(simulator)
-                baseURL = "http://127.0.0.1:8000"
-            #else
-                baseURL = "http://localhost:8000"
-            #endif
+        #if targetEnvironment(simulator)
+            baseURL = "http://127.0.0.1:8000"
         #else
-            // TODO: Update with production URL when deployed
             baseURL = "https://funnel-api.deno.dev"
         #endif
     }

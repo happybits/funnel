@@ -110,6 +110,7 @@ struct ProcessingOverlay: View {
             let funnelText = "Processing - Hang tight!"
             Text(funnelText)
                 .funnelTitle()
+                .whiteSandGradientEffect()
                 .multilineTextAlignment(.center)
 
             if let error = appState.processingError {
