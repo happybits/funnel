@@ -4,6 +4,106 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **Updated app display name**: Changed from "Funnel" to "Funnel - Think Better" for Xcode Cloud compatibility
+  - Added INFOPLIST_KEY_CFBundleDisplayName to project.yml
+  - Updated microphone usage description to use new app name
+- **Migrated to Xcode folder-based project structure**: Removed XcodeGen dependency
+  - Converted project to use Xcode's new automatic file referencing feature
+  - Deleted project.yml configuration file
+  - Updated Makefile to remove xcodegen commands
+  - Updated all documentation to reflect the new workflow
+  - Files are now automatically included when added to project folders
+
+### Added
+- **Card Peek Effect**: Implemented adjacent card visibility in SwipeableCardsView
+  - Shows 15 pixels of adjacent cards on left and right edges
+  - Provides visual cue that cards are swipeable
+  - Replaced TabView with custom ScrollView implementation
+  - Maintains smooth paging behavior with gesture controls
+  - Card width adjusted to screen width minus 30px (15px peek on each side)
+
+### Added
+- **Swipeable Cards View**: New screen for viewing recording results
+  - Horizontal swipeable cards with paging (TabView)
+  - Three card types: Bullet Summary, Diagram, and Transcript
+- **Figma Asset Exports**: Exported SVG icons from Figma design
+  - `chevron-left.svg` - Back button icon with gradient fill and stroke
+  - `microphone-icon.svg` - Voice/microphone icon with gradient effects and filters
+  - Located key Figma nodes:
+    - Transcript Mode frame (node 67:398) - Main swipeable card view
+    - Back button component (node 67:407) - Navigation back button
+    - Add Voice button (node 67:408) - Button with microphone icon
+    - Index Mode frame (node 67:367) - Alternative card layout with summary view
+  - Dynamic gradient background that transitions between cards
+  - Back button navigation to return to recording screen
+  - "Add Voice" button for future enhancements
+  - Custom glassmorphic card designs matching Figma specifications
+  - Page indicators showing current card position
+
+### Fixed
+- **Button visibility in SwipeableCardsView**: Improved visibility of back button and add voice button
+  - Increased opacity values from 0.1-0.4 to 0.2-0.3 for backgrounds
+  - Changed button text to solid white color instead of low-opacity gradients
+  - Increased stroke opacity from 0 to 0.8 for better definition
+  - Simplified shadow effects and reduced blur radius for cleaner appearance
+- **Card gradient colors**: Updated gradient backgrounds to match exact Figma design specifications
+  - Bullet Summary card: Orange gradient (RGB 0.972,0.698,0.459 to 0.976,0.843,0.459)
+  - Diagram card: Pink to red gradient (RGB 0.827,0.435,0.757 to 0.969,0.290,0.286)
+  - Transcript card: Blue to teal gradient (RGB 0.580,0.651,0.882 to 0.400,0.820,0.796)
+- **Screen transitions**: Improved navigation animations
+  - Processing view now appears as an overlay instead of sliding up from bottom
+  - Recording screen remains visible in background during processing
+  - Gradient background stays in place during screen transitions
+  - Cards view transitions with swipe while gradient shifts colors smoothly
+
+### Enhanced
+- **Gradient Background Animation**: Added breathing effect to gradient background
+  - Increased color shift intensity from 5% to 15% for better visibility
+  - Added subtle saturation wave effect using cosine function
+  - Implemented gradient angle rotation for fluid movement
+  - Adjusted animation durations: 6s for color breathing, 8s for rotation
+- **Font Extensions**: Added new text style modifiers
+  - Added funnelBodyBold, funnelSubheadlineBold, funnelCallout, and funnelCalloutBold styles
+  - Support for all text variations used in the new cards UI
+- **Navigation State**: Added new `.cards(Recording)` state
+  - Processing now navigates directly to cards view instead of debug view
+  - Smooth transition animations between screens
+
+### Changed
+- **Updated APIClient to use production server**: Default URL now points to https://funnel-api.deno.dev
+- **Added server toggle**: Added `useLocalServer` boolean flag in APIClient for easy switching between local development and production servers
+- **Removed Xcode file headers**: Cleaned up all Swift files by removing standard Xcode-generated headers (file name, project name, creation date) to reduce clutter and improve code readability
+
+### Added
+- **Deployed server to Deno Deploy**: Production deployment at https://funnel-api.deno.dev
+  - Created new project "funnel-api" on Deno Deploy
+  - Configured deployment settings in deno.deploy.json
+  - Added deployment configuration to deno.json
+  - Environment variables need to be configured in Deno Deploy dashboard:
+    - OPENAI_API_KEY - Required for audio transcription
+    - ANTHROPIC_API_KEY - Required for content generation
+    - CORS_ORIGIN - Optional, defaults to "*"
+    - PORT - Automatically set by Deno Deploy
+- **Bottom Drawer Component**: Created reusable `BottomDrawerModifier` matching Figma design
+  - Found in Figma file as "Bottom Drawer" component (node ID: 67:356)
+  - Glassmorphic style with rounded top corners only (15px radius)
+  - Gradient background (white 0% to 30% opacity)
+  - Complex gradient stroke with opacity variations
+  - Multiple drawer variations found across different screens
+
+### Changed
+- **Updated Bottom Drawer UI**: Matched Figma design specifications exactly
+  - Created custom `BottomDrawerModifier` with proper blur effect (radius 10)
+  - Updated gradient background to match Figma (0.1 to 0.4 opacity)
+  - Fixed corner radius to only round top corners (15px)
+  - Added proper shadows: drop shadow (black 12%, offset y:4, radius:12) and inner shadow (white 25%, offset y:4, radius:8)
+  - Updated gradient stroke with varying opacity
+  - Changed title text from "Voice Recording 1" to "Adding Context" during recording
+  - Updated fonts to use correct Nunito font family names
+  - Fixed waveform bars to 2px width with 10px corner radius and proper shadows
+  - Created custom stop button matching Figma design with gradient background and red square
+
 ### Fixed
 - Recording functionality now properly handles completion callbacks
 - Added minimum recording duration check (0.5s) to prevent API errors

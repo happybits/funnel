@@ -1,10 +1,3 @@
-//
-//  AppState.swift
-//  Funnel
-//
-//  Created by Claude on 6/17/25.
-//
-
 import AVFoundation
 import Combine
 import Foundation
@@ -15,6 +8,7 @@ enum NavigationState: Equatable {
     case recording
     case processing
     case viewing(Recording)
+    case cards(Recording)
 }
 
 @MainActor
@@ -177,8 +171,8 @@ class AppState: ObservableObject {
 
             try modelContext.save()
 
-            // Navigate to viewing state
-            navigationState = .viewing(recording)
+            // Navigate to cards view
+            navigationState = .cards(recording)
 
         } catch {
             // Handle error
@@ -201,6 +195,18 @@ class AppState: ObservableObject {
         navigationState = .recording
         processingError = nil
         processingStatus = ""
+
+        // Reset recording state to ensure clean state for next recording
+        isRecording = false
+        recordingTime = 0
+        audioLevel = 0
+        waveformValues = []
+
+        // Clean up any active timers
+        recordingTimer?.invalidate()
+        recordingTimer = nil
+        levelTimer?.invalidate()
+        levelTimer = nil
     }
 
     // MARK: - Retry Methods

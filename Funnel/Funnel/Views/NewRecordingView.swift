@@ -1,19 +1,16 @@
-//
-//  NewRecordingView.swift
-//  Funnel
-//
-//  Created by Claude on 6/17/25.
-//
 
 import SwiftData
 import SwiftUI
 
 struct NewRecordingView: View {
     @EnvironmentObject var appState: AppState
+    var hideBackground: Bool = false
 
     var body: some View {
         ZStack {
-            GradientBackground()
+            if !hideBackground {
+                GradientBackground()
+            }
 
             VStack(spacing: 0) {
                 // Logo aligned to left
@@ -30,15 +27,15 @@ struct NewRecordingView: View {
                     MicrophoneButton()
 
                     Text("Record Your First Message")
-                        .funnelTitle()
-                        .funnelTextOverlay("Record Your First Message", font: .nunitoExtraBold, size: 18)
+                        .funnelFont(.nunitoExtraBold, size: 18)
+                        .whiteSandGradientEffect()
 
                     let speakText = "Speak your thoughts — we'll turn them into something magical."
 
                     Text(speakText)
-                        .funnelBody()
+                        .funnelFont(.nunitoRegular, size: 15)
+                        .whiteSandGradientEffect()
                         .multilineTextAlignment(.center)
-                        .funnelTextOverlay(speakText, font: .nunitoRegular, size: 15)
                         .padding(.horizontal, 40)
                 }
                 .padding(.bottom, appState.isRecording ? 156 : 179)
@@ -62,12 +59,12 @@ struct RecordingControls: View {
                 // Recording state
                 VStack(spacing: 20) {
                     Text("Voice Recording 1")
-                        .funnelTitle()
-                        .funnelTextOverlay("Voice Recording 1", font: .nunitoExtraBold, size: 18)
+                        .funnelFont(.nunitoExtraBold, size: 18)
+                        .whiteSandGradientEffect()
 
                     Text(formatTime(appState.recordingTime))
                         .funnelBody()
-                        .funnelTextOverlay(formatTime(appState.recordingTime), font: .nunitoRegular, size: 15)
+                        .whiteSandGradientEffect()
 
                     WaveformView(values: appState.waveformValues)
                         .frame(height: 37)
@@ -124,7 +121,7 @@ struct RecordButton: View {
 
     var body: some View {
         Button(action: onTap) {
-            Image("RecordButton")
+            Image("RecordBtn")
                 .scaleEffect(isPressed ? 0.95 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())

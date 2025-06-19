@@ -1,10 +1,3 @@
-//
-//  FontExtensions.swift
-//  Funnel
-//
-//  Created by Claude on 6/16/25.
-//
-
 import SwiftUI
 
 // Font names enum for type safety
@@ -49,29 +42,19 @@ extension View {
 
 // Text style modifiers with the layered effect from the design
 extension View {
-    func funnelTextStyle(opacity: (CGFloat, CGFloat) = (0.1, 0.4)) -> some View {
-        foregroundStyle(
-            LinearGradient(
-                colors: [
-                    Color.white.opacity(opacity.0),
-                    Color.white.opacity(opacity.1),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-        .shadow(color: .black.opacity(0.12), radius: 20, x: 0, y: 4)
-    }
-
-    func funnelTextOverlay(_ text: String, font: FunnelFont, size: CGFloat) -> some View {
-        overlay(
-            Text(text)
-                .font(.custom(font.rawValue, size: size))
-                .multilineTextAlignment(.center)
-                .foregroundColor(.white)
-                .blendMode(.overlay)
-                .shadow(color: .white, radius: 12, x: 0, y: 4)
-        )
+    func funnelTextStyle(opacity _: (CGFloat, CGFloat) = (0.1, 0.4)) -> some View {
+//        foregroundStyle(
+//            LinearGradient(
+//                colors: [
+//                    Color.white.opacity(opacity.0),
+//                    Color.white.opacity(opacity.1),
+//                ],
+//                startPoint: .top,
+//                endPoint: .bottom
+//            )
+//        )
+//        self.shadow(color: .black.opacity(0.12), radius: 20, x: 0, y: 4)
+        self
     }
 }
 
@@ -87,8 +70,28 @@ extension Text {
             .funnelTextStyle()
     }
 
+    func funnelBodyBold() -> some View {
+        funnelFont(.nunitoBold, size: .title)
+            .funnelTextStyle()
+    }
+
     func funnelSmall() -> some View {
         funnelFont(.nunitoRegular, size: .small)
+            .funnelTextStyle()
+    }
+
+    func funnelSubheadlineBold() -> some View {
+        funnelFont(.nunitoExtraBold, size: 14)
+            .funnelTextStyle()
+    }
+
+    func funnelCallout() -> some View {
+        funnelFont(.nunitoSemiBold, size: 16)
+            .funnelTextStyle()
+    }
+
+    func funnelCalloutBold() -> some View {
+        funnelFont(.nunitoExtraBold, size: 16)
             .funnelTextStyle()
     }
 }

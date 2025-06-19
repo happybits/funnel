@@ -1,10 +1,3 @@
-//
-//  AudioRecorderManager.swift
-//  Funnel
-//
-//  Created by Claude on 6/16/25.
-//
-
 import AVFoundation
 import Combine
 import Foundation

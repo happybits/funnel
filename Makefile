@@ -12,31 +12,24 @@ YELLOW = \033[0;33m
 RED = \033[0;31m
 NC = \033[0m # No Color
 
-.PHONY: help build clean generate install run test format lint all
+.PHONY: help build clean install run test format lint all
 
 # Default target
-all: generate build
+all: build
 
 help:
 	@echo "$(GREEN)Funnel iOS App - Available commands:$(NC)"
-	@echo "  $(YELLOW)make build$(NC)     - Generate project and build the app"
-	@echo "  $(YELLOW)make generate$(NC)  - Generate Xcode project from project.yml"
+	@echo "  $(YELLOW)make build$(NC)     - Build the app"
 	@echo "  $(YELLOW)make clean$(NC)     - Clean build artifacts and DerivedData"
-	@echo "  $(YELLOW)make install$(NC)   - Install required tools (xcodegen, swiftformat)"
+	@echo "  $(YELLOW)make install$(NC)   - Install required tools (swiftformat)"
 	@echo "  $(YELLOW)make run$(NC)       - Build and run on simulator"
 	@echo "  $(YELLOW)make test$(NC)      - Run tests"
 	@echo "  $(YELLOW)make format$(NC)    - Format Swift code"
 	@echo "  $(YELLOW)make lint$(NC)      - Run SwiftLint (if installed)"
-	@echo "  $(YELLOW)make all$(NC)       - Generate and build (default)"
-
-# Generate Xcode project
-generate:
-	@echo "$(GREEN)Generating Xcode project...$(NC)"
-	@xcodegen generate
-	@echo "$(GREEN)✅ Project generated$(NC)"
+	@echo "  $(YELLOW)make all$(NC)       - Build (default)"
 
 # Build the app
-build: generate
+build:
 	@echo "$(GREEN)Building for $(SIMULATOR)...$(NC)"
 	@xcodebuild -project $(PROJECT) \
 		-scheme $(SCHEME) \
@@ -51,16 +44,13 @@ clean:
 	@xcodebuild -project $(PROJECT) -scheme $(SCHEME) clean -quiet 2>/dev/null || true
 	@echo "$(GREEN)✅ Clean complete$(NC)"
 
-# Deep clean (including regenerating project)
+# Deep clean
 deep-clean: clean
-	@echo "$(YELLOW)Removing generated project files...$(NC)"
-	@rm -rf $(PROJECT)
 	@echo "$(GREEN)✅ Deep clean complete$(NC)"
 
 # Install required tools
 install:
 	@echo "$(GREEN)Checking and installing required tools...$(NC)"
-	@command -v xcodegen >/dev/null 2>&1 || (echo "Installing XcodeGen..." && brew install xcodegen)
 	@command -v swiftformat >/dev/null 2>&1 || (echo "Installing SwiftFormat..." && brew install swiftformat)
 	@echo "$(GREEN)✅ All tools installed$(NC)"
 
@@ -79,7 +69,7 @@ run: build
 	@xcrun simctl launch booted com.joya.funnel
 
 # Run tests
-test: generate
+test:
 	@echo "$(GREEN)Running tests...$(NC)"
 	@xcodebuild -project $(PROJECT) \
 		-scheme $(SCHEME) \
@@ -107,7 +97,6 @@ lint:
 
 # Quick build without all the noise
 quick: 
-	@xcodegen generate >/dev/null 2>&1
 	@xcodebuild -project $(PROJECT) \
 		-scheme $(SCHEME) \
 		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
@@ -121,7 +110,7 @@ watch:
 	@fswatch -o . -e ".*\.xcodeproj" -e "\.build" -e "DerivedData" | xargs -n1 -I{} make quick
 
 # Build for release
-release: generate
+release:
 	@echo "$(GREEN)Building Release configuration...$(NC)"
 	@xcodebuild -project $(PROJECT) \
 		-scheme $(SCHEME) \

@@ -1,0 +1,324 @@
+import SwiftData
+import SwiftUI
+
+struct SwipeableCardsView: View {
+    @EnvironmentObject var appState: AppState
+    @Environment(\.modelContext) private var modelContext
+    @State private var currentPage = 0
+    @State private var dragOffset: CGSize = .zero
+    @State private var scrollOffset: CGFloat = 0
+
+    let recording: Recording
+    var hideBackground: Bool = false
+
+    // Gradient colors for each card
+    private let gradientColors: [[Color]] = [
+        // Bullet Summary - Orange gradient
+        [
+            Color(red: 0.972, green: 0.698, blue: 0.459),
+            Color(red: 0.976, green: 0.843, blue: 0.459),
+        ],
+        // Diagram - Pink to Red gradient
+        [
+            Color(red: 0.827, green: 0.435, blue: 0.757),
+            Color(red: 0.969, green: 0.290, blue: 0.286),
+        ],
+        // Transcript - Blue to Teal gradient
+        [
+            Color(red: 0.580, green: 0.651, blue: 0.882),
+            Color(red: 0.400, green: 0.820, blue: 0.796),
+        ],
+    ]
+
+    var body: some View {
+        GeometryReader { _ in
+            ZStack {
+                // Animated gradient background
+                if !hideBackground {
+                    LinearGradient(
+                        colors: gradientColors[currentPage],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 0.5), value: currentPage)
+                }
+
+                VStack(spacing: 0) {
+                    // Header with back button and add voice button
+                    HStack {
+                        Button {
+                            appState.resetToRecording()
+                        } label: {
+                            Image("backbtn")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 44, height: 44)
+                        }
+
+                        Spacer()
+
+                        Button {
+                            // TODO: Add voice action
+                        } label: {
+                            Image("addbtn")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 44)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
+
+                    // Cards Container with custom scroll view for peek effect
+                    GeometryReader { geometry in
+                        ScrollViewReader { scrollProxy in
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 15) {
+                                    BulletSummaryCard(bulletSummary: recording.bulletSummary ?? [])
+                                        .frame(width: geometry.size.width - 30) // 15px peek on each side
+                                        .id(0)
+
+                                    DiagramCard(diagram: recording.diagram)
+                                        .frame(width: geometry.size.width - 30)
+                                        .id(1)
+
+                                    TranscriptCard(transcript: recording.transcript ?? "")
+                                        .frame(width: geometry.size.width - 30)
+                                        .id(2)
+                                }
+                                .padding(.horizontal, 15) // This creates the peek effect
+                            }
+                            .scrollTargetBehavior(.paging)
+                            .contentMargins(.horizontal, 15, for: .scrollContent)
+                            .onAppear {
+                                scrollProxy.scrollTo(currentPage, anchor: .center)
+                            }
+                            .onChange(of: currentPage) { _, newValue in
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    scrollProxy.scrollTo(newValue, anchor: .center)
+                                }
+                            }
+                            .gesture(
+                                DragGesture()
+                                    .onEnded { value in
+                                        let threshold: CGFloat = 50
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                            if value.translation.width > threshold, currentPage > 0 {
+                                                currentPage -= 1
+                                            } else if value.translation.width < -threshold, currentPage < 2 {
+                                                currentPage += 1
+                                            }
+                                        }
+                                    }
+                            )
+                        }
+                    }
+                    .padding(.top, 20)
+
+                    // Custom page indicators
+                    HStack(spacing: 8) {
+                        ForEach(0 ..< 3) { index in
+                            Circle()
+                                .fill(currentPage == index ? Color.white : Color.white.opacity(0.3))
+                                .frame(width: 8, height: 8)
+                                .scaleEffect(currentPage == index ? 1.2 : 1)
+                                .animation(.spring(response: 0.3), value: currentPage)
+                        }
+                    }
+                    .padding(.bottom, 50)
+                }
+            }
+        }
+        .onChange(of: currentPage) { _, newValue in
+            // Notify parent view of gradient change
+            NotificationCenter.default.post(
+                name: Notification.Name("CardGradientChanged"),
+                object: nil,
+                userInfo: ["colors": gradientColors[newValue]]
+            )
+        }
+        .onAppear {
+            // Set initial gradient
+            NotificationCenter.default.post(
+                name: Notification.Name("CardGradientChanged"),
+                object: nil,
+                userInfo: ["colors": gradientColors[currentPage]]
+            )
+        }
+    }
+}
+
+// MARK: - Card Views
+
+struct BulletSummaryCard: View {
+    let bulletSummary: [String]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Summary")
+                .funnelBodyBold()
+                .foregroundColor(.white)
+
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(bulletSummary, id: \.self) { bullet in
+                    HStack(alignment: .top, spacing: 8) {
+                        Text("•")
+                            .funnelCallout()
+                            .foregroundColor(.white.opacity(0.8))
+
+                        Text(bullet)
+                            .funnelCallout()
+                            .foregroundColor(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(25)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white, location: 0),
+                            .init(color: Color.white.opacity(0), location: 0.434),
+                            .init(color: Color.white, location: 1),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 4)
+        .glassmorphic(cornerRadius: 10, blurRadius: 10)
+        .padding(.bottom, 100)
+    }
+}
+
+struct DiagramCard: View {
+    let diagram: Recording.Diagram?
+
+    var body: some View {
+        VStack(spacing: 20) {
+            if let diagram = diagram {
+                Text(diagram.title)
+                    .funnelBodyBold()
+                    .foregroundColor(.white)
+
+                Text(diagram.description)
+                    .funnelCallout()
+                    .foregroundColor(.white.opacity(0.9))
+                    .multilineTextAlignment(.center)
+
+                Spacer()
+
+                // TODO: Render actual diagram
+                Text(diagram.content)
+                    .funnelSmall()
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+
+                Spacer()
+            } else {
+                Text("No diagram available")
+                    .funnelCallout()
+                    .foregroundColor(.white.opacity(0.5))
+            }
+        }
+        .padding(25)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            LinearGradient(
+                colors: [Color.white.opacity(0.1), Color.white.opacity(0.4)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .opacity(0.6)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 9)
+                .stroke(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white, location: 0),
+                            .init(color: Color.white.opacity(0), location: 0.434),
+                            .init(color: Color.white, location: 1),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.9
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 9))
+        .shadow(color: .black.opacity(0.12), radius: 10.8, x: 0, y: 3.6)
+        .glassmorphic(cornerRadius: 9, blurRadius: 9)
+        .padding(.bottom, 100)
+    }
+}
+
+struct TranscriptCard: View {
+    let transcript: String
+
+    var body: some View {
+        ScrollView {
+            Text(transcript)
+                .funnelCallout()
+                .foregroundColor(.white.opacity(0.9))
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(25)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            LinearGradient(
+                colors: [Color.white.opacity(0.1), Color.white.opacity(0.4)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .opacity(0.6)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 9)
+                .stroke(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white, location: 0),
+                            .init(color: Color.white.opacity(0), location: 0.434),
+                            .init(color: Color.white, location: 1),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.9
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 9))
+        .shadow(color: .black.opacity(0.12), radius: 10.8, x: 0, y: 3.6)
+        .glassmorphic(cornerRadius: 9, blurRadius: 9)
+        .padding(.bottom, 100)
+    }
+}
+
+#Preview {
+    SwipeableCardsView(recording: {
+        let recording = Recording(audioFileName: "sample.m4a", duration: 60)
+        recording.transcript = "This is a sample transcript that demonstrates the text content..."
+        recording.bulletSummary = [
+            "First key point from the recording",
+            "Second important insight",
+            "Third valuable observation",
+            "Final summary point",
+        ]
+        recording.diagramTitle = "Key Concepts"
+        recording.diagramDescription = "Visual representation of main ideas"
+        recording.diagramContent = "Concept A → Concept B → Result"
+        return recording
+    }())
+        .funnelPreviewEnvironment()
+}

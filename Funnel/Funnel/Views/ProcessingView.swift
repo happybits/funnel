@@ -1,9 +1,3 @@
-//
-//  ProcessingView.swift
-//  Funnel
-//
-//  Created by Claude on 6/17/25.
-//
 
 import SwiftData
 import SwiftUI
@@ -29,8 +23,8 @@ struct ProcessingView: View {
             let funnelText = "Processing - Hang tight!"
             Text(funnelText)
                 .funnelTitle()
+                .whiteSandGradientEffect()
                 .multilineTextAlignment(.center)
-                .funnelTextOverlay(funnelText, font: .nunitoExtraBold, size: 18)
 
             if let error = appState.processingError {
                 Text("Error: \(error.localizedDescription)")
@@ -59,16 +53,18 @@ struct ProcessingView: View {
     }
 
     var body: some View {
-        GradientBackground()
-            .overlay(alignment: .topLeading) {
+        VStack {
+            HStack {
                 logo
+                Spacer()
             }
-            .overlay {
-                VStack {
-                    processingBox
-                }
-            }
-            .ignoresSafeArea()
+
+            Spacer()
+
+            processingBox
+
+            Spacer()
+        }
     }
 }
 

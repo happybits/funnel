@@ -1,9 +1,3 @@
-//
-//  Recording.swift
-//  Funnel
-//
-//  Created by Claude on 6/17/25.
-//
 
 import Foundation
 import SwiftData
@@ -37,6 +31,23 @@ final class Recording {
     var diagramTitle: String?
     var diagramDescription: String?
     var diagramContent: String?
+
+    // Computed property for diagram
+    var diagram: Diagram? {
+        guard let title = diagramTitle,
+              let description = diagramDescription,
+              let content = diagramContent
+        else {
+            return nil
+        }
+        return Diagram(title: title, description: description, content: content)
+    }
+
+    struct Diagram {
+        let title: String
+        let description: String
+        let content: String
+    }
 
     init(audioFileName: String, duration: TimeInterval) {
         id = UUID()
