@@ -38,7 +38,7 @@ struct NewRecordingView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
                 }
-                .padding(.bottom, appState.isRecording ? 156 : 179)
+                .padding(.bottom, appState.isActivelyRecording ? 156 : 179)
 
                 RecordingControls()
                     .padding(.horizontal, 15)
@@ -55,7 +55,7 @@ struct RecordingControls: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if appState.isRecording {
+            if appState.isActivelyRecording {
                 // Recording state
                 VStack(spacing: 20) {
                     Text("Voice Recording 1")
@@ -77,13 +77,13 @@ struct RecordingControls: View {
 
             // Single button that changes based on state
             Button {
-                if appState.isRecording && appState.navigationState != .processing {
+                if appState.isActivelyRecording {
                     appState.stopRecording()
                 } else {
                     appState.startRecording()
                 }
             } label: {
-                Image(appState.isRecording && appState.navigationState != .processing ? "StopRecordBtn" : "RecordBtn")
+                Image(appState.isActivelyRecording ? "StopRecordBtn" : "RecordBtn")
                     .scaleEffect(isPressed ? 0.95 : 1.0)
             }
             .buttonStyle(PlainButtonStyle())
@@ -95,12 +95,12 @@ struct RecordingControls: View {
             .padding(.top, 15)
             .padding(.bottom, 61)
         }
-        .frame(width: 372, height: appState.isRecording ? 350 : 179)
+        .frame(width: 372, height: appState.isActivelyRecording ? 350 : 179)
         .glassmorphic(
             cornerRadius: 15,
-            gradientOpacity: appState.isRecording ? (0.1, 0.4) : (0.0, 0.3)
+            gradientOpacity: appState.isActivelyRecording ? (0.1, 0.4) : (0.0, 0.3)
         )
-        .animation(.easeInOut(duration: 0.3), value: appState.isRecording)
+        .animation(.easeInOut(duration: 0.3), value: appState.navigationState)
     }
 
     private func formatTime(_ time: TimeInterval) -> String {

@@ -5,7 +5,7 @@ import SwiftData
 import SwiftUI
 
 enum NavigationState: Equatable {
-    case recording
+    case recording(isActive: Bool)
     case processing
     case viewing(Recording)
     case cards(Recording)
@@ -15,20 +15,27 @@ enum NavigationState: Equatable {
 class AppState: ObservableObject {
     // MARK: - Navigation State
 
-    @Published var navigationState: NavigationState = .recording
+    @Published var navigationState: NavigationState = .recording(isActive: false)
 
     // MARK: - Recording State
 
-    @Published var isRecording = false
     @Published var recordingTime: TimeInterval = 0
     @Published var audioLevel: Float = 0
     @Published var waveformValues: [CGFloat] = []
 
     // MARK: - Processing State
 
-    @Published var isProcessing = false
     @Published var processingStatus: String = ""
     @Published var processingError: Error?
+
+    // MARK: - Computed Properties
+
+    var isActivelyRecording: Bool {
+        if case .recording(isActive: true) = navigationState {
+            return true
+        }
+        return false
+    }
 
     // MARK: - Dependencies
 
@@ -67,11 +74,11 @@ class AppState: ObservableObject {
                 switch result {
                 case .success:
                     DispatchQueue.main.async {
-                        self.isRecording = true
+                        self.navigationState = .recording(isActive: true)
                         self.recordingTime = 0
                         self.waveformValues = []
                         self.startTimers()
-                        print("AppState: Recording state updated, isRecording: \(self.isRecording)")
+                        print("AppState: Recording state updated to active")
                     }
                 case let .failure(error):
                     print("AppState: Recording failed: \(error)")
@@ -109,15 +116,11 @@ class AppState: ObservableObject {
                 await processRecording(audioURL: audioURL, duration: recordingDuration)
             }
         }
-
-        // Set isRecording to false after navigation state change
-        isRecording = false
     }
 
     // MARK: - Processing Methods
 
     private func processRecording(audioURL: URL, duration: TimeInterval) async {
-        isProcessing = true
         processingError = nil
 
         // Create and save the recording
@@ -133,7 +136,6 @@ class AppState: ObservableObject {
             await processRecordingSteps(recording: recording)
         } catch {
             processingError = error
-            isProcessing = false
         }
     }
 
@@ -186,20 +188,16 @@ class AppState: ObservableObject {
 
             try? modelContext.save()
         }
-
-        print("AppState: Setting isProcessing to false")
-        isProcessing = false
     }
 
     // MARK: - Navigation Methods
 
     func resetToRecording() {
-        navigationState = .recording
+        navigationState = .recording(isActive: false)
         processingError = nil
         processingStatus = ""
 
         // Reset recording state to ensure clean state for next recording
-        isRecording = false
         recordingTime = 0
         audioLevel = 0
         waveformValues = []
