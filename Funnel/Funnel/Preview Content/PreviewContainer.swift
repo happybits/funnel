@@ -109,57 +109,10 @@ extension View {
     @ViewBuilder
     func funnelPreviewEnvironment() -> some View {
         modelContainer(ModelContainer.previewContainer)
-            .environmentObject(MockCurrentRecordingProvider() as CurrentRecordingProvider)
     }
 }
 
 // Helper to check if running in preview
 var isRunningInPreview: Bool {
     ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
-}
-
-// Mock recording provider for previews
-class MockCurrentRecordingProvider: CurrentRecordingProvider {
-    private var mockTimer: Timer?
-    private var mockWaveformTimer: Timer?
-
-    override func startRecording(completion _: @escaping (Result<URL, Error>) -> Void) {
-        // Simulate recording start
-        DispatchQueue.main.async { [weak self] in
-            self?.isRecording = true
-            self?.recordingTime = 0
-            self?.waveformValues = []
-            self?.startMockTimers()
-        }
-    }
-
-    override func stopRecording() {
-        mockTimer?.invalidate()
-        mockWaveformTimer?.invalidate()
-        isRecording = false
-        recordingTime = 0
-        waveformValues = []
-    }
-
-    private func startMockTimers() {
-        // Mock recording time
-        mockTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            self?.recordingTime += 0.1
-        }
-
-        // Mock waveform animation
-        mockWaveformTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-
-            withAnimation(.linear(duration: 0.05)) {
-                // Generate random waveform values to simulate audio
-                let randomLevel = CGFloat.random(in: 0.1 ... 0.8)
-                self.waveformValues.append(randomLevel)
-
-                if self.waveformValues.count > 50 {
-                    self.waveformValues.removeFirst()
-                }
-            }
-        }
-    }
 }

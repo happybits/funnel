@@ -1,25 +1,20 @@
-
 import Foundation
 import SwiftData
+import SwiftUI
 
 @MainActor
-class RecordingProcessor: ObservableObject {
+class RecordingManager: ObservableObject {
     @Published var isProcessing = false
-    @Published var processingStatus: String = ""
+    @Published var processingStatus = ""
     @Published var processingError: Error?
+    @Published var presentedRecording: Recording?
 
     private let apiService = FunnelAPIService.shared
-    var modelContext: ModelContext
 
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
-    }
-
-    func processRecording(audioURL: URL, duration: TimeInterval) async {
+    func processRecording(audioURL: URL, duration: TimeInterval, modelContext: ModelContext) async {
         isProcessing = true
         processingError = nil
 
-        // Create and save the recording
         let recording = Recording(
             audioFileName: audioURL.lastPathComponent,
             duration: duration
@@ -29,34 +24,26 @@ class RecordingProcessor: ObservableObject {
 
         do {
             try modelContext.save()
+            await processRecordingSteps(recording: recording, modelContext: modelContext)
         } catch {
             processingError = error
             isProcessing = false
-            return
         }
-
-        // Process the recording
-        await processRecordingSteps(recording: recording)
     }
 
-    private func processRecordingSteps(recording: Recording) async {
+    private func processRecordingSteps(recording: Recording, modelContext: ModelContext) async {
+
         do {
-            // Update status: Uploading
             recording.processingStatus = .uploading
             processingStatus = "Uploading audio..."
             try? modelContext.save()
 
-            print("RecordingProcessor: Starting upload to API")
-
-            // Process audio through combined endpoint
             recording.processingStatus = .transcribing
             processingStatus = "Processing audio..."
             try? modelContext.save()
 
             let processedData = try await apiService.processAudio(fileURL: recording.audioFileURL)
-            print("RecordingProcessor: API processing complete")
 
-            // Update recording with all data from combined response
             recording.transcript = processedData.transcript
             recording.duration = processedData.duration
             recording.bulletSummary = processedData.bulletSummary
@@ -64,42 +51,42 @@ class RecordingProcessor: ObservableObject {
             recording.diagramDescription = processedData.diagram.description
             recording.diagramContent = processedData.diagram.content
 
-            // Mark as completed
             recording.processingStatus = .completed
             processingStatus = "Processing complete!"
 
-            // Update title based on summary
             if let firstBullet = recording.bulletSummary?.first {
-                // Use first bullet point as title, truncated if necessary
                 recording.title = String(firstBullet.prefix(50))
             }
 
             try modelContext.save()
 
+            isProcessing = false
+            presentedRecording = recording
+
         } catch {
-            // Handle error
-            print("RecordingProcessor: Processing failed with error: \(error)")
             recording.processingStatus = .failed
             recording.errorMessage = error.localizedDescription
             processingError = error
             processingStatus = "Processing failed"
+            isProcessing = false
 
             try? modelContext.save()
         }
-
-        print("RecordingProcessor: Setting isProcessing to false")
-        isProcessing = false
     }
 
-    // MARK: - Retry Failed Recording
-
-    func retryProcessing(recording: Recording) async {
+    func retryProcessing(recording: Recording, modelContext: ModelContext) async {
         guard recording.processingStatus == .failed else { return }
 
         recording.processingStatus = .unprocessed
         recording.errorMessage = nil
         try? modelContext.save()
 
-        await processRecordingSteps(recording: recording)
+        isProcessing = true
+        await processRecordingSteps(recording: recording, modelContext: modelContext)
+    }
+
+    func dismissError() {
+        processingError = nil
+        isProcessing = false
     }
 }
