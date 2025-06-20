@@ -4,61 +4,29 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var recordingManager = RecordingManager()
-    @State private var showFontDebug = false
-    @State private var currentGradientColors: [Color] = [
-        Color(red: 0.972, green: 0.698, blue: 0.459),
-        Color(red: 0.976, green: 0.843, blue: 0.459),
-    ]
-
-    // Default gradient for recording state
-    private let recordingGradientColors = [
-        Color(red: 0.972, green: 0.698, blue: 0.459),
-        Color(red: 0.976, green: 0.843, blue: 0.459),
-    ]
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // Single gradient background that stays in place
-                LinearGradient(
-                    colors: currentGradientColors,
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                .animation(.easeInOut(duration: 0.5), value: currentGradientColors)
+                // Rainbow gradient background from GradientBackground component
+                GradientBackground()
 
-                if showFontDebug {
-                    // Temporary debug view - triple tap to toggle
-                    VStack {
-                        FontDebugView()
-                            .onTapGesture(count: 3) {
-                                showFontDebug = false
-                            }
-                    }
-                } else {
-                    ZStack {
-                        // Main recording view
-                        NewRecordingView(hideBackground: true)
-                            .onTapGesture(count: 3) {
-                                showFontDebug = true
-                            }
+                ZStack {
+                    // Main recording view
+                    NewRecordingView(hideBackground: true)
 
-                        // Processing overlay
-                        if recordingManager.isProcessing {
-                            ProcessingOverlay()
-                                .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                        }
+                    // Processing overlay
+                    if recordingManager.isProcessing {
+                        ProcessingOverlay()
+                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
                     }
-                    .navigationDestination(item: $recordingManager.presentedRecording) { recording in
-                        SwipeableCardsView(recording: recording, hideBackground: false)
-                            .navigationBarBackButtonHidden(true)
-                            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("CardGradientChanged"))) { notification in
-                                if let colors = notification.userInfo?["colors"] as? [Color] {
-                                    currentGradientColors = colors
-                                }
-                            }
-                    }
+                }
+                .navigationDestination(item: $recordingManager.presentedRecording) { recording in
+                    SwipeableCardsView(recording: recording, hideBackground: true)
+                        .navigationBarBackButtonHidden(true)
+                        .background(
+                            GradientBackground()
+                        )
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: recordingManager.isProcessing)

@@ -28,42 +28,50 @@ struct NewRecordingView: View {
                 GradientBackground()
             }
 
-            VStack(spacing: 0) {
-                // Logo aligned to left
-                HStack {
-                    FunnelLogo()
-                        .padding(.leading, 30)
-                    Spacer()
-                }
-                .padding(.top, 89)
-
-                Spacer()
-
-                if recordings.isEmpty && !isRecording {
-                    // Show explainer text when no recordings
-                    VStack(spacing: 20) {
-                        MicrophoneButton()
-
-                        Text("Record Your First Message")
-                            .funnelFont(.nunitoExtraBold, size: 18)
-                            .whiteSandGradientEffect()
-
-                        let speakText = "Speak your thoughts — we'll turn them into something magical."
-
-                        Text(speakText)
-                            .funnelFont(.nunitoRegular, size: 15)
-                            .whiteSandGradientEffect()
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 40)
-                    }
-                    .padding(.bottom, 179)
-                } else if !isRecording {
-                    // Show past recordings list
+            ZStack(alignment: .bottom) {
+                // Background recordings list that extends full height
+                if !recordings.isEmpty && !isRecording {
                     RecordingsListView(recordings: recordings)
                         .padding(.horizontal, 15)
-                        .padding(.bottom, 20)
+                        .padding(.top, 178) // Space for logo
+                        .padding(.bottom, 195) // Space for floating record button
+                }
+                
+                VStack(spacing: 0) {
+                    // Logo aligned to left
+                    HStack {
+                        FunnelLogo()
+                            .padding(.leading, 30)
+                        Spacer()
+                    }
+                    .padding(.top, 89)
+
+                    if recordings.isEmpty && !isRecording {
+                        // Show explainer text when no recordings
+                        Spacer()
+
+                        VStack(spacing: 20) {
+                            MicrophoneButton()
+
+                            Text("Record Your First Message")
+                                .funnelFont(.nunitoExtraBold, size: 18)
+                                .whiteSandGradientEffect()
+
+                            let speakText = "Speak your thoughts — we'll turn them into something magical."
+
+                            Text(speakText)
+                                .funnelFont(.nunitoRegular, size: 15)
+                                .whiteSandGradientEffect()
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 40)
+                        }
+                        .padding(.bottom, 179)
+                    } else {
+                        Spacer()
+                    }
                 }
 
+                // Recording controls float on top
                 RecordingControlsView(
                     isRecording: $isRecording,
                     recordingTime: $recordingTime,
@@ -77,7 +85,6 @@ struct NewRecordingView: View {
                     }
                 )
                 .padding(.horizontal, 15)
-                .padding(.bottom, 0)
             }
         }
         .ignoresSafeArea()
@@ -142,7 +149,7 @@ struct RecordingControlsView: View {
         .frame(width: 372, height: isRecording ? 350 : 179)
         .glassmorphic(
             cornerRadius: 15,
-            gradientOpacity: isRecording ? (0.1, 0.4) : (0.0, 0.3)
+            gradientOpacity: isRecording ? (0.05, 0.25) : (0.0, 0.15)
         )
         .animation(.easeInOut(duration: 0.3), value: isRecording)
     }
@@ -150,11 +157,7 @@ struct RecordingControlsView: View {
     private func startRecording() {
         audioRecorder.requestMicrophonePermission { granted in
             guard granted else {
-                recordingError = NSError(
-                    domain: "AudioRecorder",
-                    code: -2,
-                    userInfo: [NSLocalizedDescriptionKey: "Microphone permission denied"]
-                )
+                recordingError = FunnelError.microphonePermissionDenied
                 return
             }
 
@@ -178,11 +181,7 @@ struct RecordingControlsView: View {
         let duration = recordingTime
 
         guard duration >= 0.5 else {
-            recordingError = NSError(
-                domain: "Recording",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Recording too short. Please record for at least 0.5 seconds."]
-            )
+            recordingError = FunnelError.recordingTooShort(minimumDuration: 0.5)
             return
         }
 
@@ -287,11 +286,13 @@ struct RecordingsListView: View {
                                 Text(recording.title)
                                     .funnelFont(.nunitoBold, size: 16)
                                     .foregroundColor(.white)
+                                    .shadow(radius: 8)
                                     .lineLimit(1)
 
                                 Text(recording.timestamp.formatted(date: .abbreviated, time: .shortened))
                                     .funnelFont(.nunitoRegular, size: 14)
                                     .foregroundColor(.white.opacity(0.7))
+                                    .shadow(radius: 8)
                             }
 
                             Spacer()
@@ -299,16 +300,16 @@ struct RecordingsListView: View {
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.white.opacity(0.5))
                         }
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.1))
+                        .padding(20)
+                        .frame(maxWidth: .infinity)
+                        .glassmorphic(
+                            cornerRadius: 15,
+                            gradientOpacity: (0.1, 0.3)
                         )
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
             }
-            .padding(.top, 20)
         }
     }
 }

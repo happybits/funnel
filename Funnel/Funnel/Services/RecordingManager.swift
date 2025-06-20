@@ -32,7 +32,6 @@ class RecordingManager: ObservableObject {
     }
 
     private func processRecordingSteps(recording: Recording, modelContext: ModelContext) async {
-
         do {
             recording.processingStatus = .uploading
             processingStatus = "Uploading audio..."

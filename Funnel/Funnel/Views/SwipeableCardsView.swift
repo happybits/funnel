@@ -85,15 +85,15 @@ struct SwipeableCardsView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 15) {
                                     BulletSummaryCard(bulletSummary: recording.bulletSummary ?? [])
-                                        .frame(width: geometry.size.width - 30) // 15px peek on each side
+                                        .frame(width: geometry.size.width - 60) // 30px peek on right side
                                         .id(0)
 
                                     DiagramCard(diagram: recording.diagram)
-                                        .frame(width: geometry.size.width - 30)
+                                        .frame(width: geometry.size.width - 60)
                                         .id(1)
 
                                     TranscriptCard(transcript: recording.transcript ?? "")
-                                        .frame(width: geometry.size.width - 30)
+                                        .frame(width: geometry.size.width - 60)
                                         .id(2)
                                 }
                                 .scrollTargetLayout()
@@ -113,17 +113,9 @@ struct SwipeableCardsView: View {
                     }
                     .padding(.top, 20)
 
-                    // Custom page indicators
-                    HStack(spacing: 8) {
-                        ForEach(0 ..< 3) { index in
-                            Circle()
-                                .fill(currentPage == index ? Color.white : Color.white.opacity(0.3))
-                                .frame(width: 8, height: 8)
-                                .scaleEffect(currentPage == index ? 1.2 : 1)
-                                .animation(.spring(response: 0.3), value: currentPage)
-                        }
-                    }
-                    .padding(.bottom, 50)
+                    // Removed page indicators
+                    Spacer()
+                        .frame(height: 30)
                 }
             }
         }
@@ -152,10 +144,11 @@ struct BulletSummaryCard: View {
     let bulletSummary: [String]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(spacing: 20) {
             Text("Summary")
                 .funnelBodyBold()
                 .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
 
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(bulletSummary, id: \.self) { bullet in

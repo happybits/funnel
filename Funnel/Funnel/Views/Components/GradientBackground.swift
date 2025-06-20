@@ -39,6 +39,7 @@ struct GradientBackground: View {
             startPoint: UnitPoint(x: 0.1 + cos(gradientRotation) * 0.1, y: 0),
             endPoint: UnitPoint(x: 0.9 + sin(gradientRotation) * 0.1, y: 1)
         )
+        .overlay(Color.black.opacity(0.15))
         .ignoresSafeArea()
         .onAppear {
             // Breathing animation with color shifts
