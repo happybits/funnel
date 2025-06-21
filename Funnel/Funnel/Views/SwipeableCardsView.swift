@@ -2,8 +2,9 @@ import SwiftData
 import SwiftUI
 
 struct SwipeableCardsView: View {
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var recordingManager: RecordingManager
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     @State private var currentPage = 0
     @State private var dragOffset: CGSize = .zero
     @State private var scrollOffset: CGFloat = 0
@@ -62,7 +63,8 @@ struct SwipeableCardsView: View {
                     // Header with back button and add voice button
                     HStack {
                         Button {
-                            appState.resetToRecording()
+                            recordingManager.presentedRecording = nil
+                            dismiss()
                         } label: {
                             Image("BackBtn")
                         }

@@ -3,8 +3,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject var appState: AppState
-    @Query private var recordings: [Recording]
+    @StateObject private var recordingManager = RecordingManager()
     @State private var showFontDebug = false
     @State private var currentGradientColors: [Color] = [
         Color(red: 0.972, green: 0.698, blue: 0.459),
@@ -18,88 +17,59 @@ struct ContentView: View {
     ]
 
     var body: some View {
-        ZStack {
-            // Single gradient background that stays in place
-            LinearGradient(
-                colors: currentGradientColors,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            .animation(.easeInOut(duration: 0.5), value: currentGradientColors)
+        NavigationStack {
+            ZStack {
+                // Single gradient background that stays in place
+                LinearGradient(
+                    colors: currentGradientColors,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 0.5), value: currentGradientColors)
 
-            if showFontDebug {
-                // Temporary debug view - triple tap to toggle
-                VStack {
-                    FontDebugView()
-                        .onTapGesture(count: 3) {
-                            showFontDebug = false
-                        }
-                }
-            } else {
-                ZStack {
-                    // Base content
-                    switch appState.navigationState {
-                    case .recording, .processing:
+                if showFontDebug {
+                    // Temporary debug view - triple tap to toggle
+                    VStack {
+                        FontDebugView()
+                            .onTapGesture(count: 3) {
+                                showFontDebug = false
+                            }
+                    }
+                } else {
+                    ZStack {
+                        // Main recording view
                         NewRecordingView(hideBackground: true)
                             .onTapGesture(count: 3) {
                                 showFontDebug = true
                             }
 
-                    case let .viewing(recording):
-                        ProcessedRecordingView(recording: recording)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
-                            ))
-
-                    case let .cards(recording):
-                        SwipeableCardsView(recording: recording, hideBackground: true)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
-                            ))
+                        // Processing overlay
+                        if recordingManager.isProcessing {
+                            ProcessingOverlay()
+                                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                        }
+                    }
+                    .navigationDestination(item: $recordingManager.presentedRecording) { recording in
+                        SwipeableCardsView(recording: recording, hideBackground: false)
+                            .navigationBarBackButtonHidden(true)
                             .onReceive(NotificationCenter.default.publisher(for: Notification.Name("CardGradientChanged"))) { notification in
                                 if let colors = notification.userInfo?["colors"] as? [Color] {
                                     currentGradientColors = colors
                                 }
                             }
                     }
-
-                    // Processing overlay
-                    if case .processing = appState.navigationState {
-                        ProcessingOverlay()
-                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                    }
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: recordingManager.isProcessing)
         }
-        .animation(.easeInOut(duration: 0.3), value: appState.navigationState)
-        .onAppear {
-            // Ensure AppState has the correct model context
-            appState.modelContext = modelContext
-        }
-        .onChange(of: appState.navigationState) { _, newState in
-            // Update gradient colors based on navigation state
-            switch newState {
-            case .recording, .processing:
-                currentGradientColors = recordingGradientColors
-            case .viewing:
-                currentGradientColors = recordingGradientColors
-            case .cards:
-                // Start with the first card's gradient (orange)
-                currentGradientColors = [
-                    Color(red: 0.972, green: 0.698, blue: 0.459),
-                    Color(red: 0.976, green: 0.843, blue: 0.459),
-                ]
-            }
-        }
+        .environmentObject(recordingManager)
     }
 }
 
 // Processing overlay that appears on top of recording view
 struct ProcessingOverlay: View {
-    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var recordingManager: RecordingManager
 
     private var processingBox: some View {
         VStack(spacing: 8) {
@@ -113,7 +83,7 @@ struct ProcessingOverlay: View {
                 .whiteSandGradientEffect()
                 .multilineTextAlignment(.center)
 
-            if let error = appState.processingError {
+            if let error = recordingManager.processingError {
                 Text("Error: \(error.localizedDescription)")
                     .font(.system(size: 14))
                     .foregroundColor(.red)
@@ -121,7 +91,7 @@ struct ProcessingOverlay: View {
                     .padding(.horizontal, 40)
                     .padding(.top, 10)
 
-                Button(action: { appState.resetToRecording() }) {
+                Button(action: { recordingManager.dismissError() }) {
                     Text("Dismiss")
                         .funnelBody()
                         .padding(.horizontal, 30)
