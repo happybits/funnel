@@ -16,19 +16,9 @@ struct NewRecordingView: View {
     private var recordingTimer: Timer?
     private var levelTimer: Timer?
 
-    let hideBackground: Bool
-
-    init(hideBackground: Bool = false) {
-        self.hideBackground = hideBackground
-    }
 
     var body: some View {
-        ZStack {
-            if !hideBackground {
-                GradientBackground()
-            }
-
-            ZStack(alignment: .bottom) {
+        ZStack(alignment: .bottom) {
                 // Background recordings list that extends full height
                 if !recordings.isEmpty && !isRecording {
                     RecordingsListView(recordings: recordings)
@@ -85,7 +75,6 @@ struct NewRecordingView: View {
                     }
                 )
                 .padding(.horizontal, 15)
-            }
         }
         .ignoresSafeArea()
     }

@@ -4,16 +4,18 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var recordingManager = RecordingManager()
+    @StateObject private var gradientManager = GradientBackgroundManager()
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // Rainbow gradient background from GradientBackground component
-                GradientBackground()
+                // Global gradient background
+                GlobalGradientBackground()
+                    .environmentObject(gradientManager)
 
                 ZStack {
                     // Main recording view
-                    NewRecordingView(hideBackground: true)
+                    NewRecordingView()
 
                     // Processing overlay
                     if recordingManager.isProcessing {
@@ -22,16 +24,15 @@ struct ContentView: View {
                     }
                 }
                 .navigationDestination(item: $recordingManager.presentedRecording) { recording in
-                    SwipeableCardsView(recording: recording, hideBackground: true)
+                    SwipeableCardsView(recording: recording)
                         .navigationBarBackButtonHidden(true)
-                        .background(
-                            GradientBackground()
-                        )
+                        .environmentObject(gradientManager)
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: recordingManager.isProcessing)
         }
         .environmentObject(recordingManager)
+        .environmentObject(gradientManager)
     }
 }
 

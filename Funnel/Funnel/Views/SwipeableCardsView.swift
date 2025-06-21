@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SwipeableCardsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
+    @EnvironmentObject var gradientManager: GradientBackgroundManager
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var currentPage = 0
@@ -11,7 +12,6 @@ struct SwipeableCardsView: View {
     @State private var scrolledID: Int? = 0
 
     let recording: Recording
-    var hideBackground: Bool = false
 
     // Computed property for truncated title
     private var truncatedTitle: String {
@@ -26,40 +26,9 @@ struct SwipeableCardsView: View {
         return "Recording"
     }
 
-    // Gradient colors for each card
-    private let gradientColors: [[Color]] = [
-        // Bullet Summary - Orange gradient
-        [
-            Color(red: 0.972, green: 0.698, blue: 0.459),
-            Color(red: 0.976, green: 0.843, blue: 0.459),
-        ],
-        // Diagram - Pink to Red gradient
-        [
-            Color(red: 0.827, green: 0.435, blue: 0.757),
-            Color(red: 0.969, green: 0.290, blue: 0.286),
-        ],
-        // Transcript - Blue to Teal gradient
-        [
-            Color(red: 0.580, green: 0.651, blue: 0.882),
-            Color(red: 0.400, green: 0.820, blue: 0.796),
-        ],
-    ]
-
     var body: some View {
         GeometryReader { _ in
-            ZStack {
-                // Animated gradient background
-                if !hideBackground {
-                    LinearGradient(
-                        colors: gradientColors[currentPage],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .ignoresSafeArea()
-                    .animation(.easeInOut(duration: 0.5), value: currentPage)
-                }
-
-                VStack(spacing: 0) {
+            VStack(spacing: 0) {
                     // Header with back button and add voice button
                     HStack {
                         Button {
@@ -116,24 +85,28 @@ struct SwipeableCardsView: View {
                     // Removed page indicators
                     Spacer()
                         .frame(height: 30)
-                }
             }
         }
         .onChange(of: currentPage) { _, newValue in
-            // Notify parent view of gradient change
-            NotificationCenter.default.post(
-                name: Notification.Name("CardGradientChanged"),
-                object: nil,
-                userInfo: ["colors": gradientColors[newValue]]
-            )
+            // Update gradient based on current card
+            switch newValue {
+            case 0:
+                gradientManager.setTheme(.orange)
+            case 1:
+                gradientManager.setTheme(.pinkRed)
+            case 2:
+                gradientManager.setTheme(.blueTeal)
+            default:
+                gradientManager.setTheme(.defaultTheme)
+            }
         }
         .onAppear {
-            // Set initial gradient
-            NotificationCenter.default.post(
-                name: Notification.Name("CardGradientChanged"),
-                object: nil,
-                userInfo: ["colors": gradientColors[currentPage]]
-            )
+            // Set initial gradient based on first card
+            gradientManager.setTheme(.orange)
+        }
+        .onDisappear {
+            // Reset to default gradient when leaving
+            gradientManager.setTheme(.defaultTheme)
         }
     }
 }
