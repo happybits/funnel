@@ -4,6 +4,14 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Enhanced
+- **Card Layout in SwipeableCardsView**: Improved card visibility and centering
+  - Cards now use full screen width minus 60px (30px padding on each side)
+  - Adjacent cards peek 30px on both sides of the selected card
+  - Added horizontal spacers (22.5px) to ensure proper centering accounting for card spacing
+  - Card spacing set to 15px between cards
+  - Selected card is now always centered in the viewport
+
 ### Fixed
 - **Button asset references in SwipeableCardsView**: Fixed incorrect image names
   - Changed "backbtn" to "BackBtn" to match actual asset names

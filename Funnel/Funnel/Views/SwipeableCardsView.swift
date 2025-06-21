@@ -79,24 +79,26 @@ struct SwipeableCardsView: View {
 
                     // Cards Container with custom scroll view for peek effect
                     GeometryReader { geometry in
+                        let cardWidth = geometry.size.width - 60 // Full width minus 30px on each side
+
                         ScrollViewReader { scrollProxy in
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 15) {
                                     BulletSummaryCard(bulletSummary: recording.bulletSummary ?? [])
-                                        .frame(width: geometry.size.width - 30) // 15px peek on each side
+                                        .frame(width: cardWidth)
                                         .id(0)
 
                                     DiagramCard(diagram: recording.diagram)
-                                        .frame(width: geometry.size.width - 30)
+                                        .frame(width: cardWidth)
                                         .id(1)
 
                                     TranscriptCard(transcript: recording.transcript ?? "")
-                                        .frame(width: geometry.size.width - 30)
+                                        .frame(width: cardWidth)
                                         .id(2)
                                 }
                                 .scrollTargetLayout()
                             }
-                            .contentMargins(.horizontal, 15, for: .scrollContent)
+                            .contentMargins(.horizontal, 30, for: .scrollContent)
                             .scrollTargetBehavior(.viewAligned)
                             .scrollPosition(id: $scrolledID)
                             .onAppear {
