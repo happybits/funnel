@@ -23,7 +23,6 @@ struct GlassmorphicModifier: ViewModifier {
             // .preferredColorScheme(.light)
             .background(
                 ZStack {
-
                     // Pure backdrop blur without material effects
                     VisualEffectView(effect: UIBlurEffect(style: .regular))
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))

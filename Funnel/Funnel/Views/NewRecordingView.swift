@@ -16,65 +16,64 @@ struct NewRecordingView: View {
     private var recordingTimer: Timer?
     private var levelTimer: Timer?
 
-
     var body: some View {
         ZStack(alignment: .bottom) {
-                // Background recordings list that extends full height
-                if !recordings.isEmpty && !isRecording {
-                    RecordingsListView(recordings: recordings)
-                        .padding(.horizontal, 15)
-                        .padding(.top, 178) // Space for logo
-                        .padding(.bottom, 195) // Space for floating record button
+            // Background recordings list that extends full height
+            if !recordings.isEmpty && !isRecording {
+                RecordingsListView(recordings: recordings)
+                    .padding(.horizontal, 15)
+                    .padding(.top, 178) // Space for logo
+                    .padding(.bottom, 195) // Space for floating record button
+            }
+
+            VStack(spacing: 0) {
+                // Logo aligned to left
+                HStack {
+                    FunnelLogo()
+                        .padding(.leading, 30)
+                    Spacer()
                 }
-                
-                VStack(spacing: 0) {
-                    // Logo aligned to left
-                    HStack {
-                        FunnelLogo()
-                            .padding(.leading, 30)
-                        Spacer()
+                .padding(.top, 89)
+
+                if recordings.isEmpty && !isRecording {
+                    // Show explainer text when no recordings
+                    Spacer()
+
+                    VStack(spacing: 20) {
+                        MicrophoneButton()
+
+                        Text("Record Your First Message")
+                            .funnelFont(.nunitoExtraBold, size: 18)
+                            .whiteSandGradientEffect()
+
+                        let speakText = "Speak your thoughts — we'll turn them into something magical."
+
+                        Text(speakText)
+                            .funnelFont(.nunitoRegular, size: 15)
+                            .whiteSandGradientEffect()
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
                     }
-                    .padding(.top, 89)
+                    .padding(.bottom, 179)
+                } else {
+                    Spacer()
+                }
+            }
 
-                    if recordings.isEmpty && !isRecording {
-                        // Show explainer text when no recordings
-                        Spacer()
-
-                        VStack(spacing: 20) {
-                            MicrophoneButton()
-
-                            Text("Record Your First Message")
-                                .funnelFont(.nunitoExtraBold, size: 18)
-                                .whiteSandGradientEffect()
-
-                            let speakText = "Speak your thoughts — we'll turn them into something magical."
-
-                            Text(speakText)
-                                .funnelFont(.nunitoRegular, size: 15)
-                                .whiteSandGradientEffect()
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 40)
-                        }
-                        .padding(.bottom, 179)
-                    } else {
-                        Spacer()
+            // Recording controls float on top
+            RecordingControlsView(
+                isRecording: $isRecording,
+                recordingTime: $recordingTime,
+                waveformValues: $waveformValues,
+                recordingError: $recordingError,
+                audioRecorder: audioRecorder,
+                onRecordingComplete: { audioURL, duration in
+                    Task {
+                        await recordingManager.processRecording(audioURL: audioURL, duration: duration, modelContext: modelContext)
                     }
                 }
-
-                // Recording controls float on top
-                RecordingControlsView(
-                    isRecording: $isRecording,
-                    recordingTime: $recordingTime,
-                    waveformValues: $waveformValues,
-                    recordingError: $recordingError,
-                    audioRecorder: audioRecorder,
-                    onRecordingComplete: { audioURL, duration in
-                        Task {
-                            await recordingManager.processRecording(audioURL: audioURL, duration: duration, modelContext: modelContext)
-                        }
-                    }
-                )
-                .padding(.horizontal, 15)
+            )
+            .padding(.horizontal, 15)
         }
         .ignoresSafeArea()
     }

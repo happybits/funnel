@@ -27,8 +27,13 @@ struct SwipeableCardsView: View {
     }
 
     var body: some View {
-        GeometryReader { _ in
-            VStack(spacing: 0) {
+        ZStack {
+            // Add the gradient background
+            GlobalGradientBackground()
+                .ignoresSafeArea()
+
+            GeometryReader { _ in
+                VStack(spacing: 0) {
                     // Header with back button and add voice button
                     HStack {
                         Button {
@@ -87,6 +92,7 @@ struct SwipeableCardsView: View {
                     // Removed page indicators
                     Spacer()
                         .frame(height: 30)
+                }
             }
         }
         .onChange(of: currentPage) { _, newValue in
