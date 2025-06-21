@@ -20,14 +20,15 @@ struct GlassmorphicModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .preferredColorScheme(.light)
+            // .preferredColorScheme(.light)
             .background(
                 ZStack {
+
                     // Pure backdrop blur without material effects
                     VisualEffectView(effect: UIBlurEffect(style: .regular))
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
 
-                    // Gradient overlay
+                    // // Gradient overlay
                     LinearGradient(
                         colors: [
                             Color.white.opacity(gradientOpacity.start),
@@ -53,8 +54,8 @@ struct GlassmorphicModifier: ViewModifier {
                         lineWidth: 1
                     )
             )
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .stroke(Color.white.opacity(0.25), lineWidth: 1)

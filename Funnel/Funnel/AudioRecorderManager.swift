@@ -83,8 +83,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
                 completion(.success(audioFilename))
             } else {
                 print("AudioRecorderManager: Failed to start recording")
-                let error = NSError(domain: "AudioRecorder", code: -3, userInfo: [NSLocalizedDescriptionKey: "Failed to start recording"])
-                completion(.failure(error))
+                completion(.failure(FunnelError.recordingFailed(reason: "Failed to start recording")))
                 recordingCompletion = nil
             }
         } catch {
@@ -137,7 +136,7 @@ extension AudioRecorderManager: AVAudioRecorderDelegate {
                 recordingCompletion?(.success(url))
             }
         } else {
-            recordingCompletion?(.failure(NSError(domain: "AudioRecorder", code: -1, userInfo: [NSLocalizedDescriptionKey: "Recording failed"])))
+            recordingCompletion?(.failure(FunnelError.recordingFailed(reason: "Recording was interrupted")))
         }
         recordingCompletion = nil
         currentRecordingURL = nil

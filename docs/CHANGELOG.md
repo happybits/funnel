@@ -13,6 +13,40 @@ All notable changes to the Funnel project will be documented in this file.
   - Selected card is now always centered in the viewport
 
 ### Fixed
+- **Gesture recognizer performance**: Removed triple-tap gesture recognizer that was causing UI delays
+  - Removed font debug view and all associated triple-tap gesture handlers
+  - This eliminates the 350ms delay when tapping buttons that was introduced by gesture conflict
+  - UI interactions are now instantaneous without gesture recognizer interference
+
+### Changed
+- **Recordings list layout**: Extended scroll view to full screen height with floating record button
+  - Scroll view now extends from below the logo to the bottom of the screen
+  - Record button floats above the scroll view at the bottom
+  - Provides better use of screen space for viewing past recordings
+- **Home screen gradient**: Updated to use rainbow gradient matching Figma design
+  - Replaced solid orange gradient with animated rainbow gradient from GradientBackground component
+  - Applied same gradient to both home screen and swipeable cards view for consistency
+  - Rainbow gradient includes 6 color stops with breathing animation effect
+  - Matches Figma design at https://www.figma.com/design/KnkuJhDf5CxBwYt4xZtSEZ/Funnel-Design-File-6-18?node-id=67-239
+- **Glassmorphic modifier**: Added 50% dark grey backdrop for improved readability
+  - Added `Color(white: 0.2).opacity(0.5)` layer before blur effect
+  - Ensures text and UI elements remain readable over the rainbow gradient
+  - Maintains the blur and gradient overlay effects while improving contrast
+
+### Verified
+- **Gradient Background Colors**: Confirmed exact match between Figma design and implementation
+  - Extracted gradient from Figma node ID 67:211 (gradient fill)
+  - Linear gradient with 6 color stops at positions 0, 0.2, 0.4, 0.6, 0.8, 1.0
+  - Colors (RGB values):
+    - Position 0: (0.576, 0.651, 0.878) - Light blue/purple
+    - Position 0.2: (0.404, 0.816, 0.796) - Cyan/turquoise
+    - Position 0.4: (0.976, 0.839, 0.459) - Yellow
+    - Position 0.6: (0.969, 0.698, 0.459) - Orange
+    - Position 0.8: (0.965, 0.294, 0.298) - Red/coral
+    - Position 1.0: (0.827, 0.435, 0.749) - Purple/magenta
+  - All values match exactly with GradientBackground.swift implementation
+
+### Fixed
 - **Button asset references in SwipeableCardsView**: Fixed incorrect image names
   - Changed "backbtn" to "BackBtn" to match actual asset names
   - Changed "addbtn" to "AddBtn" to match actual asset names

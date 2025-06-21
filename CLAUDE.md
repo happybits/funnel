@@ -226,3 +226,8 @@ Button(action: {
 })
 ```
 This applies to all SwiftUI views and Swift functions where trailing closures make the code more readable.
+
+## SwiftUI Performance Tips
+
+### Gesture Recognizers and UI Responsiveness
+**AVOID adding gesture recognizers that can interfere with button taps** - Gesture recognizers like `.onTapGesture(count: 3)` add a delay to all tap interactions because the system waits to distinguish between single and multi-tap gestures. This creates a noticeable 350ms delay on button presses. If you need debug functionality, use a dedicated debug button or menu instead of gesture recognizers on the main UI.
