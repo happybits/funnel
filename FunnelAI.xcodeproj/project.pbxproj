@@ -6,6 +6,10 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5DBA9E872E089E64000F4006 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 5DBA9E862E089E64000F4006 /* SwiftUIIntrospect */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		0A9BC078DD4AC38F123687A2 /* FunnelAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunnelAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,17 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		49E8777E2E03892C00721933 /* Funnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Funnel; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5DBA9E842E089E35000F4006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5DBA9E872E089E64000F4006 /* SwiftUIIntrospect in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		30EF63C64EAF6A14571B0920 /* Products */ = {
@@ -49,6 +64,7 @@
 			buildConfigurationList = FCB18D299A4B72C484FECEBA /* Build configuration list for PBXNativeTarget "FunnelAI" */;
 			buildPhases = (
 				DACB6B35E162417B9E12F0EF /* Sources */,
+				5DBA9E842E089E35000F4006 /* Frameworks */,
 				C671E455E945581A2E307E36 /* Resources */,
 			);
 			buildRules = (
@@ -60,6 +76,7 @@
 			);
 			name = FunnelAI;
 			packageProductDependencies = (
+				5DBA9E862E089E64000F4006 /* SwiftUIIntrospect */,
 			);
 			productName = Funnel;
 			productReference = 0A9BC078DD4AC38F123687A2 /* FunnelAI.app */;
@@ -89,6 +106,9 @@
 			);
 			mainGroup = D9581316AE7A5E7CB95F6728;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5DBA9E852E089E64000F4006 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -327,6 +347,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5DBA9E852E089E64000F4006 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/swiftui-introspect";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5DBA9E862E089E64000F4006 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5DBA9E852E089E64000F4006 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
+			productName = SwiftUIIntrospect;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 907C3DDE5BB93C24658194DA /* Project object */;
 }

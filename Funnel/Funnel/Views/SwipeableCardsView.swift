@@ -5,7 +5,6 @@ struct SwipeableCardsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
     @EnvironmentObject var gradientManager: GradientBackgroundManager
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.dismiss) private var dismiss
     @State private var currentPage = 0
     @State private var dragOffset: CGSize = .zero
     @State private var scrollOffset: CGFloat = 0
@@ -26,74 +25,67 @@ struct SwipeableCardsView: View {
         return "Recording"
     }
 
-    var body: some View {
-        ZStack {
-            // Add the gradient background
-            GlobalGradientBackground()
-                .ignoresSafeArea()
+    private var header: some View {
+        HStack {
+            Button {
+                recordingManager.presentedRecording = nil
+            } label: {
+                Image("BackBtn")
+            }
 
-            GeometryReader { _ in
-                VStack(spacing: 0) {
-                    // Header with back button and add voice button
-                    HStack {
-                        Button {
-                            recordingManager.presentedRecording = nil
-                            dismiss()
-                        } label: {
-                            Image("BackBtn")
-                        }
+            Spacer()
 
-                        Spacer()
+            Button {
+                // TODO: Add voice action
+            } label: {
+                Image("AddBtn")
+            }
+        }
+        .padding(.top, 10)
+    }
 
-                        Button {
-                            // TODO: Add voice action
-                        } label: {
-                            Image("AddBtn")
-                        }
+    private var cardsContainer: some View {
+        // Cards Container with custom scroll view for peek effect
+        GeometryReader { geometry in
+            let cardWidth = geometry.size.width - 60 // Full width minus 30px on each side
+
+            ScrollViewReader { scrollProxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 15) {
+                        BulletSummaryCard(bulletSummary: recording.bulletSummary ?? [])
+                            .frame(width: cardWidth)
+                            .id(0)
+
+                        DiagramCard(diagram: recording.diagram)
+                            .frame(width: cardWidth)
+                            .id(1)
+
+                        TranscriptCard(transcript: recording.transcript ?? "")
+                            .frame(width: cardWidth)
+                            .id(2)
                     }
-                    .padding(.top, 10)
-
-                    // Cards Container with custom scroll view for peek effect
-                    GeometryReader { geometry in
-                        let cardWidth = geometry.size.width - 60 // Full width minus 30px on each side
-
-                        ScrollViewReader { scrollProxy in
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 15) {
-                                    BulletSummaryCard(bulletSummary: recording.bulletSummary ?? [])
-                                        .frame(width: cardWidth)
-                                        .id(0)
-
-                                    DiagramCard(diagram: recording.diagram)
-                                        .frame(width: cardWidth)
-                                        .id(1)
-
-                                    TranscriptCard(transcript: recording.transcript ?? "")
-                                        .frame(width: cardWidth)
-                                        .id(2)
-                                }
-                                .scrollTargetLayout()
-                            }
-                            .contentMargins(.horizontal, 30, for: .scrollContent)
-                            .scrollTargetBehavior(.viewAligned)
-                            .scrollPosition(id: $scrolledID)
-                            .onAppear {
-                                scrollProxy.scrollTo(currentPage, anchor: .center)
-                            }
-                            .onChange(of: scrolledID) { _, newValue in
-                                if let page = newValue {
-                                    currentPage = page
-                                }
-                            }
-                        }
+                    .scrollTargetLayout()
+                }
+                .contentMargins(.horizontal, 30, for: .scrollContent)
+                .scrollTargetBehavior(.viewAligned)
+                .scrollPosition(id: $scrolledID)
+                .onAppear {
+                    scrollProxy.scrollTo(currentPage, anchor: .center)
+                }
+                .onChange(of: scrolledID) { _, newValue in
+                    if let page = newValue {
+                        currentPage = page
                     }
-                    .padding(.top, 20)
-
-                    // Removed page indicators
-                    Spacer()
-                        .frame(height: 30)
                 }
             }
+        }
+        .padding(.top, 20)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            header
+            cardsContainer
         }
         .onChange(of: currentPage) { _, newValue in
             // Update gradient based on current card

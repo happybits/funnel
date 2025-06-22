@@ -12,8 +12,8 @@
 	"argv": [
 		"/opt/homebrew/bin/xcode-build-server"
 	],
-	"workspace": "/Users/joeldrotleff/code/joya/funnel/FunnelAI.xcodeproj/project.xcworkspace",
-	"build_root": "/Users/joeldrotleff/Library/Developer/Xcode/DerivedData/FunnelAI-ctowujwwlmekvoctfwcjccrtbinc",
+	"workspace": "/Users/joel/code/joya/funnel/FunnelAI.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/joel/Library/Developer/Xcode/DerivedData/FunnelAI-hbauekiyomzrwncewipkuecmksrg",
 	"scheme": "FunnelAI",
 	"kind": "xcode"
 }
