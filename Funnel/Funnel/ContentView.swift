@@ -11,7 +11,7 @@ struct ContentView: View {
         ZStack {
             GradientBackground()
 
-            CustomNavigationContainer(currentView: $navigationDestination) {
+            PushTransitionContainer(currentView: $navigationDestination) {
                 // Main recording view
                 NewRecordingView()
                     .overlay {

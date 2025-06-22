@@ -1,7 +1,7 @@
 import SwiftUI
 
-// Custom navigation container that provides slide animations without NavigationStack
-struct CustomNavigationContainer<Content: View>: View {
+// Navigation container that provides push/pop slide animations without NavigationStack
+struct PushTransitionContainer<Content: View>: View {
     @Binding var currentView: NavigationDestination
     let content: Content
 
