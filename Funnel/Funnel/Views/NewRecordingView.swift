@@ -23,7 +23,6 @@ struct NewRecordingView: View {
                 RecordingsListView(recordings: recordings)
                     .padding(.horizontal, 15)
                     .padding(.top, 178) // Space for logo
-                    .padding(.bottom, 195) // Space for floating record button
             }
 
             VStack(spacing: 0) {
@@ -298,12 +297,17 @@ struct RecordingsListView: View {
                     .buttonStyle(PlainButtonStyle())
                 }
             }
+            .padding(.bottom, 195) // Add bottom padding to content so last item can scroll above record button
         }
+        .scrollIndicators(.hidden)
     }
 }
 
 #Preview {
-    NewRecordingView()
-        .funnelPreviewEnvironment()
-        .environmentObject(RecordingManager())
+    ZStack {
+        GradientBackground()
+        NewRecordingView()
+            .funnelPreviewEnvironment()
+            .environmentObject(RecordingManager())
+    }
 }

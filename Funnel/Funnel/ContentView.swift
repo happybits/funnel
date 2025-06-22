@@ -5,34 +5,33 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var recordingManager = RecordingManager()
     @StateObject private var gradientManager = GradientBackgroundManager()
+    @State private var navigationDestination: NavigationDestination = .recording
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Global gradient background
-                GlobalGradientBackground()
-                    .environmentObject(gradientManager)
+        ZStack {
+            GradientBackground()
 
-                ZStack {
-                    // Main recording view
-                    NewRecordingView()
-
-                    // Processing overlay
-                    if recordingManager.isProcessing {
-                        ProcessingOverlay()
-                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            PushTransitionContainer(currentView: $navigationDestination) {
+                // Main recording view
+                NewRecordingView()
+                    .overlay {
+                        if recordingManager.isProcessing {
+                            ProcessingOverlay()
+                                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                        }
                     }
-                }
-                .navigationDestination(item: $recordingManager.presentedRecording) { recording in
-                    SwipeableCardsView(recording: recording)
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(gradientManager)
-                }
+                    .animation(.easeInOut(duration: 0.3), value: recordingManager.isProcessing)
             }
-            .animation(.easeInOut(duration: 0.3), value: recordingManager.isProcessing)
         }
         .environmentObject(recordingManager)
         .environmentObject(gradientManager)
+        .onChange(of: recordingManager.presentedRecording) { _, newValue in
+            if let recording = newValue {
+                navigationDestination = .cards(recording)
+            } else {
+                navigationDestination = .recording
+            }
+        }
     }
 }
 

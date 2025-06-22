@@ -24,6 +24,16 @@
 		49E8777E2E03892C00721933 /* Funnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Funnel; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		5DBA9E842E089E35000F4006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		30EF63C64EAF6A14571B0920 /* Products */ = {
 			isa = PBXGroup;
@@ -49,6 +59,7 @@
 			buildConfigurationList = FCB18D299A4B72C484FECEBA /* Build configuration list for PBXNativeTarget "FunnelAI" */;
 			buildPhases = (
 				DACB6B35E162417B9E12F0EF /* Sources */,
+				5DBA9E842E089E35000F4006 /* Frameworks */,
 				C671E455E945581A2E307E36 /* Resources */,
 			);
 			buildRules = (
@@ -89,6 +100,8 @@
 			);
 			mainGroup = D9581316AE7A5E7CB95F6728;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
