@@ -1,7 +1,0 @@
-.env
-.env.local
-.env.production
-deno.lock
-node_modules/
-promptfoo-output/
-.promptfoo/

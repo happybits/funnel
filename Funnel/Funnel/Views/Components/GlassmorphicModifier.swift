@@ -1,96 +1,75 @@
-
 import SwiftUI
 
-// Reusable pure blur view without material effects
-struct VisualEffectView: UIViewRepresentable {
-    var effect: UIVisualEffect?
+struct VisualEffectBlur: UIViewRepresentable {
+    var style: UIBlurEffect.Style
 
-    func makeUIView(context _: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
-        UIVisualEffectView()
+    func makeUIView(context _: Context) -> UIVisualEffectView {
+        let view = UIVisualEffectView(effect: UIBlurEffect(style: style))
+        view.overrideUserInterfaceStyle = .light
+        return view
     }
 
-    func updateUIView(_ uiView: UIVisualEffectView, context _: UIViewRepresentableContext<Self>) {
-        uiView.effect = effect
+    func updateUIView(_ uiView: UIVisualEffectView, context _: Context) {
+        uiView.effect = UIBlurEffect(style: style)
     }
 }
 
 struct GlassmorphicModifier: ViewModifier {
     let cornerRadius: CGFloat
-    let gradientOpacity: (start: Double, end: Double)
+    let shadowRadius: CGFloat
 
     func body(content: Content) -> some View {
         content
-            // .preferredColorScheme(.light)
             .background(
                 ZStack {
-                    // Pure backdrop blur without material effects
-                    VisualEffectView(effect: UIBlurEffect(style: .regular))
-                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+                    VisualEffectBlur(style: .systemUltraThinMaterialLight)
 
-                    // // Gradient overlay
                     LinearGradient(
-                        colors: [
-                            Color.white.opacity(gradientOpacity.start),
-                            Color.white.opacity(gradientOpacity.end),
-                        ],
+                        gradient: Gradient(stops: [
+                            .init(color: .white.opacity(0.1), location: 0),
+                            .init(color: .white.opacity(0.4), location: 1),
+                        ]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 }
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(
+                    .stroke(
                         LinearGradient(
-                            colors: [
-                                Color.white,
-                                Color.white.opacity(0),
-                                Color.white,
-                            ],
+                            gradient: Gradient(stops: [
+                                .init(color: .white, location: 0),
+                                .init(color: .white.opacity(0), location: 0.434),
+                                .init(color: .white, location: 1),
+                            ]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
                         lineWidth: 1
                     )
             )
-            .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 4)
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Color.white.opacity(0.25), lineWidth: 1)
-                    .blur(radius: 1)
-                    .offset(y: 2)
-                    .mask(RoundedRectangle(cornerRadius: cornerRadius))
-            )
-    }
-}
-
-// Inner shadow modifier for text effects
-struct InnerShadowModifier: ViewModifier {
-    let color: Color
-    let radius: CGFloat
-    let x: CGFloat
-    let y: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .overlay(
-                content
-                    .foregroundColor(color)
-                    .blur(radius: radius)
-                    .offset(x: x, y: y)
-                    .blendMode(.plusLighter)
-                    .allowsHitTesting(false)
-            )
+            .shadow(color: Color.black.opacity(0.12), radius: shadowRadius, x: 0, y: 4)
+            .shadow(color: Color.white.opacity(0.25), radius: 8, x: 0, y: 4)
     }
 }
 
 extension View {
-    func glassmorphic(cornerRadius: CGFloat = 15, gradientOpacity: (start: Double, end: Double) = (0.0, 0.3)) -> some View {
-        modifier(GlassmorphicModifier(cornerRadius: cornerRadius, gradientOpacity: gradientOpacity))
+    func glassmorphic(cornerRadius: CGFloat = 15, shadowRadius: CGFloat = 12) -> some View {
+        modifier(GlassmorphicModifier(cornerRadius: cornerRadius, shadowRadius: shadowRadius))
     }
+}
 
-    func glassmorphic(cornerRadius: CGFloat = 15, blurRadius _: CGFloat = 10) -> some View {
-        modifier(GlassmorphicModifier(cornerRadius: cornerRadius, gradientOpacity: (0.1, 0.4)))
+#Preview {
+    ZStack {
+        GradientBackground()
+
+        VStack {
+            Text("Glassmorphic Effect")
+                .font(.title)
+                .padding()
+                .glassmorphic()
+        }
     }
 }

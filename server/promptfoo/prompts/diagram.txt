@@ -1,1 +1,0 @@
-../../lib/prompts/diagram-prompt.txt
