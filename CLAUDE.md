@@ -231,3 +231,36 @@ This applies to all SwiftUI views and Swift functions where trailing closures ma
 
 ### Gesture Recognizers and UI Responsiveness
 **AVOID adding gesture recognizers that can interfere with button taps** - Gesture recognizers like `.onTapGesture(count: 3)` add a delay to all tap interactions because the system waits to distinguish between single and multi-tap gestures. This creates a noticeable 350ms delay on button presses. If you need debug functionality, use a dedicated debug button or menu instead of gesture recognizers on the main UI.
+
+### Glassmorphism and Blur Effects
+**Performance considerations for live blur effects:**
+- CADisplayLink-based blur is very inefficient and can cause app crashes
+- Use UIVisualEffectView wrapped in UIViewRepresentable for performant live blur
+- Force light mode on blur views with `overrideUserInterfaceStyle = .light` for consistency
+- Use `.systemUltraThinMaterialLight` for minimal frosted glass effect
+- Consider making blur optional with a debug toggle for performance testing
+
+**Implementing glassmorphism in SwiftUI:**
+```swift
+// Use UIVisualEffectView for performance
+struct VisualEffectBlur: UIViewRepresentable {
+    var style: UIBlurEffect.Style
+    
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        let view = UIVisualEffectView(effect: UIBlurEffect(style: style))
+        view.overrideUserInterfaceStyle = .light
+        return view
+    }
+}
+
+// Combine with gradient overlay for glass effect
+.background(
+    ZStack {
+        VisualEffectBlur(style: .systemUltraThinMaterialLight)
+        LinearGradient(
+            colors: [.white.opacity(0.1), .white.opacity(0.4)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+)

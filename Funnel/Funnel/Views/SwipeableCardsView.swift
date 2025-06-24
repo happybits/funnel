@@ -159,7 +159,7 @@ struct BulletSummaryCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 4)
-        .glassmorphic(cornerRadius: 10, blurRadius: 10)
+        .liveGlassmorphicCell(cornerRadius: 10)
         .padding(.bottom, 100)
     }
 }
@@ -221,7 +221,7 @@ struct DiagramCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 9))
         .shadow(color: .black.opacity(0.12), radius: 10.8, x: 0, y: 3.6)
-        .glassmorphic(cornerRadius: 9, blurRadius: 9)
+        .liveGlassmorphicCell(cornerRadius: 9)
         .padding(.bottom, 100)
     }
 }
@@ -263,7 +263,7 @@ struct TranscriptCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 9))
         .shadow(color: .black.opacity(0.12), radius: 10.8, x: 0, y: 3.6)
-        .glassmorphic(cornerRadius: 9, blurRadius: 9)
+        .liveGlassmorphicCell(cornerRadius: 9)
         .padding(.bottom, 100)
     }
 }

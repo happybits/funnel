@@ -4,6 +4,26 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **Custom live glassmorphism implementation** with performance optimizations
+  - LiveBlurView using UIVisualEffectView for efficient real-time blur
+  - LiveGlassmorphicModifier for easy application of glass effects  
+  - Debug toggle to enable/disable blur effects globally
+  - GlassRecord component demonstrating glassmorphic record button with Figma-accurate design
+- **DebugSettings environment object** for global debug preferences
+- **CheckboxToggleStyle component** for consistent toggle UI across the app
+
+### Changed
+- **Glassmorphic blur implementation**: Replaced CADisplayLink-based blur with UIVisualEffectView
+  - Significantly improved performance by using native iOS blur
+  - Forces light mode on blur view with .systemUltraThinMaterialLight for minimal frosting
+  - Blur can now be toggled on/off for performance testing
+- **NewRecordingView**: Added blur toggle checkbox in header for debugging
+- **Selective blur application**: Blur effects now only apply to recording controls
+  - Created separate `liveGlassmorphicCell` modifier for content cards without blur
+  - Recording controls maintain full glassmorphic effect with blur
+  - Content cards and list items use gradient-only glassmorphic effect for better performance
+
 ### Enhanced
 - **Card Layout in SwipeableCardsView**: Improved card visibility and centering
   - Cards now use full screen width minus 60px (30px padding on each side)

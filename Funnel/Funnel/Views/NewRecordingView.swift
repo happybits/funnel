@@ -5,6 +5,7 @@ import SwiftUI
 struct NewRecordingView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var recordingManager: RecordingManager
+    @EnvironmentObject var debugSettings: DebugSettings
     @Query(sort: \Recording.timestamp, order: .reverse) private var recordings: [Recording]
 
     @State private var isRecording = false
@@ -31,6 +32,12 @@ struct NewRecordingView: View {
                     FunnelLogo()
                         .padding(.leading, 30)
                     Spacer()
+                    
+                    // Blur toggle for debugging
+                    Toggle("Blur", isOn: $debugSettings.blurEnabled)
+                        .toggleStyle(CheckboxToggleStyle())
+                        .foregroundColor(.white.opacity(0.7))
+                        .padding(.trailing, 30)
                 }
                 .padding(.top, 89)
 
@@ -134,7 +141,7 @@ struct RecordingControlsView: View {
             .padding(.bottom, 61)
         }
         .frame(width: 372, height: isRecording ? 350 : 179)
-        .glassmorphic(
+        .liveGlassmorphic(
             cornerRadius: 15,
             gradientOpacity: isRecording ? (0.05, 0.25) : (0.0, 0.15)
         )
@@ -289,7 +296,7 @@ struct RecordingsListView: View {
                         }
                         .padding(20)
                         .frame(maxWidth: .infinity)
-                        .glassmorphic(
+                        .liveGlassmorphicCell(
                             cornerRadius: 15,
                             gradientOpacity: (0.1, 0.3)
                         )
@@ -309,5 +316,6 @@ struct RecordingsListView: View {
         NewRecordingView()
             .funnelPreviewEnvironment()
             .environmentObject(RecordingManager())
+            .environmentObject(DebugSettings())
     }
 }
