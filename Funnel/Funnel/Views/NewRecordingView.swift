@@ -34,10 +34,10 @@ struct NewRecordingView: View {
                     Spacer()
                     
                     // Blur toggle for debugging
-                    Toggle("Blur", isOn: $debugSettings.blurEnabled)
-                        .toggleStyle(CheckboxToggleStyle())
-                        .foregroundColor(.white.opacity(0.7))
-                        .padding(.trailing, 30)
+                    // Toggle("Blur", isOn: $debugSettings.blurEnabled)
+                    //     .toggleStyle(CheckboxToggleStyle())
+                    //     .foregroundColor(.white.opacity(0.7))
+                    //     .padding(.trailing, 30)
                 }
                 .padding(.top, 89)
 
