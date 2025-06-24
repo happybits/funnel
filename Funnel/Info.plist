@@ -46,5 +46,7 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Funnel - Think Better needs access to your microphone to record your thoughts and turn them into organized notes.</string>
 </dict>
 </plist>

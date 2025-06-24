@@ -66,13 +66,12 @@ export class DeepgramClient {
     });
 
     const url = `${this.baseUrl}?${params.toString()}`;
+    
+    console.log("Deepgram WebSocket URL:", url);
 
-    // Create WebSocket connection
-    const ws = new WebSocket(url, {
-      headers: {
-        Authorization: `Token ${this.apiKey}`,
-      },
-    });
+    // Create WebSocket connection using Sec-WebSocket-Protocol
+    // Pass two separate protocol values: "token" and the API key
+    const ws = new WebSocket(url, ["token", this.apiKey]);
 
     return ws;
   }

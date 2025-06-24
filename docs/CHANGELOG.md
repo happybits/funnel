@@ -4,6 +4,43 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **Server architecture**: Migrated from Hono framework to pure Deno for better WebSocket support
+  - Removed Hono dependency completely
+  - Rewrote server using native Deno.serve with manual routing
+  - Fixed WebSocket upgrade issues that were causing "operation was canceled" errors
+  - Maintained all existing API functionality and endpoints
+  - Improved error handling and logging
+
+### Fixed
+- **WebSocket connection errors**: Fixed "Upgrade response was not returned from callback" error
+  - Issue was caused by Hono's WebSocket upgrade mechanism incompatibility with Deno
+  - Pure Deno implementation now properly handles WebSocket upgrades
+  - Live transcription WebSocket connections now work correctly
+- **Deepgram WebSocket authentication**: Fixed 401 Unauthorized errors
+  - Issue was incorrect use of Sec-WebSocket-Protocol header
+  - Deepgram requires two separate protocol values: `["token", apiKey]`
+  - Was incorrectly combining them as `["token.apiKey"]`
+  - WebSocket connections now authenticate successfully
+- **Live transcription reliability**: Integrated official Deepgram JS SDK
+  - Replaced custom WebSocket implementation with official SDK
+  - Added npm package support to Deno configuration
+  - Improved connection stability and error handling
+  - Enhanced transcript event handling with proper typing
+  - Browser audio now transcribes correctly with auto-detected encoding
+
+### Enhanced
+- **Faster AI response time**: Optimized recording flow to use live transcription
+  - Live transcription now runs during recording (no UI display per user preference)
+  - Full transcript is collected and sent with audio file to skip duplicate transcription
+  - Server API updated to accept optional transcript parameter
+  - AI processing (bullet summary and diagram) starts immediately after recording stops
+  - Reduces total processing time by eliminating redundant transcription step
+  - RecordingManager now supports `processRecordingWithTranscript` method
+  - Falls back to regular processing if live transcription fails
+
+## [0.11.0] - 2025-06-24
+
 ### Added
 - **Live audio transcription with Deepgram**: Real-time transcription during recording
   - WebSocket endpoint `/api/live-transcription` for streaming audio
@@ -16,6 +53,27 @@ All notable changes to the Funnel project will be documented in this file.
   - Type-safe interfaces for transcription options and responses
   - Configurable model, language, and formatting options
   - Built-in error handling and connection management
+- **iOS app integration**: Complete live transcription during recording
+  - LiveTranscriptionService with WebSocket client for real-time communication
+  - Updated AudioRecorderManager with audio streaming capabilities
+  - Real-time PCM audio data conversion and streaming
+  - Live transcript display in recording UI with smooth animations
+  - RecordingManager integration for centralized state management
+- **Integration tests**: WebSocket endpoint testing with Deno test framework
+  - Connection establishment tests
+  - Audio streaming simulation tests
+  - Test HTML client for manual validation
+
+### Changed
+- **AudioRecorderManager**: Added audio streaming support
+  - New `startRecordingWithStreaming` method for simultaneous recording and streaming
+  - AVAudioEngine integration for real-time audio capture
+  - Audio tap installation for buffer processing
+  - PCM data conversion from float audio samples
+- **Recording UI**: Enhanced with live transcription display
+  - Dynamic height adjustment based on transcript content
+  - ScrollView for longer transcripts
+  - Integrated with RecordingManager for state management
 
 ### Added
 - **Custom live glassmorphism implementation** with performance optimizations

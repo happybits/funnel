@@ -9,5 +9,8 @@
     "promptfoo:eval": "cd promptfoo && npm run promptfoo:eval",
     "promptfoo:view": "cd promptfoo && npm run promptfoo:view",
     "promptfoo:install": "cd promptfoo && npm install"
+  },
+  "dependencies": {
+    "ws": "^8.18.2"
   }
 }

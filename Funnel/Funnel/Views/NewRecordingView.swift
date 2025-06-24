@@ -75,7 +75,25 @@ struct NewRecordingView: View {
                 audioRecorder: audioRecorder,
                 onRecordingComplete: { audioURL, duration in
                     Task {
-                        await recordingManager.processRecording(audioURL: audioURL, duration: duration, modelContext: modelContext)
+                        // Get the full transcript from live transcription
+                        let transcript = recordingManager.getFullTranscript()
+                        
+                        if !transcript.isEmpty {
+                            // Use the live transcript for faster processing
+                            await recordingManager.processRecordingWithTranscript(
+                                audioURL: audioURL,
+                                duration: duration,
+                                transcript: transcript,
+                                modelContext: modelContext
+                            )
+                        } else {
+                            // Fallback to regular processing if no transcript
+                            await recordingManager.processRecording(
+                                audioURL: audioURL,
+                                duration: duration,
+                                modelContext: modelContext
+                            )
+                        }
                     }
                 }
             )
@@ -90,6 +108,7 @@ struct RecordingControlsView: View {
     @Binding var recordingTime: TimeInterval
     @Binding var waveformValues: [CGFloat]
     @Binding var recordingError: Error?
+    @EnvironmentObject var recordingManager: RecordingManager
 
     let audioRecorder: AudioRecorderManager
     let onRecordingComplete: (URL, TimeInterval) -> Void
@@ -155,7 +174,7 @@ struct RecordingControlsView: View {
                 return
             }
 
-            audioRecorder.startRecording { result in
+            audioRecorder.startRecordingWithStreaming { result in
                 switch result {
                 case .success:
                     DispatchQueue.main.async {
@@ -163,6 +182,9 @@ struct RecordingControlsView: View {
                         recordingTime = 0
                         waveformValues = []
                         startTimers()
+                        
+                        // Start live transcription
+                        recordingManager.startLiveTranscription(audioRecorder: audioRecorder)
                     }
                 case let .failure(error):
                     recordingError = error
@@ -182,6 +204,9 @@ struct RecordingControlsView: View {
         audioRecorder.stopRecording()
         recordingTimer?.invalidate()
         levelTimer?.invalidate()
+        
+        // Stop live transcription
+        recordingManager.stopLiveTranscription()
 
         isRecording = false
 

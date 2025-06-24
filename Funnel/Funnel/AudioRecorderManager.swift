@@ -12,6 +12,11 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private var levelTimer: Timer?
     private(set) var currentRecordingURL: URL?
     private var recordingCompletion: ((Result<URL, Error>) -> Void)?
+    
+    // Audio streaming properties
+    private var audioEngine: AVAudioEngine?
+    private var inputNode: AVAudioInputNode?
+    var audioDataCallback: ((Data) -> Void)?
 
     override init() {
         super.init()
@@ -93,7 +98,76 @@ class AudioRecorderManager: NSObject, ObservableObject {
         }
     }
 
+    func startRecordingWithStreaming(completion: @escaping (Result<URL, Error>) -> Void) {
+        print("AudioRecorderManager: startRecordingWithStreaming called")
+        
+        // First start regular recording for file storage
+        startRecording { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let url):
+                // Now set up audio streaming
+                self.setupAudioStreaming()
+                completion(.success(url))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    private func setupAudioStreaming() {
+        audioEngine = AVAudioEngine()
+        guard let audioEngine = audioEngine else { return }
+        
+        inputNode = audioEngine.inputNode
+        guard let inputNode = inputNode else { return }
+        
+        let recordingFormat = inputNode.outputFormat(forBus: 0)
+        
+        // Install tap on input node to capture audio
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
+            self?.processAudioBuffer(buffer)
+        }
+        
+        audioEngine.prepare()
+        
+        do {
+            try audioEngine.start()
+            print("AudioRecorderManager: Audio engine started for streaming")
+        } catch {
+            print("AudioRecorderManager: Failed to start audio engine: \(error)")
+        }
+    }
+    
+    private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
+        guard let channelData = buffer.floatChannelData else { return }
+        
+        let channelDataValue = channelData.pointee
+        let channelDataValueArray = Array(UnsafeBufferPointer(start: channelDataValue, count: Int(buffer.frameLength)))
+        
+        // Convert float audio data to 16-bit PCM
+        var pcmData = Data()
+        for sample in channelDataValueArray {
+            // Convert float (-1.0 to 1.0) to Int16
+            let intSample = Int16(max(-32768, min(32767, sample * 32767)))
+            withUnsafeBytes(of: intSample) { bytes in
+                pcmData.append(contentsOf: bytes)
+            }
+        }
+        
+        // Call the callback with audio data
+        audioDataCallback?(pcmData)
+    }
+
     func stopRecording() {
+        // Stop audio engine if running
+        audioEngine?.stop()
+        inputNode?.removeTap(onBus: 0)
+        audioEngine = nil
+        inputNode = nil
+        
+        // Stop regular recording
         audioRecorder?.stop()
         timer?.invalidate()
         levelTimer?.invalidate()

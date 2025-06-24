@@ -18,8 +18,12 @@ class APIClient {
         decoder = JSONDecoder()
         encoder = JSONEncoder()
 
-        let useLocalServer = false
-        baseURL = useLocalServer ? "http://127.0.0.1:8000" : "https://funnel-api.deno.dev"
+        #if DEBUG
+        let useLocalServer = true // Toggle this to switch between local and production
+        baseURL = useLocalServer ? "http://localhost:8000" : "https://funnel-api.deno.dev"
+        #else
+        baseURL = "https://funnel-api.deno.dev"
+        #endif
     }
 
     // MARK: - Generic Request Methods

@@ -1,5 +1,5 @@
-import { Context } from "@hono/hono";
-import { DeepgramClient, TranscriptResponse } from "../lib/deepgram.ts";
+import { DeepgramSDKClient, type LiveSchema } from "../lib/deepgram-sdk.ts";
+import { TranscriptResponse } from "../lib/deepgram.ts";
 
 interface LiveTranscriptionMessage {
   type: "audio" | "config" | "stop";
@@ -10,29 +10,31 @@ interface LiveTranscriptionMessage {
   };
 }
 
-export async function liveTranscriptionHandler(c: Context): Promise<Response | void> {
-  const upgradeHeader = c.req.header("upgrade");
-  if (!upgradeHeader || upgradeHeader !== "websocket") {
-    return c.text("Expected websocket connection", 426);
-  }
-
-  const { response, socket } = Deno.upgradeWebSocket(c.req.raw);
-
-  handleWebSocketConnection(socket);
-
-  return response;
-}
-
-function handleWebSocketConnection(clientWs: WebSocket) {
+export function liveTranscriptionHandler(req: Request): Response {
+  const { socket: clientWs, response } = Deno.upgradeWebSocket(req);
+  
   let deepgramWs: WebSocket | null = null;
   let keepAliveInterval: number | null = null;
 
   clientWs.onopen = () => {
     console.log("Client WebSocket connected");
-    initializeDeepgramConnection();
+    
+    // Send immediate acknowledgment
+    clientWs.send(JSON.stringify({
+      type: "connected",
+      message: "Connected to server, initializing Deepgram...",
+    }));
+    
+    initializeDeepgramConnection(req);
   };
 
   clientWs.onmessage = async (event) => {
+    // Log the type of data received
+    const dataType = event.data instanceof Blob ? "Blob" : 
+                     event.data instanceof ArrayBuffer ? "ArrayBuffer" : 
+                     typeof event.data;
+    console.log("Received data type:", dataType, "size:", event.data?.size || event.data?.byteLength || event.data?.length);
+    
     if (!deepgramWs || deepgramWs.readyState !== WebSocket.OPEN) {
       console.warn("Deepgram WebSocket not ready");
       return;
@@ -40,7 +42,8 @@ function handleWebSocketConnection(clientWs: WebSocket) {
 
     // Handle different message types
     if (event.data instanceof Blob) {
-      // Audio data as Blob
+      // Audio data as Blob - common from browsers
+      console.log("Processing Blob data, size:", event.data.size);
       const arrayBuffer = await event.data.arrayBuffer();
       deepgramWs.send(arrayBuffer);
     } else if (typeof event.data === "string") {
@@ -51,12 +54,16 @@ function handleWebSocketConnection(clientWs: WebSocket) {
           closeDeepgramConnection();
         }
       } catch {
-        // If not JSON, assume it's raw audio data
+        // If not JSON, might be base64 audio data
+        console.log("Received string data, attempting to send to Deepgram");
         deepgramWs.send(event.data);
       }
     } else if (event.data instanceof ArrayBuffer) {
       // Audio data as ArrayBuffer
+      console.log("Processing ArrayBuffer data, size:", event.data.byteLength);
       deepgramWs.send(event.data);
+    } else {
+      console.warn("Unknown data type received:", event.data);
     }
   };
 
@@ -70,28 +77,50 @@ function handleWebSocketConnection(clientWs: WebSocket) {
     closeDeepgramConnection();
   };
 
-  async function initializeDeepgramConnection() {
+  async function initializeDeepgramConnection(request: Request) {
     const deepgramApiKey = Deno.env.get("DEEPGRAM_API_KEY");
+    console.log("Deepgram API key found:", deepgramApiKey ? `${deepgramApiKey.substring(0, 8)}...` : "NOT FOUND");
+    
     if (!deepgramApiKey) {
+      console.error("DEEPGRAM_API_KEY not found in environment");
       clientWs.send(JSON.stringify({
         type: "error",
         message: "Deepgram API key not configured",
       }));
-      clientWs.close();
       return;
     }
 
     try {
-      const deepgramClient = new DeepgramClient({ apiKey: deepgramApiKey });
-      deepgramWs = await deepgramClient.connectLive({
+      const deepgramClient = new DeepgramSDKClient(deepgramApiKey);
+      
+      // Check if this is a browser client (they send WebM/Opus)
+      // iOS app sends PCM (linear16)
+      const userAgent = request.headers.get("user-agent") || "";
+      const isBrowser = userAgent.includes("Mozilla");
+      console.log("User agent:", userAgent);
+      console.log("Is browser?", isBrowser, "- Using encoding:", isBrowser ? "webm-opus" : "linear16");
+      
+      // For browsers, we need to omit encoding and let Deepgram auto-detect
+      // Deepgram can handle WebM/Opus without specifying the encoding
+      const options: LiveSchema = {
         model: "nova-2",
         language: "en-US",
         smart_format: true,
         punctuate: true,
         profanity_filter: false,
-        encoding: "linear16",
-        sample_rate: 16000,
-      });
+        interim_results: true,
+        utterance_end_ms: 1000,
+        vad_events: true,
+        endpointing: 300,
+      };
+      
+      // Only specify encoding for iOS (PCM data)
+      if (!isBrowser) {
+        options.encoding = "linear16";
+        options.sample_rate = 16000;
+      }
+      
+      deepgramWs = await deepgramClient.connectLive(options);
 
       deepgramWs.onopen = () => {
         console.log("Deepgram WebSocket connected");
@@ -110,11 +139,13 @@ function handleWebSocketConnection(clientWs: WebSocket) {
       };
 
       deepgramWs.onmessage = (event) => {
+        console.log("Received Deepgram response:", event.data);
         try {
           const response: TranscriptResponse = JSON.parse(event.data as string);
           
           // Only send transcripts with actual content
           if (response.channel?.alternatives?.[0]?.transcript) {
+            console.log("Sending transcript to client:", response.channel.alternatives[0].transcript);
             clientWs.send(JSON.stringify({
               type: "transcript",
               transcript: response.channel.alternatives[0].transcript,
@@ -155,7 +186,6 @@ function handleWebSocketConnection(clientWs: WebSocket) {
         type: "error",
         message: "Failed to initialize Deepgram connection",
       }));
-      clientWs.close();
     }
   }
 
@@ -170,4 +200,6 @@ function handleWebSocketConnection(clientWs: WebSocket) {
       deepgramWs = null;
     }
   }
+
+  return response;
 }

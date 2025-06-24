@@ -17,4 +17,17 @@ class FunnelAPIService {
             fieldName: "audio"
         )
     }
+    
+    /// Process audio file with pre-transcribed text (from live transcription)
+    func processAudioWithTranscript(fileURL: URL, transcript: String, duration: TimeInterval) async throws -> ProcessedRecording {
+        return try await apiClient.uploadMultipart(
+            "/api/new-recording",
+            fileURL: fileURL,
+            fieldName: "audio",
+            additionalFields: [
+                "transcript": transcript,
+                "duration": String(duration)
+            ]
+        )
+    }
 }
