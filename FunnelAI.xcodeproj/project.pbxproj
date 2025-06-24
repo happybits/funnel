@@ -6,6 +6,10 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4908C3C42E0A250700076173 /* CHGlassmorphismView in Frameworks */ = {isa = PBXBuildFile; productRef = 4908C3C32E0A250700076173 /* CHGlassmorphismView */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		0A9BC078DD4AC38F123687A2 /* FunnelAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunnelAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -29,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4908C3C42E0A250700076173 /* CHGlassmorphismView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +76,7 @@
 			);
 			name = FunnelAI;
 			packageProductDependencies = (
+				4908C3C32E0A250700076173 /* CHGlassmorphismView */,
 			);
 			productName = Funnel;
 			productReference = 0A9BC078DD4AC38F123687A2 /* FunnelAI.app */;
@@ -101,6 +107,7 @@
 			mainGroup = D9581316AE7A5E7CB95F6728;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				4908C3C22E0A250700076173 /* XCRemoteSwiftPackageReference "CHGlassmorphismView" */,
 			);
 			projectDirPath = "";
 			projectRoot = "";
@@ -340,6 +347,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4908C3C22E0A250700076173 /* XCRemoteSwiftPackageReference "CHGlassmorphismView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Chaehui-Seo/CHGlassmorphismView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4908C3C32E0A250700076173 /* CHGlassmorphismView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4908C3C22E0A250700076173 /* XCRemoteSwiftPackageReference "CHGlassmorphismView" */;
+			productName = CHGlassmorphismView;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 907C3DDE5BB93C24658194DA /* Project object */;
 }

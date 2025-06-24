@@ -74,7 +74,7 @@ struct ProcessingOverlay: View {
         }
         .padding()
         .frame(maxWidth: 350)
-        .glassmorphic(cornerRadius: 15, gradientOpacity: (0.1, 0.4))
+        .liveGlassmorphic(cornerRadius: 15, gradientOpacity: (0.1, 0.4))
     }
 
     var body: some View {

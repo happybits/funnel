@@ -86,4 +86,3 @@ enum NavigationDestination: Equatable {
         }
     }
 }
-
