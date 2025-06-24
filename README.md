@@ -161,6 +161,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ### Development Best Practices
 - Follow the [SwiftUI Layout Best Practices](docs/swiftui-layout-best-practices.md)
+- Review the [Glassmorphism Implementation Guide](docs/glassmorphism-implementation-guide.md) for performance tips
 - The project uses Xcode's new folder-based structure (files are automatically referenced)
 - Run `make format` before committing
 - Write tests for new features

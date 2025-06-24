@@ -5,6 +5,19 @@ All notable changes to the Funnel project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Live audio transcription with Deepgram**: Real-time transcription during recording
+  - WebSocket endpoint `/api/live-transcription` for streaming audio
+  - Deepgram integration using WebSocket API for minimal latency
+  - Client receives transcripts as user speaks with interim and final results
+  - Keep-alive mechanism to maintain connection during pauses
+  - Support for WebM/Opus audio streaming from browser clients
+  - Test HTML client included for validating WebSocket functionality
+- **Deepgram client library**: Custom Deno implementation for Deepgram WebSocket API
+  - Type-safe interfaces for transcription options and responses
+  - Configurable model, language, and formatting options
+  - Built-in error handling and connection management
+
+### Added
 - **Custom live glassmorphism implementation** with performance optimizations
   - LiveBlurView using UIVisualEffectView for efficient real-time blur
   - LiveGlassmorphicModifier for easy application of glass effects  

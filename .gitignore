@@ -54,3 +54,5 @@ xcuserdata/
 .temp/
 tmp/
 EOF < /dev/null
+
+wt-*/

@@ -234,11 +234,14 @@ This applies to all SwiftUI views and Swift functions where trailing closures ma
 
 ### Glassmorphism and Blur Effects
 **Performance considerations for live blur effects:**
-- CADisplayLink-based blur is very inefficient and can cause app crashes
+- **NEVER use CADisplayLink-based blur** - It causes excessive CPU usage, memory leaks, and app crashes
+- CADisplayLink fires 60-120 times per second, creating constant view updates that overwhelm the system
 - Use UIVisualEffectView wrapped in UIViewRepresentable for performant live blur
 - Force light mode on blur views with `overrideUserInterfaceStyle = .light` for consistency
 - Use `.systemUltraThinMaterialLight` for minimal frosted glass effect
 - Consider making blur optional with a debug toggle for performance testing
+
+**Important iOS limitation**: Creating truly transparent live blur is extremely difficult without UIVisualEffectView, which always includes a frosted/material appearance. If your background is a gradient (not live content), you don't need real blur - the gradient + overlay achieves the glassmorphism effect without performance costs.
 
 **Implementing glassmorphism in SwiftUI:**
 ```swift
@@ -264,3 +267,35 @@ struct VisualEffectBlur: UIViewRepresentable {
         )
     }
 )
+```
+
+**Selective blur application pattern:**
+```swift
+// Create separate modifiers for performance
+extension View {
+    // Full glassmorphic effect with blur - use sparingly
+    func liveGlassmorphic(...) -> some View { 
+        // Includes blur + gradient + shadows
+    }
+    
+    // Gradient-only effect - use for scrollable content
+    func liveGlassmorphicCell(...) -> some View {
+        // Only gradient + shadows, no blur
+    }
+}
+```
+
+**Debug toggle pattern for performance testing:**
+```swift
+// Global debug settings
+class DebugSettings: ObservableObject {
+    @Published var blurEnabled: Bool = true
+}
+
+// In your app:
+@StateObject private var debugSettings = DebugSettings()
+
+// In your modifier:
+if debugSettings.blurEnabled {
+    VisualEffectBlur(style: .systemUltraThinMaterialLight)
+}
