@@ -12,29 +12,36 @@ interface LiveTranscriptionMessage {
 
 export function liveTranscriptionHandler(req: Request): Response {
   const { socket: clientWs, response } = Deno.upgradeWebSocket(req);
-  
+
   let deepgramWs: WebSocket | null = null;
   let keepAliveInterval: number | null = null;
 
   clientWs.onopen = () => {
     console.log("Client WebSocket connected");
-    
+
     // Send immediate acknowledgment
     clientWs.send(JSON.stringify({
       type: "connected",
       message: "Connected to server, initializing Deepgram...",
     }));
-    
+
     initializeDeepgramConnection(req);
   };
 
   clientWs.onmessage = async (event) => {
     // Log the type of data received
-    const dataType = event.data instanceof Blob ? "Blob" : 
-                     event.data instanceof ArrayBuffer ? "ArrayBuffer" : 
-                     typeof event.data;
-    console.log("Received data type:", dataType, "size:", event.data?.size || event.data?.byteLength || event.data?.length);
-    
+    const dataType = event.data instanceof Blob
+      ? "Blob"
+      : event.data instanceof ArrayBuffer
+      ? "ArrayBuffer"
+      : typeof event.data;
+    console.log(
+      "Received data type:",
+      dataType,
+      "size:",
+      event.data?.size || event.data?.byteLength || event.data?.length,
+    );
+
     if (!deepgramWs || deepgramWs.readyState !== WebSocket.OPEN) {
       console.warn("Deepgram WebSocket not ready");
       return;
@@ -79,8 +86,11 @@ export function liveTranscriptionHandler(req: Request): Response {
 
   async function initializeDeepgramConnection(request: Request) {
     const deepgramApiKey = Deno.env.get("DEEPGRAM_API_KEY");
-    console.log("Deepgram API key found:", deepgramApiKey ? `${deepgramApiKey.substring(0, 8)}...` : "NOT FOUND");
-    
+    console.log(
+      "Deepgram API key found:",
+      deepgramApiKey ? `${deepgramApiKey.substring(0, 8)}...` : "NOT FOUND",
+    );
+
     if (!deepgramApiKey) {
       console.error("DEEPGRAM_API_KEY not found in environment");
       clientWs.send(JSON.stringify({
@@ -92,14 +102,19 @@ export function liveTranscriptionHandler(req: Request): Response {
 
     try {
       const deepgramClient = new DeepgramSDKClient(deepgramApiKey);
-      
+
       // Check if this is a browser client (they send WebM/Opus)
       // iOS app sends PCM (linear16)
       const userAgent = request.headers.get("user-agent") || "";
       const isBrowser = userAgent.includes("Mozilla");
       console.log("User agent:", userAgent);
-      console.log("Is browser?", isBrowser, "- Using encoding:", isBrowser ? "webm-opus" : "linear16");
-      
+      console.log(
+        "Is browser?",
+        isBrowser,
+        "- Using encoding:",
+        isBrowser ? "webm-opus" : "linear16",
+      );
+
       // For browsers, we need to omit encoding and let Deepgram auto-detect
       // Deepgram can handle WebM/Opus without specifying the encoding
       const options: LiveSchema = {
@@ -113,18 +128,18 @@ export function liveTranscriptionHandler(req: Request): Response {
         vad_events: true,
         endpointing: 300,
       };
-      
+
       // Only specify encoding for iOS (PCM data)
       if (!isBrowser) {
         options.encoding = "linear16";
         options.sample_rate = 16000;
       }
-      
+
       deepgramWs = await deepgramClient.connectLive(options);
 
       deepgramWs.onopen = () => {
         console.log("Deepgram WebSocket connected");
-        
+
         // Send keep-alive every 10 seconds
         keepAliveInterval = setInterval(() => {
           if (deepgramWs && deepgramWs.readyState === WebSocket.OPEN) {
@@ -142,10 +157,13 @@ export function liveTranscriptionHandler(req: Request): Response {
         console.log("Received Deepgram response:", event.data);
         try {
           const response: TranscriptResponse = JSON.parse(event.data as string);
-          
+
           // Only send transcripts with actual content
           if (response.channel?.alternatives?.[0]?.transcript) {
-            console.log("Sending transcript to client:", response.channel.alternatives[0].transcript);
+            console.log(
+              "Sending transcript to client:",
+              response.channel.alternatives[0].transcript,
+            );
             clientWs.send(JSON.stringify({
               type: "transcript",
               transcript: response.channel.alternatives[0].transcript,
@@ -166,7 +184,7 @@ export function liveTranscriptionHandler(req: Request): Response {
         if (keepAliveInterval) {
           clearInterval(keepAliveInterval);
         }
-        
+
         clientWs.send(JSON.stringify({
           type: "deepgram_closed",
           message: "Deepgram connection closed",

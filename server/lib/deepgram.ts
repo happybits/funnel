@@ -46,7 +46,7 @@ export class DeepgramClient {
     this.apiKey = config.apiKey;
   }
 
-  async connectLive(
+  connectLive(
     options: LiveTranscriptionOptions = {},
   ): Promise<WebSocket> {
     const defaultOptions: LiveTranscriptionOptions = {
@@ -66,13 +66,13 @@ export class DeepgramClient {
     });
 
     const url = `${this.baseUrl}?${params.toString()}`;
-    
+
     console.log("Deepgram WebSocket URL:", url);
 
     // Create WebSocket connection using Sec-WebSocket-Protocol
     // Pass two separate protocol values: "token" and the API key
     const ws = new WebSocket(url, ["token", this.apiKey]);
 
-    return ws;
+    return Promise.resolve(ws);
   }
 }

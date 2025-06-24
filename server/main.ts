@@ -8,9 +8,18 @@ await load({ export: true });
 console.log("Environment variables loaded");
 
 // Debug: Check if API keys are loaded
-console.log("DEEPGRAM_API_KEY:", Deno.env.get("DEEPGRAM_API_KEY") ? "Found" : "Not found");
-console.log("OPENAI_API_KEY:", Deno.env.get("OPENAI_API_KEY") ? "Found" : "Not found");
-console.log("ANTHROPIC_API_KEY:", Deno.env.get("ANTHROPIC_API_KEY") ? "Found" : "Not found");
+console.log(
+  "DEEPGRAM_API_KEY:",
+  Deno.env.get("DEEPGRAM_API_KEY") ? "Found" : "Not found",
+);
+console.log(
+  "OPENAI_API_KEY:",
+  Deno.env.get("OPENAI_API_KEY") ? "Found" : "Not found",
+);
+console.log(
+  "ANTHROPIC_API_KEY:",
+  Deno.env.get("ANTHROPIC_API_KEY") ? "Found" : "Not found",
+);
 
 const port = parseInt(Deno.env.get("PORT") || "8000");
 const corsOrigin = Deno.env.get("CORS_ORIGIN") || "*";
@@ -60,16 +69,22 @@ Deno.serve({ port }, async (req) => {
             "Content-Type": "application/json",
             ...corsHeaders,
           },
-        }
+        },
       );
-      console.log(`--> ${method} ${url.pathname} 200 ${Date.now() - startTime}ms`);
+      console.log(
+        `--> ${method} ${url.pathname} 200 ${Date.now() - startTime}ms`,
+      );
       return response;
     }
 
     // POST /api/new-recording
     if (url.pathname === "/api/new-recording" && method === "POST") {
       const response = await newRecordingHandler(req);
-      console.log(`--> ${method} ${url.pathname} ${response.status} ${Date.now() - startTime}ms`);
+      console.log(
+        `--> ${method} ${url.pathname} ${response.status} ${
+          Date.now() - startTime
+        }ms`,
+      );
       return new Response(response.body, {
         status: response.status,
         headers: {
@@ -83,11 +98,16 @@ Deno.serve({ port }, async (req) => {
     if (url.pathname === "/api/live-transcription" && method === "GET") {
       const upgrade = req.headers.get("upgrade") || "";
       if (upgrade.toLowerCase() !== "websocket") {
-        return new Response("Expected WebSocket", { status: 400, headers: corsHeaders });
+        return new Response("Expected WebSocket", {
+          status: 400,
+          headers: corsHeaders,
+        });
       }
-      
+
       const response = liveTranscriptionHandler(req);
-      console.log(`--> ${method} ${url.pathname} 101 ${Date.now() - startTime}ms`);
+      console.log(
+        `--> ${method} ${url.pathname} 101 ${Date.now() - startTime}ms`,
+      );
       return response;
     }
 
@@ -102,14 +122,18 @@ Deno.serve({ port }, async (req) => {
             ...corsHeaders,
           },
         });
-        console.log(`--> ${method} ${url.pathname} 200 ${Date.now() - startTime}ms`);
+        console.log(
+          `--> ${method} ${url.pathname} 200 ${Date.now() - startTime}ms`,
+        );
         return response;
       } catch {
-        const response = new Response("Test file not found", { 
+        const response = new Response("Test file not found", {
           status: 404,
           headers: corsHeaders,
         });
-        console.log(`--> ${method} ${url.pathname} 404 ${Date.now() - startTime}ms`);
+        console.log(
+          `--> ${method} ${url.pathname} 404 ${Date.now() - startTime}ms`,
+        );
         return response;
       }
     }
@@ -123,11 +147,12 @@ Deno.serve({ port }, async (req) => {
           "Content-Type": "application/json",
           ...corsHeaders,
         },
-      }
+      },
     );
-    console.log(`--> ${method} ${url.pathname} 404 ${Date.now() - startTime}ms`);
+    console.log(
+      `--> ${method} ${url.pathname} 404 ${Date.now() - startTime}ms`,
+    );
     return notFoundResponse;
-
   } catch (error) {
     console.error("Server error:", error);
     const errorResponse = new Response(
@@ -138,9 +163,11 @@ Deno.serve({ port }, async (req) => {
           "Content-Type": "application/json",
           ...corsHeaders,
         },
-      }
+      },
     );
-    console.log(`--> ${method} ${url.pathname} 500 ${Date.now() - startTime}ms`);
+    console.log(
+      `--> ${method} ${url.pathname} 500 ${Date.now() - startTime}ms`,
+    );
     return errorResponse;
   }
 });

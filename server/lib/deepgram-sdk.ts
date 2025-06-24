@@ -1,4 +1,9 @@
-import { createClient, LiveTranscriptionEvents, type DeepgramClient, type LiveSchema } from "npm:@deepgram/sdk@3.9.0";
+import {
+  createClient,
+  type DeepgramClient,
+  type LiveSchema,
+  LiveTranscriptionEvents,
+} from "npm:@deepgram/sdk@3.9.0";
 
 export class DeepgramSDKClient {
   private client: DeepgramClient;
@@ -7,14 +12,18 @@ export class DeepgramSDKClient {
     this.client = createClient(apiKey);
   }
 
-  async connectLive(options: LiveSchema) {
+  connectLive(options: LiveSchema) {
     // Get the live transcription connection
     const connection = this.client.listen.live(options);
 
     // Return a wrapper that matches our existing WebSocket-like interface
     return new Promise<WebSocket>((resolve, reject) => {
+      // Create a proxy-like object that mimics WebSocket behavior
+      let currentReadyState = WebSocket.CONNECTING;
       const wsWrapper = {
-        readyState: WebSocket.CONNECTING,
+        get readyState() {
+          return currentReadyState;
+        },
         send: (data: string | ArrayBuffer) => {
           if (data instanceof ArrayBuffer || typeof data === "string") {
             connection.send(data);
@@ -31,7 +40,7 @@ export class DeepgramSDKClient {
       } as unknown as WebSocket;
 
       connection.on(LiveTranscriptionEvents.Open, () => {
-        wsWrapper.readyState = WebSocket.OPEN;
+        currentReadyState = WebSocket.OPEN;
         if (wsWrapper.onopen) {
           wsWrapper.onopen(new Event("open"));
         }
@@ -40,14 +49,16 @@ export class DeepgramSDKClient {
 
       connection.on(LiveTranscriptionEvents.Transcript, (data) => {
         if (wsWrapper.onmessage) {
-          wsWrapper.onmessage(new MessageEvent("message", { 
-            data: JSON.stringify(data) 
-          }));
+          wsWrapper.onmessage(
+            new MessageEvent("message", {
+              data: JSON.stringify(data),
+            }),
+          );
         }
       });
 
       connection.on(LiveTranscriptionEvents.Close, () => {
-        wsWrapper.readyState = WebSocket.CLOSED;
+        currentReadyState = WebSocket.CLOSED;
         if (wsWrapper.onclose) {
           wsWrapper.onclose(new CloseEvent("close"));
         }
@@ -56,6 +67,7 @@ export class DeepgramSDKClient {
       connection.on(LiveTranscriptionEvents.Error, (error) => {
         if (wsWrapper.onerror) {
           const errorEvent = new Event("error");
+          // deno-lint-ignore no-explicit-any
           (errorEvent as any).error = error;
           wsWrapper.onerror(errorEvent);
         }
@@ -65,4 +77,4 @@ export class DeepgramSDKClient {
   }
 }
 
-export { LiveTranscriptionEvents, type LiveSchema };
+export { type LiveSchema, LiveTranscriptionEvents };

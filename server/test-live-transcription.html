@@ -1,202 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Transcription Test</title>
     <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        button {
-            font-size: 16px;
-            padding: 10px 20px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            background: #007aff;
-            color: white;
-        }
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        button.recording {
-            background: #ff3b30;
-        }
-        #status {
-            margin: 10px 0;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 4px;
-        }
-        #transcript {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 4px;
-            min-height: 200px;
-            white-space: pre-wrap;
-        }
-        .transcript-item {
-            margin: 5px 0;
-            padding: 5px;
-            border-left: 3px solid #007aff;
-            padding-left: 10px;
-        }
-        .transcript-item.final {
-            border-left-color: #34c759;
-        }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      button {
+        font-size: 16px;
+        padding: 10px 20px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background: #007aff;
+        color: white;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      button.recording {
+        background: #ff3b30;
+      }
+      #status {
+        margin: 10px 0;
+        padding: 10px;
+        background: #f0f0f0;
+        border-radius: 4px;
+      }
+      #transcript {
+        margin: 20px 0;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 4px;
+        min-height: 200px;
+        white-space: pre-wrap;
+      }
+      .transcript-item {
+        margin: 5px 0;
+        padding: 5px;
+        border-left: 3px solid #007aff;
+        padding-left: 10px;
+      }
+      .transcript-item.final {
+        border-left-color: #34c759;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>Live Transcription Test</h1>
-        <button id="connectBtn">Connect to Server</button>
-        <button id="recordBtn" disabled>Start Recording</button>
-        
-        <div id="status">Status: Disconnected</div>
-        
-        <h2>Transcript</h2>
-        <div id="transcript"></div>
+      <h1>Live Transcription Test</h1>
+      <button id="connectBtn">Connect to Server</button>
+      <button id="recordBtn" disabled>Start Recording</button>
+
+      <div id="status">Status: Disconnected</div>
+
+      <h2>Transcript</h2>
+      <div id="transcript"></div>
     </div>
 
     <script>
-        let socket = null;
-        let mediaRecorder = null;
-        let isRecording = false;
+      let socket = null;
+      let mediaRecorder = null;
+      let isRecording = false;
 
-        const connectBtn = document.getElementById('connectBtn');
-        const recordBtn = document.getElementById('recordBtn');
-        const statusDiv = document.getElementById('status');
-        const transcriptDiv = document.getElementById('transcript');
+      const connectBtn = document.getElementById("connectBtn");
+      const recordBtn = document.getElementById("recordBtn");
+      const statusDiv = document.getElementById("status");
+      const transcriptDiv = document.getElementById("transcript");
 
-        function updateStatus(message, color = '#333') {
-            statusDiv.textContent = `Status: ${message}`;
-            statusDiv.style.color = color;
+      function updateStatus(message, color = "#333") {
+        statusDiv.textContent = `Status: ${message}`;
+        statusDiv.style.color = color;
+      }
+
+      function addTranscript(text, isFinal = false) {
+        const item = document.createElement("div");
+        item.className = "transcript-item" + (isFinal ? " final" : "");
+        item.textContent = text;
+        transcriptDiv.appendChild(item);
+        transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
+      }
+
+      connectBtn.addEventListener("click", () => {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.close();
+          return;
         }
 
-        function addTranscript(text, isFinal = false) {
-            const item = document.createElement('div');
-            item.className = 'transcript-item' + (isFinal ? ' final' : '');
-            item.textContent = text;
-            transcriptDiv.appendChild(item);
-            transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
+        const wsUrl = `ws://localhost:8000/api/live-transcription`;
+        socket = new WebSocket(wsUrl);
+
+        socket.onopen = () => {
+          updateStatus("Connected to server", "#34c759");
+          connectBtn.textContent = "Disconnect";
+          recordBtn.disabled = false;
+        };
+
+        socket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+
+          switch (data.type) {
+            case "ready":
+              updateStatus("Ready for transcription", "#34c759");
+              break;
+            case "transcript":
+              if (data.transcript.trim()) {
+                addTranscript(data.transcript, data.is_final);
+              }
+              break;
+            case "error":
+              updateStatus(`Error: ${data.message}`, "#ff3b30");
+              break;
+            case "deepgram_closed":
+              updateStatus("Deepgram connection closed", "#ff9500");
+              break;
+          }
+        };
+
+        socket.onclose = () => {
+          updateStatus("Disconnected");
+          connectBtn.textContent = "Connect to Server";
+          recordBtn.disabled = true;
+          if (isRecording) {
+            stopRecording();
+          }
+        };
+
+        socket.onerror = (error) => {
+          updateStatus("Connection error", "#ff3b30");
+          console.error("WebSocket error:", error);
+        };
+      });
+
+      recordBtn.addEventListener("click", async () => {
+        if (!isRecording) {
+          await startRecording();
+        } else {
+          stopRecording();
         }
+      });
 
-        connectBtn.addEventListener('click', () => {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.close();
-                return;
+      async function startRecording() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              channelCount: 1,
+              sampleRate: 16000,
+              echoCancellation: true,
+              noiseSuppression: true,
+            },
+          });
+
+          mediaRecorder = new MediaRecorder(stream, {
+            mimeType: "audio/webm;codecs=opus",
+          });
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (
+              event.data.size > 0 &&
+              socket.readyState === WebSocket.OPEN
+            ) {
+              socket.send(event.data);
             }
+          };
 
-            const wsUrl = `ws://localhost:8000/api/live-transcription`;
-            socket = new WebSocket(wsUrl);
-
-            socket.onopen = () => {
-                updateStatus('Connected to server', '#34c759');
-                connectBtn.textContent = 'Disconnect';
-                recordBtn.disabled = false;
-            };
-
-            socket.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                
-                switch (data.type) {
-                    case 'ready':
-                        updateStatus('Ready for transcription', '#34c759');
-                        break;
-                    case 'transcript':
-                        if (data.transcript.trim()) {
-                            addTranscript(data.transcript, data.is_final);
-                        }
-                        break;
-                    case 'error':
-                        updateStatus(`Error: ${data.message}`, '#ff3b30');
-                        break;
-                    case 'deepgram_closed':
-                        updateStatus('Deepgram connection closed', '#ff9500');
-                        break;
-                }
-            };
-
-            socket.onclose = () => {
-                updateStatus('Disconnected');
-                connectBtn.textContent = 'Connect to Server';
-                recordBtn.disabled = true;
-                if (isRecording) {
-                    stopRecording();
-                }
-            };
-
-            socket.onerror = (error) => {
-                updateStatus('Connection error', '#ff3b30');
-                console.error('WebSocket error:', error);
-            };
-        });
-
-        recordBtn.addEventListener('click', async () => {
-            if (!isRecording) {
-                await startRecording();
-            } else {
-                stopRecording();
-            }
-        });
-
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        channelCount: 1,
-                        sampleRate: 16000,
-                        echoCancellation: true,
-                        noiseSuppression: true
-                    } 
-                });
-
-                mediaRecorder = new MediaRecorder(stream, {
-                    mimeType: 'audio/webm;codecs=opus'
-                });
-
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-                        socket.send(event.data);
-                    }
-                };
-
-                mediaRecorder.start(100); // Send data every 100ms
-                isRecording = true;
-                recordBtn.textContent = 'Stop Recording';
-                recordBtn.classList.add('recording');
-                updateStatus('Recording...', '#ff3b30');
-            } catch (error) {
-                console.error('Error accessing microphone:', error);
-                updateStatus('Error accessing microphone', '#ff3b30');
-            }
+          mediaRecorder.start(100); // Send data every 100ms
+          isRecording = true;
+          recordBtn.textContent = "Stop Recording";
+          recordBtn.classList.add("recording");
+          updateStatus("Recording...", "#ff3b30");
+        } catch (error) {
+          console.error("Error accessing microphone:", error);
+          updateStatus("Error accessing microphone", "#ff3b30");
         }
+      }
 
-        function stopRecording() {
-            if (mediaRecorder) {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-                mediaRecorder = null;
-            }
-            isRecording = false;
-            recordBtn.textContent = 'Start Recording';
-            recordBtn.classList.remove('recording');
-            updateStatus('Recording stopped', '#34c759');
+      function stopRecording() {
+        if (mediaRecorder) {
+          mediaRecorder.stop();
+          mediaRecorder.stream.getTracks().forEach((track) =>
+            track.stop()
+          );
+          mediaRecorder = null;
         }
+        isRecording = false;
+        recordBtn.textContent = "Start Recording";
+        recordBtn.classList.remove("recording");
+        updateStatus("Recording stopped", "#34c759");
+      }
     </script>
-</body>
+  </body>
 </html>
