@@ -4,7 +4,7 @@ import SwiftUI
 @main
 struct FunnelApp: App {
     @StateObject private var debugSettings = DebugSettings()
-    
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Recording.self,

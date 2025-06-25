@@ -18,8 +18,15 @@ class APIClient {
         decoder = JSONDecoder()
         encoder = JSONEncoder()
 
-        let useLocalServer = false
-        baseURL = useLocalServer ? "http://127.0.0.1:8000" : "https://funnel-api.deno.dev"
+        // Check for test API URL from environment
+        if let testAPIURL = ProcessInfo.processInfo.environment["API_BASE_URL"] {
+            baseURL = testAPIURL
+        } else {
+            let useLocalServer = false
+            baseURL = useLocalServer ? "http://127.0.0.1:8000" : "https://funnel-api.deno.dev"
+        }
+
+        print("APIClient: Using base URL: \(baseURL)")
     }
 
     // MARK: - Generic Request Methods

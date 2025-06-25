@@ -55,14 +55,17 @@ struct SwipeableCardsView: View {
                         BulletSummaryCard(bulletSummary: recording.bulletSummary ?? [])
                             .frame(width: cardWidth)
                             .id(0)
+                            .accessibilityIdentifier("BulletSummaryCard")
 
                         DiagramCard(diagram: recording.diagram)
                             .frame(width: cardWidth)
                             .id(1)
+                            .accessibilityIdentifier("DiagramCard")
 
                         TranscriptCard(transcript: recording.transcript ?? "")
                             .frame(width: cardWidth)
                             .id(2)
+                            .accessibilityIdentifier("TranscriptCard")
                     }
                     .scrollTargetLayout()
                 }
@@ -80,6 +83,7 @@ struct SwipeableCardsView: View {
             }
         }
         .padding(.top, 20)
+        .accessibilityIdentifier("CardsView")
     }
 
     var body: some View {
@@ -192,6 +196,7 @@ struct DiagramCard: View {
                 Text("No diagram available")
                     .funnelCallout()
                     .foregroundColor(.white.opacity(0.5))
+                    .accessibilityIdentifier("NoDiagramText")
             }
         }
         .padding(25)

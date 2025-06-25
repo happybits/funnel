@@ -13,6 +13,11 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private(set) var currentRecordingURL: URL?
     private var recordingCompletion: ((Result<URL, Error>) -> Void)?
 
+    // Test mode support
+    static var isTestMode: Bool {
+        ProcessInfo.processInfo.arguments.contains("--ui-testing")
+    }
+
     override init() {
         super.init()
         setupAudioSession()
@@ -45,6 +50,12 @@ class AudioRecorderManager: NSObject, ObservableObject {
 
         currentRecordingURL = audioFilename
         recordingCompletion = completion
+
+        // Test mode - use pre-recorded file
+        if Self.isTestMode {
+            startTestRecording(audioFilename: audioFilename, completion: completion)
+            return
+        }
 
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
@@ -94,11 +105,27 @@ class AudioRecorderManager: NSObject, ObservableObject {
     }
 
     func stopRecording() {
-        audioRecorder?.stop()
-        timer?.invalidate()
-        levelTimer?.invalidate()
-        isRecording = false
-        audioLevel = 0
+        if Self.isTestMode {
+            // In test mode, just stop the timers and call completion
+            timer?.invalidate()
+            levelTimer?.invalidate()
+            isRecording = false
+            audioLevel = 0
+
+            // Simulate successful recording completion
+            if let url = currentRecordingURL {
+                print("AudioRecorderManager: Test recording finished, file at: \(url.path)")
+                recordingCompletion?(.success(url))
+            }
+            recordingCompletion = nil
+            currentRecordingURL = nil
+        } else {
+            audioRecorder?.stop()
+            timer?.invalidate()
+            levelTimer?.invalidate()
+            isRecording = false
+            audioLevel = 0
+        }
     }
 
     private func updateAudioLevel() {
@@ -123,6 +150,45 @@ class AudioRecorderManager: NSObject, ObservableObject {
 
         DispatchQueue.main.async {
             self.audioLevel = curvedLevel
+        }
+    }
+
+    // MARK: - Test Mode Support
+
+    private func startTestRecording(audioFilename: URL, completion: @escaping (Result<URL, Error>) -> Void) {
+        print("AudioRecorderManager: Starting test mode recording")
+
+        // Copy test audio file to the recording location
+        if let testAudioURL = Bundle.main.url(forResource: "sample-audio-recording", withExtension: "m4a") {
+            do {
+                try FileManager.default.copyItem(at: testAudioURL, to: audioFilename)
+                print("AudioRecorderManager: Test audio file copied to: \(audioFilename.path)")
+
+                // Simulate recording
+                isRecording = true
+                recordingTime = 0
+
+                // Simulate recording duration (test audio is about 5 seconds)
+                timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.recordingTime += 0.1
+
+                    // Simulate varying audio levels
+                    let baseLevel: Float = 0.3
+                    let variation: Float = 0.2
+                    let randomVariation = Float.random(in: -variation ... variation)
+                    self.audioLevel = max(0, min(1, baseLevel + randomVariation))
+                }
+
+                completion(.success(audioFilename))
+            } catch {
+                print("AudioRecorderManager: Failed to copy test audio file: \(error)")
+                completion(.failure(error))
+                recordingCompletion = nil
+            }
+        } else {
+            completion(.failure(FunnelError.recordingFailed(reason: "Test audio file not found")))
+            recordingCompletion = nil
         }
     }
 }

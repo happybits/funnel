@@ -32,7 +32,7 @@ struct NewRecordingView: View {
                     FunnelLogo()
                         .padding(.leading, 30)
                     Spacer()
-                    
+
                     // Blur toggle for debugging
                     // Toggle("Blur", isOn: $debugSettings.blurEnabled)
                     //     .toggleStyle(CheckboxToggleStyle())
@@ -132,6 +132,7 @@ struct RecordingControlsView: View {
                     .scaleEffect(isPressed ? 0.95 : 1.0)
             }
             .buttonStyle(PlainButtonStyle())
+            .accessibilityIdentifier(isRecording ? "Stop Recording" : "Start Recording")
             .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = pressing

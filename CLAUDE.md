@@ -119,8 +119,15 @@ Other useful commands:
 - `make watch` - Watches for changes and rebuilds automatically
 - `make release` - Creates a release build
 
+### Project Structure
+This project uses Xcode's modern folder-based project structure (introduced in Xcode 14+). This means:
+- Source files are automatically synchronized with the file system
+- No need to manually add/remove files in Xcode
+- Cleaner git diffs without .pbxproj conflicts for file additions/removals
+- Files in synchronized folders (marked with folder icons in Xcode) are automatically included in the target
+
 ### Code Signing
-With the new Xcode folder-based project structure, code signing is configured directly in Xcode:
+With the folder-based project structure, code signing is configured directly in Xcode:
 1. Open the project in Xcode
 2. Select the Funnel target
 3. Go to Signing & Capabilities

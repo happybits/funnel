@@ -6,7 +6,7 @@ enum BackgroundType: CaseIterable {
     case image3
     case white
     case gray
-    
+
     var label: String {
         switch self {
         case .image1: return "Image 1"
@@ -22,7 +22,7 @@ struct GlassRecord: View {
     @EnvironmentObject var debugSettings: DebugSettings
     @State private var isPressed = false
     @State private var backgroundType: BackgroundType = .image1
-    
+
     var body: some View {
         ZStack {
             // Dynamic background
@@ -64,7 +64,7 @@ struct GlassRecord: View {
                 Color.gray
                     .ignoresSafeArea()
             }
-            
+
             // Glass morphic record button - exact Figma specs
             Button {
                 // Action here
@@ -72,7 +72,7 @@ struct GlassRecord: View {
                 ZStack {
                     // Red stop square with rounded corners
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(red: 1, green: 59/255, blue: 48/255).opacity(0.8))
+                        .fill(Color(red: 1, green: 59 / 255, blue: 48 / 255).opacity(0.8))
                         .frame(width: 30, height: 30)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
@@ -81,7 +81,7 @@ struct GlassRecord: View {
                                         gradient: Gradient(stops: [
                                             .init(color: .white, location: 0),
                                             .init(color: .white.opacity(0), location: 0.434),
-                                            .init(color: .white, location: 1)
+                                            .init(color: .white, location: 1),
                                         ]),
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
@@ -100,13 +100,12 @@ struct GlassRecord: View {
                 .scaleEffect(isPressed ? 0.95 : 1.0)
             }
             .buttonStyle(PlainButtonStyle())
-            .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity) {
-            } onPressingChanged: { pressing in
+            .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity) {} onPressingChanged: { pressing in
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = pressing
                 }
             }
-            
+
             // Background picker and blur toggle
             VStack {
                 HStack {
@@ -129,9 +128,9 @@ struct GlassRecord: View {
                     }
                 }
                 .padding()
-                
+
                 Spacer()
-                
+
                 // Blur toggle checkbox
                 HStack {
                     Toggle("Blur Effect", isOn: $debugSettings.blurEnabled)
