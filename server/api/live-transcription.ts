@@ -10,7 +10,9 @@ interface LiveTranscriptionMessage {
   };
 }
 
-export async function liveTranscriptionHandler(c: Context): Promise<Response | void> {
+export async function liveTranscriptionHandler(
+  c: Context,
+): Promise<Response | void> {
   const upgradeHeader = c.req.header("upgrade");
   if (!upgradeHeader || upgradeHeader !== "websocket") {
     return c.text("Expected websocket connection", 426);
@@ -93,9 +95,9 @@ function handleWebSocketConnection(clientWs: WebSocket) {
         sample_rate: 16000,
       });
 
-      deepgramWs.onopen = () => {
+      deepgramWs!.onopen = () => {
         console.log("Deepgram WebSocket connected");
-        
+
         // Send keep-alive every 10 seconds
         keepAliveInterval = setInterval(() => {
           if (deepgramWs && deepgramWs.readyState === WebSocket.OPEN) {
@@ -109,10 +111,10 @@ function handleWebSocketConnection(clientWs: WebSocket) {
         }));
       };
 
-      deepgramWs.onmessage = (event) => {
+      deepgramWs!.onmessage = (event) => {
         try {
           const response: TranscriptResponse = JSON.parse(event.data as string);
-          
+
           // Only send transcripts with actual content
           if (response.channel?.alternatives?.[0]?.transcript) {
             clientWs.send(JSON.stringify({
@@ -130,19 +132,19 @@ function handleWebSocketConnection(clientWs: WebSocket) {
         }
       };
 
-      deepgramWs.onclose = () => {
+      deepgramWs!.onclose = () => {
         console.log("Deepgram WebSocket closed");
         if (keepAliveInterval) {
           clearInterval(keepAliveInterval);
         }
-        
+
         clientWs.send(JSON.stringify({
           type: "deepgram_closed",
           message: "Deepgram connection closed",
         }));
       };
 
-      deepgramWs.onerror = (error) => {
+      deepgramWs!.onerror = (error) => {
         console.error("Deepgram WebSocket error:", error);
         clientWs.send(JSON.stringify({
           type: "error",

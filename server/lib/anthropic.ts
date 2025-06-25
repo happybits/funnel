@@ -95,13 +95,22 @@ export class AnthropicClient {
     const data = await response.json();
     const content = data.content[0].text;
 
-    // Parse the response
-    const titleMatch = content.match(/TITLE:\s*(.+)/);
-    const descriptionMatch = content.match(/DESCRIPTION:\s*(.+)/);
-    const diagramMatch = content.match(/DIAGRAM:\s*\n([\s\S]+?)$/);
+    console.log("Diagram generation response:", content);
+
+    // Parse the response with more flexible regex
+    const titleMatch = content.match(/TITLE:\s*(.+)/i);
+    const descriptionMatch = content.match(/DESCRIPTION:\s*(.+)/i);
+    const diagramMatch = content.match(/DIAGRAM:\s*\n([\s\S]+)/i);
 
     if (!titleMatch || !descriptionMatch || !diagramMatch) {
-      throw new Error("Failed to parse diagram response");
+      console.error("Failed to parse diagram response. Content:", content);
+      throw new Error(
+        `Failed to parse diagram response. Missing: ${
+          !titleMatch ? "title" : ""
+        } ${!descriptionMatch ? "description" : ""} ${
+          !diagramMatch ? "diagram" : ""
+        }`,
+      );
     }
 
     return {
