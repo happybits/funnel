@@ -32,7 +32,7 @@ struct NewRecordingView: View {
                     FunnelLogo()
                         .padding(.leading, 30)
                     Spacer()
-                    
+
                     // Blur toggle for debugging
                     // Toggle("Blur", isOn: $debugSettings.blurEnabled)
                     //     .toggleStyle(CheckboxToggleStyle())
