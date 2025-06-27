@@ -4,6 +4,13 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **Upgraded Deepgram model to Nova 3**: Updated transcription model from nova-2 to nova-3
+  - 53.4% reduction in word error rate for streaming transcription
+  - Enhanced comprehension of domain-specific terminology
+  - Support for real-time multilingual conversation transcription
+  - Updated both live transcription endpoints and default configuration
+
 ### Added
 - **Live audio transcription with Deepgram**: Real-time transcription during recording
   - WebSocket endpoint `/api/live-transcription` for streaming audio
