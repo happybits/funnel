@@ -48,7 +48,7 @@ export class DeepgramClient {
     options: LiveTranscriptionOptions = {},
   ): Promise<WebSocket> {
     const defaultOptions: LiveTranscriptionOptions = {
-      model: "nova-2",
+      model: "nova-3",
       language: "en-US",
       smart_format: true,
       punctuate: true,
@@ -97,7 +97,7 @@ export interface TranscriptResponse {
 
 // Default options for live transcription
 export const DEFAULT_TRANSCRIPTION_OPTIONS: LiveTranscriptionOptions = {
-  model: "nova-2-general", // Using latest model as requested
+  model: "nova-3", // Using latest Nova 3 model
   language: "en-US",
   smart_format: true,
   punctuate: true,

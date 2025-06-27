@@ -35,6 +35,8 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
   let deepgramConnection: any = null;
   let audioBuffer: Uint8Array = new Uint8Array(0);
   let isClosing = false;
+  let isConfigured = false;
+  let audioFormat = "auto"; // auto-detect by default
 
   ws.onopen = async () => {
     console.log(`Client WebSocket connected for recording ${recordingId}`);
@@ -50,17 +52,25 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
     };
 
     await kv.set(["recordings", recordingId], recording);
+  };
 
+  // Helper function to initialize Deepgram with appropriate settings
+  const initializeDeepgram = (options: any = {}) => {
     try {
       const deepgram = getDeepgramClient();
       console.log(
-        `Initializing Deepgram connection for recording ${recordingId}`,
+        `Initializing Deepgram connection for recording ${recordingId} with options:`,
+        options,
       );
 
+      // Merge with default options
+      const transcriptionOptions = {
+        ...DEFAULT_TRANSCRIPTION_OPTIONS,
+        ...options,
+      } as any;
+
       // Cast to any to avoid type mismatch with SDK
-      deepgramConnection = deepgram.listen.live(
-        DEFAULT_TRANSCRIPTION_OPTIONS as any,
-      );
+      deepgramConnection = deepgram.listen.live(transcriptionOptions);
 
       // Handle transcription events
       deepgramConnection.on(LiveTranscriptionEvents.Open, () => {
@@ -167,11 +177,49 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
   };
 
   ws.onmessage = async (event) => {
-    if (isClosing || !deepgramConnection) return;
+    if (isClosing) return;
 
     try {
+      // Handle string messages (config)
+      if (typeof event.data === "string") {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === "config") {
+            console.log(
+              `Received config for recording ${recordingId}:`,
+              message,
+            );
+
+            // Initialize Deepgram with PCM settings if specified
+            if (message.format === "pcm16") {
+              initializeDeepgram({
+                encoding: "linear16",
+                sample_rate: message.sampleRate || 44100,
+                channels: message.channels || 1,
+              });
+            } else {
+              // Default initialization for other formats
+              initializeDeepgram();
+            }
+            isConfigured = true;
+            return;
+          }
+        } catch (e) {
+          console.log(`Received non-JSON string message: ${event.data}`);
+        }
+      }
+
+      // If not configured yet and receiving audio data, auto-configure
+      if (!isConfigured && !deepgramConnection) {
+        console.log(`Auto-configuring Deepgram for recording ${recordingId}`);
+        initializeDeepgram(); // Use defaults for auto-detection
+        isConfigured = true;
+      }
+
+      if (!deepgramConnection) return;
+
       console.log(
-        `Received message for recording ${recordingId}, type: ${typeof event
+        `Received audio data for recording ${recordingId}, type: ${typeof event
           .data}, size: ${
           event.data instanceof ArrayBuffer
             ? event.data.byteLength

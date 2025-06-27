@@ -1,0 +1,141 @@
+Open the ViewController.swift file and import AVFoundation and Starscream at the top
+import AVFoundation
+Import Starscream
+This will give you access to the AVAudioEngine class. Then inside the ViewController class, create an instance of AVAudioEngine by adding a property:
+private let audioEngine = AVAudioEngine()
+Next, create a function to analyse the audio and declare some constants:
+private func startAnalyzingAudio() {
+  let inputNode = audioEngine.inputNode
+  let inputFormat = inputNode.inputFormat(forBus: 0)
+  let outputFormat = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: inputFormat.sampleRate, channels: inputFormat.channelCount, interleaved: true)
+}
+From the top, you have the inputNode, which you can think of as the microphone followed by the inputFormat.
+Next is the outputFormat - The iOS microphone is a 32-bit depth format by default, so you will be converting to a 16-bit depth format before sending the data to Deepgram. While we will use a PCM 16-bit depth format for the audio encoding, Deepgram supports many audio encodings that can be specified to the API. Consider using a more compressed format if your use case requires low network usage. Just below those, add the new nodes that you will need and attach them to the audio engine:
+let converterNode = AVAudioMixerNode()
+let sinkNode = AVAudioMixerNode()
+
+audioEngine.attach(converterNode)
+audioEngine.attach(sinkNode)
+The sinkNode is needed because to get the data in the correct format you need to access the data after it has passed through the converterNode, or its output. If you refer to the diagram above, notice how the stream of data to Deepgram is coming from the connection between nodes, the output of the converterNode, and not the nodes themselves.
+Get Microphone Data
+Use the installTap function on the AVAudioMixerNode class to get the microphone data. This function gives you a closure that returns the output audio data of a node as a buffer. Call installTap on the converterNode, continuing the function from above:
+converterNode.installTap(onBus: 0, bufferSize: 1024, format: converterNode.outputFormat(forBus: 0)) { (buffer: AVAudioPCMBuffer!, time: AVAudioTime!) -> Void in
+
+}
+You will come back to this closure later. Now finish off the startAnalyzingAudio by connecting all the nodes and starting the audio engine:
+audioEngine.connect(inputNode, to: converterNode, format: inputFormat)
+audioEngine.connect(converterNode, to: sinkNode, format: outputFormat)
+audioEngine.prepare()
+
+do {
+try AVAudioSession.sharedInstance().setCategory(.record)
+  try audioEngine.start()
+} catch {
+  print(error)
+}
+You can see now how the processing pipeline mirrors the diagram from earlier. Before the audio engine is started, the audio session of the application needs to be set to a record category. This lets the app know that the audio engine is solely being used for recording purposes. Note how the converterNode is connected with outputFormat.
+Connect to Deepgram
+You will be using the Deepgram WebSocket Streaming API, create a WebSocket instance at the top of the ViewController class:
+private let apiKey = "Token YOUR_DEEPGRAM_API_KEY"
+private lazy var socket: WebSocket = {
+  let url = URL(string: "wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=48000&channels=1")!
+  var urlRequest = URLRequest(url: url)
+  urlRequest.setValue("Token \(apiKey)", forHTTPHeaderField: "Authorization")
+  return WebSocket(request: urlRequest)
+}()
+Note how the URL has an encoding matching the outputFormat from earlier. In the viewDidLoad function, set the socket's delegate to this class and open the connection:
+override func viewDidLoad() {
+  super.viewDidLoad()
+  socket.delegate = self
+  socket.connect()
+}
+You will implement the delegate later in the post.
+Send Data to Deepgram
+Now that the socket connection is open, you can now send the microphone data to Deepgram. To send data over a WebSocket in iOS, it needs to be converted to a Data object. Add the following function to the ViewController class that does the conversion:
+private func toNSData(buffer: AVAudioPCMBuffer) -> Data? {
+  let audioBuffer = buffer.audioBufferList.pointee.mBuffers
+  return Data(bytes: audioBuffer.mData!, count: Int(audioBuffer.mDataByteSize))
+}
+Then return to the startAnalyzingAudio function, and within the installTap closure, you can send the data to Deepgram. Your tap code should look like this now:
+converterNode.installTap(onBus: bus, bufferSize: 1024, format: converterNode.outputFormat(forBus: bus)) { (buffer: AVAudioPCMBuffer!, time: AVAudioTime!) -> Void in
+  if let data = self.toNSData(buffer: buffer) {
+     self.socket.write(data: data)
+  }
+}
+Call startAnalyzingAudio in the viewDidLoad function below the WebSocket configuration.
+Handle the Deepgram Response
+You will get updates from the WebSocket via its delegate. In the ViewController.swift file outside the class, create an extension for the WebSocketDelegate and a DeepgramResponse struct:
+extension ViewController: WebSocketDelegate {
+  func didReceive(event: WebSocketEvent, client: WebSocket) {
+     switch event {
+     case .text(let text):
+
+     case .error(let error):
+        print(error ?? "")
+     default:
+        break
+     }
+  }
+}
+
+struct DeepgramResponse: Codable {
+  let isFinal: Bool
+  let channel: Channel
+
+  struct Channel: Codable {
+     let alternatives: [Alternatives]
+  }
+
+  struct Alternatives: Codable {
+     let transcript: String
+  }
+}
+The didReceive function on the WebSocketDelegate will be called whenever you get an update on the WebSocket. Before you finish implementing didReceive, you need to prepare to decode the data and update the UI to display the transcripts. At the top of the ViewController class, add the following properties:
+private let jsonDecoder: JSONDecoder = {
+  let decoder = JSONDecoder()
+  decoder.keyDecodingStrategy = .convertFromSnakeCase
+  return decoder
+}()
+
+private let transcriptView: UITextView = {
+  let textView = UITextView()
+  textView.isScrollEnabled = true
+  textView.backgroundColor = .lightGray
+  textView.translatesAutoresizingMaskIntoConstraints = false
+  return textView
+}()
+Create a new function called setupView and configure your UI:
+private func setupView() {
+  view.addSubview(transcriptView)
+  NSLayoutConstraint.activate([
+     transcriptView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+     transcriptView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+     transcriptView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+     transcriptView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+  ])
+}
+Then call setupView in the viewDidLoad function.
+Returning to the didReceive function of the WebSocketDelegate, within the text case; you need to convert the text, which is a String type, into a Data type so you can decode it into an instance of DeepgramResponse:
+extension ViewController: WebSocketDelegate {
+  func didReceive(event: WebSocketEvent, client: WebSocket) {
+     switch event {
+     case .text(let text):
+        let jsonData = Data(text.utf8)
+        let response = try! jsonDecoder.decode(DeepgramResponse.self, from: jsonData)
+        let transcript = response.channel.alternatives.first!.transcript
+
+        if response.isFinal && !transcript.isEmpty {
+          if transcriptView.text.isEmpty {
+             transcriptView.text = transcript
+          } else {
+             transcriptView.text = transcriptView.text + " " + transcript
+          }
+        }
+     case .error(let error):
+        print(error ?? "")
+     default:
+        break
+     }
+  }
+}
+Once you have a DeepgramResponse instance, you will check if it is final, meaning it is ready to add to the transcriptView while handling the empty scenarios. If you now build and run the project (CMD + R), it will open in the simulator, where you will be prompted to give microphone access. Then you can start transcribing!

@@ -4,6 +4,20 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- **iOS app now properly saves transcripts**: Fixed issue where iOS live streaming wasn't saving transcripts
+  - Added finalize endpoint call after recording stops (matching web client behavior)
+  - Updated RecordingManager to handle live streaming recordings differently
+  - Exposed recording ID from AudioRecorderManager for finalization
+  - iOS now calls POST `/api/recordings/{recordingId}/done` to finalize and save transcripts
+
+### Changed
+- **Upgraded Deepgram model to Nova 3**: Updated transcription model from nova-2 to nova-3
+  - 53.4% reduction in word error rate for streaming transcription
+  - Enhanced comprehension of domain-specific terminology
+  - Support for real-time multilingual conversation transcription
+  - Updated both live transcription endpoints and default configuration
+
 ### Added
 - **Live audio transcription with Deepgram**: Real-time transcription during recording
   - WebSocket endpoint `/api/live-transcription` for streaming audio

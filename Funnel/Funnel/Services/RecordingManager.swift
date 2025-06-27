@@ -11,7 +11,7 @@ class RecordingManager: ObservableObject {
 
     private let apiService = FunnelAPIService.shared
 
-    func processRecording(audioURL: URL, duration: TimeInterval, modelContext: ModelContext) async {
+    func processRecording(audioURL: URL, duration: TimeInterval, modelContext: ModelContext, recordingId: String? = nil, isLiveStreaming: Bool = false) async {
         isProcessing = true
         processingError = nil
 
@@ -24,24 +24,42 @@ class RecordingManager: ObservableObject {
 
         do {
             try modelContext.save()
-            await processRecordingSteps(recording: recording, modelContext: modelContext)
+            await processRecordingSteps(recording: recording, modelContext: modelContext, recordingId: recordingId, isLiveStreaming: isLiveStreaming)
         } catch {
             processingError = error
             isProcessing = false
         }
     }
 
-    private func processRecordingSteps(recording: Recording, modelContext: ModelContext) async {
+    private func processRecordingSteps(recording: Recording, modelContext: ModelContext, recordingId: String? = nil, isLiveStreaming: Bool = false) async {
         do {
-            recording.processingStatus = .uploading
-            processingStatus = "Uploading audio..."
-            try? modelContext.save()
+            let processedData: ProcessedRecording
+            
+            if isLiveStreaming, let recordingId = recordingId {
+                // For live streaming, skip upload and just finalize
+                recording.processingStatus = .transcribing
+                processingStatus = "Finalizing recording..."
+                try? modelContext.save()
+                
+                print("RecordingManager: Calling finalize endpoint for recording ID: \(recordingId)")
+                processedData = try await apiService.finalizeRecording(recordingId: recordingId)
+                print("RecordingManager: Received processed data from finalize endpoint:")
+                print("  - Transcript length: \(processedData.transcript.count) characters")
+                print("  - Bullet summary items: \(processedData.bulletSummary.count)")
+                print("  - Diagram title: \(processedData.diagram.title)")
+                print("  - Duration: \(processedData.duration) seconds")
+            } else {
+                // Traditional file upload flow
+                recording.processingStatus = .uploading
+                processingStatus = "Uploading audio..."
+                try? modelContext.save()
 
-            recording.processingStatus = .transcribing
-            processingStatus = "Processing audio..."
-            try? modelContext.save()
+                recording.processingStatus = .transcribing
+                processingStatus = "Processing audio..."
+                try? modelContext.save()
 
-            let processedData = try await apiService.processAudio(fileURL: recording.audioFileURL)
+                processedData = try await apiService.processAudio(fileURL: recording.audioFileURL)
+            }
 
             recording.transcript = processedData.transcript
             recording.duration = processedData.duration
@@ -81,7 +99,7 @@ class RecordingManager: ObservableObject {
         try? modelContext.save()
 
         isProcessing = true
-        await processRecordingSteps(recording: recording, modelContext: modelContext)
+        await processRecordingSteps(recording: recording, modelContext: modelContext, recordingId: nil, isLiveStreaming: false)
     }
 
     func dismissError() {

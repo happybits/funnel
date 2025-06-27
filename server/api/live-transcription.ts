@@ -86,7 +86,7 @@ function handleWebSocketConnection(clientWs: WebSocket) {
     try {
       const deepgramClient = new DeepgramClient({ apiKey: deepgramApiKey });
       deepgramWs = await deepgramClient.connectLive({
-        model: "nova-2",
+        model: "nova-3",
         language: "en-US",
         smart_format: true,
         punctuate: true,
