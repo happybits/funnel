@@ -39,7 +39,7 @@ struct CardOptions: View {
     let cardType: CardType
     
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: -16) {
             Button {
                 UIPasteboard.general.string = cardType.copyContent
             } label: {
@@ -56,6 +56,7 @@ struct CardOptions: View {
                 Image("share-btn")
             }
         }
+        .padding(.leading, -8)
     }
 }
 
