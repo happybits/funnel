@@ -75,7 +75,15 @@ struct NewRecordingView: View {
                 audioRecorder: audioRecorder,
                 onRecordingComplete: { audioURL, duration in
                     Task {
-                        await recordingManager.processRecording(audioURL: audioURL, duration: duration, modelContext: modelContext)
+                        let recordingId = audioRecorder.recordingId
+                        let isLiveStreaming = audioRecorder.isLiveStreaming
+                        await recordingManager.processRecording(
+                            audioURL: audioURL,
+                            duration: duration,
+                            modelContext: modelContext,
+                            recordingId: recordingId,
+                            isLiveStreaming: isLiveStreaming
+                        )
                     }
                 }
             )

@@ -17,8 +17,8 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private var audioEngine = AVAudioEngine()
     private var webSocket: URLSessionWebSocketTask?
     private var urlSession: URLSession?
-    private var recordingId: String?
-    private var isLiveStreaming = false
+    private(set) var recordingId: String?
+    private(set) var isLiveStreaming = false
 
     override init() {
         super.init()

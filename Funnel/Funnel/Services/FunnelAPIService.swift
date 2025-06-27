@@ -17,4 +17,14 @@ class FunnelAPIService {
             fieldName: "audio"
         )
     }
+    
+    // MARK: - Live Streaming
+    
+    /// Finalize a live-streamed recording
+    func finalizeRecording(recordingId: String) async throws -> ProcessedRecording {
+        return try await apiClient.request(
+            "/api/recordings/\(recordingId)/done",
+            method: "POST"
+        )
+    }
 }
