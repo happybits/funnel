@@ -204,12 +204,29 @@ mcp__figmastrand__figma_get_images({
 ## Deployment Process
 
 ### Deploying to Deno Deploy
-Use deployctl to deploy the server to Deno Deploy:
+**ALWAYS use the Makefile for deployment:**
+
 ```bash
-cd server && deployctl deploy --project=funnel-api main.ts
+cd server && make deploy-prod    # Deploy to production
+cd server && make deploy-preview  # Deploy preview without --prod
 ```
 
-Note: GitHub integration is not currently set up for auto-deployment because connecting Deno Deploy to GitHub requires organization owner permissions, which we don't have. Use deployctl for all deployments instead.
+To deploy with environment variables from .env, you can manually run:
+```bash
+deployctl deploy --project=funnel-api --prod --env-file=.env main.ts
+```
+
+Other useful server commands:
+```bash
+make dev        # Run development server
+make test       # Run tests
+make logs       # View production logs
+make precommit  # Run formatter and linter
+make format     # Format code
+make lint       # Run linter
+```
+
+Note: GitHub integration is not currently set up for auto-deployment because connecting Deno Deploy to GitHub requires organization owner permissions, which we don't have. Always use the Makefile commands for deployments.
 
 # Important Instruction Reminders
 Do what has been asked; nothing more, nothing less.
