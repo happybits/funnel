@@ -185,12 +185,8 @@ class AudioRecorderManager: NSObject, ObservableObject {
         let config = URLSessionConfiguration.default
         urlSession = URLSession(configuration: config, delegate: self, delegateQueue: OperationQueue())
         
-        // Construct WebSocket URL using same host as APIClient
-        let useLocalServer = true  // Match APIClient configuration
-        let host = useLocalServer ? "127.0.0.1:8000" : "funnel-api.deno.dev"
-        let scheme = useLocalServer ? "ws" : "wss"
-        let wsURLString = "\(scheme)://\(host)/api/recordings/\(recordingId)/stream"
-        guard let url = URL(string: wsURLString) else {
+        // Use APIClient to construct WebSocket URL
+        guard let url = APIClient.shared.webSocketURL(for: "/api/recordings/\(recordingId)/stream") else {
             completion(.failure(FunnelError.recordingFailed(reason: "Invalid WebSocket URL")))
             return
         }

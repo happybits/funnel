@@ -18,7 +18,7 @@ class APIClient {
         decoder = JSONDecoder()
         encoder = JSONEncoder()
 
-        let useLocalServer = true
+        let useLocalServer = false
         baseURL = useLocalServer ? "http://127.0.0.1:8000" : "https://funnel-api.deno.dev"
     }
 
@@ -161,6 +161,18 @@ class APIClient {
         }
     }
 
+    // MARK: - WebSocket URL Generation
+    
+    func webSocketURL(for endpoint: String) -> URL? {
+        let scheme = baseURL.hasPrefix("https") ? "wss" : "ws"
+        let host = baseURL
+            .replacingOccurrences(of: "https://", with: "")
+            .replacingOccurrences(of: "http://", with: "")
+        
+        let wsURLString = "\(scheme)://\(host)\(endpoint)"
+        return URL(string: wsURLString)
+    }
+    
     // MARK: - Helper Methods
 
     private func mimeType(for pathExtension: String) -> String {

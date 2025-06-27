@@ -109,6 +109,8 @@ extension View {
     @ViewBuilder
     func funnelPreviewEnvironment() -> some View {
         modelContainer(ModelContainer.previewContainer)
+            .environmentObject(GradientBackgroundManager())
+            .environmentObject(RecordingManager())
     }
 }
 

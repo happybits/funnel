@@ -201,6 +201,16 @@ mcp__figmastrand__figma_get_images({
 });
 ```
 
+## Deployment Process
+
+### Deploying to Deno Deploy
+Use deployctl to deploy the server to Deno Deploy:
+```bash
+cd server && deployctl deploy --project=funnel-api main.ts
+```
+
+Note: GitHub integration is not currently set up for auto-deployment because connecting Deno Deploy to GitHub requires organization owner permissions, which we don't have. Use deployctl for all deployments instead.
+
 # Important Instruction Reminders
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.

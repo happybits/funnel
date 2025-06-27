@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct SwipeableCardsView: View {
     @EnvironmentObject var recordingManager: RecordingManager
@@ -161,6 +162,9 @@ struct BulletSummaryCard: View {
         .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 4)
         .liveGlassmorphicCell(cornerRadius: 10)
         .padding(.bottom, 100)
+        .overlay(alignment: .bottomLeading) {
+            CardOptions(cardType: .bulletSummary(bulletSummary))
+        }
     }
 }
 
@@ -223,6 +227,9 @@ struct DiagramCard: View {
         .shadow(color: .black.opacity(0.12), radius: 10.8, x: 0, y: 3.6)
         .liveGlassmorphicCell(cornerRadius: 9)
         .padding(.bottom, 100)
+        .overlay(alignment: .bottomLeading) {
+            CardOptions(cardType: .diagram(diagram))
+        }
     }
 }
 
@@ -265,6 +272,9 @@ struct TranscriptCard: View {
         .shadow(color: .black.opacity(0.12), radius: 10.8, x: 0, y: 3.6)
         .liveGlassmorphicCell(cornerRadius: 9)
         .padding(.bottom, 100)
+        .overlay(alignment: .bottomLeading) {
+            CardOptions(cardType: .transcript(transcript))
+        }
     }
 }
 
@@ -283,5 +293,6 @@ struct TranscriptCard: View {
         recording.diagramContent = "Concept A → Concept B → Result"
         return recording
     }())
-        .funnelPreviewEnvironment()
+    .funnelPreviewEnvironment()
+    .background (GradientBackground())
 }
