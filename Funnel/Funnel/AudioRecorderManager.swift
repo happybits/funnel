@@ -162,6 +162,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
         
         recordingId = UUID().uuidString
         isLiveStreaming = true
+        print("AudioRecorderManager: Generated recording ID: \(recordingId!)")
         
         // Setup WebSocket connection
         setupWebSocket { [weak self] result in
@@ -348,6 +349,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
     
     private func stopLiveStreaming() {
         print("AudioRecorderManager: Stopping live streaming")
+        print("AudioRecorderManager: Recording ID at stop: \(recordingId ?? "nil")")
         
         // Stop audio engine
         audioEngine.stop()

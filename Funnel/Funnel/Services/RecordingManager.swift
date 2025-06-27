@@ -41,7 +41,13 @@ class RecordingManager: ObservableObject {
                 processingStatus = "Finalizing recording..."
                 try? modelContext.save()
                 
+                print("RecordingManager: Calling finalize endpoint for recording ID: \(recordingId)")
                 processedData = try await apiService.finalizeRecording(recordingId: recordingId)
+                print("RecordingManager: Received processed data from finalize endpoint:")
+                print("  - Transcript length: \(processedData.transcript.count) characters")
+                print("  - Bullet summary items: \(processedData.bulletSummary.count)")
+                print("  - Diagram title: \(processedData.diagram.title)")
+                print("  - Duration: \(processedData.duration) seconds")
             } else {
                 // Traditional file upload flow
                 recording.processingStatus = .uploading

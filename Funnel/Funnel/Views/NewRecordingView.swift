@@ -73,10 +73,8 @@ struct NewRecordingView: View {
                 waveformValues: $waveformValues,
                 recordingError: $recordingError,
                 audioRecorder: audioRecorder,
-                onRecordingComplete: { audioURL, duration in
+                onRecordingComplete: { audioURL, duration, recordingId, isLiveStreaming in
                     Task {
-                        let recordingId = audioRecorder.recordingId
-                        let isLiveStreaming = audioRecorder.isLiveStreaming
                         await recordingManager.processRecording(
                             audioURL: audioURL,
                             duration: duration,
@@ -100,7 +98,7 @@ struct RecordingControlsView: View {
     @Binding var recordingError: Error?
 
     let audioRecorder: AudioRecorderManager
-    let onRecordingComplete: (URL, TimeInterval) -> Void
+    let onRecordingComplete: (URL, TimeInterval, String?, Bool) -> Void
 
     @State private var isPressed = false
     @State private var recordingTimer: Timer?
@@ -187,14 +185,28 @@ struct RecordingControlsView: View {
             return
         }
 
+        // Capture these values BEFORE stopping (they get reset in stopRecording)
+        let wasLiveStreaming = audioRecorder.isLiveStreaming
+        let recordingId = audioRecorder.recordingId
+        let recordingURL = audioRecorder.currentRecordingURL
+        
+        print("RecordingControlsView: Stopping recording - wasLiveStreaming: \(wasLiveStreaming), recordingId: \(recordingId ?? "nil")")
+
         audioRecorder.stopRecording()
         recordingTimer?.invalidate()
         levelTimer?.invalidate()
 
         isRecording = false
 
-        if let audioURL = audioRecorder.currentRecordingURL {
-            onRecordingComplete(audioURL, duration)
+        // For live streaming, we need to use a dummy URL and pass the recording ID
+        if wasLiveStreaming {
+            // Create a dummy URL for compatibility
+            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let dummyURL = documentsPath.appendingPathComponent("live-stream-\(recordingId ?? "unknown").m4a")
+            onRecordingComplete(dummyURL, duration, recordingId, true)
+        } else if let audioURL = recordingURL {
+            // Traditional file-based recording
+            onRecordingComplete(audioURL, duration, nil, false)
         }
     }
 
