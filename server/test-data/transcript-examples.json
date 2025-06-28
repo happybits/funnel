@@ -1,0 +1,91 @@
+{
+  "testCases": [
+    {
+      "id": "rambling-idea",
+      "description": "Typical rambling stream of consciousness about a startup idea",
+      "transcript": "So I've been thinking about this idea for like the past week and it's been keeping me up at night. What if we created an app that helps people, you know, actually stick to their habits? I know there's a million habit trackers out there but hear me out. The problem with all of them is that they're too complicated or they make you feel guilty when you miss a day. So what if instead of tracking streaks, we focused on, um, momentum? Like, the app would understand that life happens and missing a day doesn't mean you failed. It would be more like a supportive friend rather than a strict teacher. Oh and another thing - it could use AI to suggest the best time to do your habit based on your calendar and past behavior. Like if you usually go for runs in the morning but you have an early meeting, it could suggest doing it at lunch instead. And maybe it could even connect with your friends so you could have accountability buddies but in a fun way, not a judgmental way. I don't know, maybe this is stupid but I really think there's something here.",
+      "expectedBulletSummary": [
+        "Create a habit tracking app focused on momentum rather than streaks",
+        "Core differentiator: Acts as a supportive friend vs strict teacher",
+        "Doesn't guilt users for missing days - understands that life happens",
+        "AI-powered scheduling: Suggests optimal times based on calendar and past behavior",
+        "Social accountability features with friends, but designed to be encouraging not judgmental",
+        "Problem it solves: Current habit trackers are too complicated or guilt-inducing"
+      ],
+      "expectedEditedTranscript": "## Habit Tracking App Idea\n\nI've been thinking about this idea for the past week and it's been keeping me up at night.\n\n### The Problem\n\nWhat if we created an app that helps people actually stick to their habits? I know there's a million habit trackers out there, but hear me out. The problem with all of them is that they're too complicated or they make you feel guilty when you miss a day.\n\n### The Solution: Focus on Momentum\n\nWhat if instead of tracking streaks, we focused on momentum? The app would understand that life happens and missing a day doesn't mean you failed. It would be more like a supportive friend rather than a strict teacher.\n\n### Key Features\n\n**AI-Powered Scheduling**: It could use AI to suggest the best time to do your habit based on your calendar and past behavior. For example, if you usually go for runs in the morning but you have an early meeting, it could suggest doing it at lunch instead.\n\n**Social Accountability**: Maybe it could connect with your friends so you could have accountability buddies, but in a fun way, not a judgmental way.\n\nI really think there's something here."
+    },
+    {
+      "id": "technical-brainstorm",
+      "description": "Technical brainstorming session about architecture",
+      "transcript": "Okay so I'm trying to figure out the best way to architect this new feature. We need real-time updates but I'm not sure if we should use websockets or just poll every few seconds. Websockets would be better for performance but they're harder to implement and we'd need to handle reconnection logic and all that stuff. Actually wait, what about using Server-Sent Events? That might be a good middle ground. Oh but then we'd need to think about scalability. If we have thousands of users all connected at once, that could get expensive. Maybe we should start with polling and then upgrade to websockets later if we need to? But then we'd be building technical debt from the start. Ugh, architectural decisions are hard. Actually, you know what, let me think about this differently. What's the actual user requirement here? They need updates within, let's say, 5 seconds. So polling every 3 seconds would probably be fine for MVP. We can always optimize later.",
+      "expectedBulletSummary": [
+        "Need to implement real-time updates for new feature",
+        "Considering three options: WebSockets, polling, or Server-Sent Events",
+        "WebSockets: Better performance but complex implementation and reconnection logic",
+        "Server-Sent Events: Potential middle ground solution",
+        "Scalability concern: Thousands of concurrent connections could be expensive",
+        "User requirement: Updates needed within 5 seconds",
+        "MVP recommendation: Start with 3-second polling, optimize later if needed"
+      ],
+      "expectedEditedTranscript": "## Architecture Decision: Real-Time Updates\n\nI'm trying to figure out the best way to architect this new feature. We need real-time updates, but I'm not sure if we should use WebSockets or just poll every few seconds.\n\n### Option 1: WebSockets\nWebSockets would be better for performance, but they're harder to implement and we'd need to handle reconnection logic and all that complexity.\n\n### Option 2: Server-Sent Events\nWhat about using Server-Sent Events? That might be a good middle ground.\n\n### Scalability Concerns\nWe need to think about scalability. If we have thousands of users all connected at once, that could get expensive.\n\n### Pragmatic Approach\nMaybe we should start with polling and then upgrade to WebSockets later if we need to? But then we'd be building technical debt from the start.\n\n### Final Decision\nLet me think about this differently. What's the actual user requirement here? They need updates within 5 seconds. So polling every 3 seconds would probably be fine for MVP. We can always optimize later."
+    },
+    {
+      "id": "short-reminder",
+      "description": "Very short recording with just a quick reminder",
+      "transcript": "Remember to email Sarah about the design mockups",
+      "expectedBulletSummary": [
+        "Email Sarah about the design mockups"
+      ],
+      "expectedEditedTranscript": "## Quick Reminder\n\nEmail Sarah about the design mockups."
+    },
+    {
+      "id": "empty-recording",
+      "description": "Empty or silent recording",
+      "transcript": "",
+      "expectedBulletSummary": [
+        "Ah, the recording is empty!"
+      ],
+      "expectedEditedTranscript": "## Empty Recording\n\nAh, the recording is empty!"
+    },
+    {
+      "id": "meeting-notes",
+      "description": "Rambling meeting notes with action items",
+      "transcript": "Just got out of the product meeting and wow there's a lot to unpack. So first thing, James mentioned that the new onboarding flow is causing confusion. Users are dropping off at the third step where we ask for their preferences. I think maybe we're asking for too much information upfront? We should probably just get them into the app first and then gradually collect preferences. Oh and then Maria brought up that customer support is getting a lot of questions about the pricing. Apparently people don't understand the difference between the pro and enterprise tiers. We need to make that clearer on the pricing page. Action items - I need to redesign the onboarding flow, probably by next sprint. And someone needs to update the pricing page copy, I'll ask the marketing team about that. Oh also, almost forgot, we're pushing the launch date back by two weeks because engineering found some performance issues with the real-time sync. That's probably for the best honestly, gives us more time to polish things.",
+      "expectedBulletSummary": [
+        "Onboarding flow causing confusion - users dropping at step 3 (preferences)",
+        "Recommendation: Get users into app first, collect preferences gradually",
+        "Customer support receiving many pricing questions - pro vs enterprise unclear",
+        "Action: Redesign onboarding flow by next sprint",
+        "Action: Update pricing page copy (assign to marketing team)",
+        "Launch date pushed back 2 weeks due to performance issues with real-time sync",
+        "Silver lining: More time to polish the product"
+      ],
+      "expectedEditedTranscript": "## Product Meeting Recap\n\nJust got out of the product meeting and there's a lot to unpack.\n\n### Onboarding Flow Issues\n\nJames mentioned that the new onboarding flow is causing confusion. Users are dropping off at the third step where we ask for their preferences. I think we're asking for too much information upfront. We should probably just get them into the app first and then gradually collect preferences.\n\n### Pricing Clarity\n\nMaria brought up that customer support is getting a lot of questions about the pricing. Apparently, people don't understand the difference between the pro and enterprise tiers. We need to make that clearer on the pricing page.\n\n### Action Items\n\n1. **Redesign the onboarding flow** - I need to complete this by next sprint\n2. **Update pricing page copy** - I'll ask the marketing team about this\n\n### Launch Update\n\nWe're pushing the launch date back by two weeks because engineering found some performance issues with the real-time sync. That's probably for the best honestly - gives us more time to polish things."
+    },
+    {
+      "id": "personal-reflection",
+      "description": "Personal reflection on work-life balance",
+      "transcript": "Man I've been working way too much lately. It's like 9pm and I'm still thinking about work stuff. I need to set better boundaries. Maybe I should try that thing where you have a hard stop at 6pm no matter what. But then again there's so much to do and the team is counting on me. I don't know, it's hard to balance everything. I love what I'm working on but I also miss having time for hobbies. When was the last time I went climbing? Must be at least a month. You know what, I'm going to block out Wednesday evenings for climbing. Non-negotiable. And maybe Saturday mornings for reading. I used to read so much and now I barely finish a book a month. Work will always be there but I need to take care of myself too.",
+      "expectedBulletSummary": [
+        "Working too much lately - still thinking about work at 9pm",
+        "Need to set better boundaries with work",
+        "Considering a hard stop at 6pm daily",
+        "Struggling to balance work demands with personal time",
+        "Haven't gone climbing in at least a month",
+        "Decision: Block Wednesday evenings for climbing (non-negotiable)",
+        "Decision: Reserve Saturday mornings for reading",
+        "Reminder: Work will always be there, self-care is important"
+      ],
+      "expectedEditedTranscript": "## Work-Life Balance Reflection\n\nI've been working way too much lately. It's 9pm and I'm still thinking about work stuff.\n\n### The Problem\n\nI need to set better boundaries. Maybe I should try that thing where you have a hard stop at 6pm no matter what. But then again, there's so much to do and the team is counting on me. It's hard to balance everything.\n\n### What I'm Missing\n\nI love what I'm working on, but I also miss having time for hobbies. When was the last time I went climbing? Must be at least a month. I used to read so much and now I barely finish a book a month.\n\n### Commitments\n\n1. **Wednesday evenings**: Blocked for climbing (non-negotiable)\n2. **Saturday mornings**: Reserved for reading\n\nWork will always be there, but I need to take care of myself too."
+    },
+    {
+      "id": "very-short",
+      "description": "Just a few words",
+      "transcript": "Buy milk",
+      "expectedBulletSummary": [
+        "Buy milk"
+      ],
+      "expectedEditedTranscript": "## Quick Note\n\nBuy milk."
+    }
+  ]
+}

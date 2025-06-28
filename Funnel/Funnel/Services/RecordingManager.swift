@@ -34,13 +34,13 @@ class RecordingManager: ObservableObject {
     private func processRecordingSteps(recording: Recording, modelContext: ModelContext, recordingId: String? = nil, isLiveStreaming: Bool = false) async {
         do {
             let processedData: ProcessedRecording
-            
+
             if isLiveStreaming, let recordingId = recordingId {
                 // For live streaming, skip upload and just finalize
                 recording.processingStatus = .transcribing
                 processingStatus = "Finalizing recording..."
                 try? modelContext.save()
-                
+
                 print("RecordingManager: Calling finalize endpoint for recording ID: \(recordingId)")
                 processedData = try await apiService.finalizeRecording(recordingId: recordingId)
                 print("RecordingManager: Received processed data from finalize endpoint:")
@@ -62,8 +62,10 @@ class RecordingManager: ObservableObject {
             }
 
             recording.transcript = processedData.transcript
+            recording.editedTranscript = processedData.editedTranscript
             recording.duration = processedData.duration
             recording.bulletSummary = processedData.bulletSummary
+            recording.thingsToThinkAbout = processedData.thingsToThinkAbout
             recording.diagramTitle = processedData.diagram.title
             recording.diagramDescription = processedData.diagram.description
             recording.diagramContent = processedData.diagram.content

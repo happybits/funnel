@@ -69,20 +69,27 @@ export async function newRecordingHandler(c: Context): Promise<Response> {
       );
     }
 
-    // Step 2: Generate summary and diagram in parallel
-    console.log("Generating summary and diagram...");
+    // Step 2: Generate summary, edited transcript, questions, and diagram in parallel
+    console.log(
+      "Generating summary, edited transcript, questions, and diagram...",
+    );
     const anthropicClient = new AnthropicClient(anthropicKey);
 
-    const [summaryResult, diagramResult] = await Promise.all([
-      anthropicClient.summarizeTranscript(transcribeResult.transcript),
-      anthropicClient.generateDiagram(transcribeResult.transcript),
-    ]);
+    const [summaryResult, editResult, questionsResult, diagramResult] =
+      await Promise.all([
+        anthropicClient.summarizeTranscript(transcribeResult.transcript),
+        anthropicClient.editTranscript(transcribeResult.transcript),
+        anthropicClient.generateThingsToThinkAbout(transcribeResult.transcript),
+        anthropicClient.generateDiagram(transcribeResult.transcript),
+      ]);
 
     // Combine all results
     const response: NewRecordingResponse = {
       transcript: transcribeResult.transcript,
+      editedTranscript: editResult.editedTranscript,
       duration: transcribeResult.duration,
       bulletSummary: summaryResult.bulletSummary,
+      thingsToThinkAbout: questionsResult.thingsToThinkAbout,
       diagram: {
         title: diagramResult.title,
         description: diagramResult.description,

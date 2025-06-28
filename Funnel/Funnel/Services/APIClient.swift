@@ -162,17 +162,17 @@ class APIClient {
     }
 
     // MARK: - WebSocket URL Generation
-    
+
     func webSocketURL(for endpoint: String) -> URL? {
         let scheme = baseURL.hasPrefix("https") ? "wss" : "ws"
         let host = baseURL
             .replacingOccurrences(of: "https://", with: "")
             .replacingOccurrences(of: "http://", with: "")
-        
+
         let wsURLString = "\(scheme)://\(host)\(endpoint)"
         return URL(string: wsURLString)
     }
-    
+
     // MARK: - Helper Methods
 
     private func mimeType(for pathExtension: String) -> String {

@@ -47,7 +47,13 @@ extension ModelContainer {
 
         if processingStatus == .completed {
             recording.transcript = sampleTranscripts[index]
+            recording.editedTranscript = "## Key Ideas\n\n\(sampleTranscripts[index])\n\n### Action Items\n\n- Follow up on main points\n- Schedule next steps"
             recording.bulletSummary = sampleBulletSummaries[index]
+            recording.thingsToThinkAbout = [
+                "What would be the biggest challenge in implementing this idea?",
+                "How might this impact our current users?",
+                "What resources would we need to make this successful?",
+            ]
             recording.diagramTitle = sampleDiagramTitles[index]
             recording.diagramDescription = "A visual representation of the key concepts discussed"
             recording.diagramContent = """

@@ -4,6 +4,26 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **Enhanced AI prompts for better transcript processing**
+  - New bullet summary prompt that handles edge cases (empty recordings, very short recordings)
+  - Added "edited transcript" feature that lightly formats raw transcripts with markdown
+  - Improved handling of rambling stream-of-consciousness recordings
+  - Special handling for empty recordings: "Ah, the recording is empty!"
+  - Better organization of thoughts into logical groupings with headers
+- **New API response fields**: 
+  - `editedTranscript` - Lightly edited version with markdown formatting
+  - `thingsToThinkAbout` - 2-3 thought-provoking questions to help users explore their ideas
+- **iOS app updates for new card types**:
+  - Replaced raw transcript card with lightly edited transcript card (with markdown rendering)
+  - Added new "Things to Think About" card with numbered questions
+  - Updated card navigation to include 4 cards total (summary, diagram, edited transcript, questions)
+  - Added purple-pink gradient theme for the questions card
+- **Test data and scripts**
+  - Comprehensive test cases for various transcript scenarios
+  - Test script (`test-prompts.ts`) to validate prompt behavior
+  - Examples include: empty recordings, short reminders, technical brainstorms, meeting notes
+
 ### Fixed
 - **iOS app now properly saves transcripts**: Fixed issue where iOS live streaming wasn't saving transcripts
   - Added finalize endpoint call after recording stops (matching web client behavior)

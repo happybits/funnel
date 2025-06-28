@@ -1,0 +1,85 @@
+# Edge case tests for new prompts
+
+tests:
+  # Empty recording
+  - description: "Empty transcript"
+    vars:
+      transcript: ""
+    assert:
+      - type: not-empty
+        metric: "Handles empty input gracefully"
+
+  # Very short (2-3 words)
+  - description: "Ultra short transcript"
+    vars:
+      transcript: "Buy milk"
+    assert:
+      - type: not-contains
+        value: "##"
+        metric: "No headers for very short text"
+      - type: contains
+        value: "Buy milk"
+        metric: "Preserves exact text"
+
+  # All filler words
+  - description: "Transcript with many filler words"
+    vars:
+      transcript: "Um, so, like, you know, I was thinking, uh, that we should, um, maybe, like, consider, you know, implementing the new feature"
+    assert:
+      - type: not-contains
+        value: "um"
+        metric: "Removes 'um'"
+      - type: not-contains
+        value: "uh"
+        metric: "Removes 'uh'"
+      - type: contains
+        value: "implementing the new feature"
+        metric: "Preserves meaningful content"
+
+  # Multiple topic changes
+  - description: "Transcript with clear topic changes"
+    vars:
+      transcript: |
+        Let me talk about the user interface first. We need to make sure the buttons are accessible and the colors have good contrast. The current design is too cluttered.
+
+        Now switching to the backend architecture. I think we should use microservices instead of a monolith. This will help with scaling and deployment.
+
+        Finally, about the timeline. We're looking at about 3 months for the MVP if we have 2 developers full time.
+    assert:
+      - type: javascript
+        value: |
+          const headers = output.match(/##[^#\n]+/g) || [];
+          headers.length >= 3
+        metric: "Creates headers for each topic"
+
+  # Personal reflection (for questions)
+  - description: "Personal career reflection"
+    vars:
+      transcript: |
+        I'm at a crossroads in my career. I've been a software engineer for 10 years and I'm good at it, but I don't feel passionate about it anymore. I keep thinking about teaching. Maybe I could teach computer science at a community college or do coding bootcamps. The pay would be less but I think I'd be happier. My wife is supportive but we have a mortgage and two kids. I'm 35 now, is it too late to change careers?
+    assert:
+      - type: javascript
+        value: |
+          // Should ask about deeper motivations, not just surface level
+          const hasDepthQuestions = output.includes("fulfill") || output.includes("passion") || output.includes("impact") || output.includes("meaning");
+          const hasPracticalQuestions = output.includes("transition") || output.includes("financial") || output.includes("family");
+          hasDepthQuestions && hasPracticalQuestions
+        metric: "Questions balance emotional and practical aspects"
+
+  # Technical jargon preservation
+  - description: "Technical transcript with specific terms"
+    vars:
+      transcript: "We need to implement OAuth2 with PKCE flow for the mobile app. The JWT tokens should have a 15 minute expiry and we'll use refresh tokens stored in the keychain."
+    assert:
+      - type: contains
+        value: "OAuth2"
+        metric: "Preserves OAuth2"
+      - type: contains
+        value: "PKCE"
+        metric: "Preserves PKCE"
+      - type: contains
+        value: "JWT"
+        metric: "Preserves JWT"
+      - type: contains
+        value: "15 minute"
+        metric: "Preserves specific numbers"

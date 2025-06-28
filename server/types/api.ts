@@ -1,7 +1,9 @@
 export interface NewRecordingResponse {
   transcript: string;
+  editedTranscript: string;
   duration: number;
   bulletSummary: string[];
+  thingsToThinkAbout: string[];
   diagram: {
     title: string;
     description: string;

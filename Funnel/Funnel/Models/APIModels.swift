@@ -12,8 +12,10 @@ struct ErrorResponse: Codable {
 
 struct ProcessedRecording: Codable {
     let transcript: String
+    let editedTranscript: String
     let duration: Double
     let bulletSummary: [String]
+    let thingsToThinkAbout: [String]
     let diagram: DiagramData
 
     struct DiagramData: Codable {

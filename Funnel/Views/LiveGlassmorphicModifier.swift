@@ -3,15 +3,15 @@ import UIKit
 
 struct VisualEffectBlur: UIViewRepresentable {
     var style: UIBlurEffect.Style
-    
-    func makeUIView(context: Context) -> UIVisualEffectView {
+
+    func makeUIView(context _: Context) -> UIVisualEffectView {
         let view = UIVisualEffectView(effect: UIBlurEffect(style: style))
         // Force light mode appearance
         view.overrideUserInterfaceStyle = .light
         return view
     }
-    
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
+
+    func updateUIView(_ uiView: UIVisualEffectView, context _: Context) {
         uiView.effect = UIBlurEffect(style: style)
         uiView.overrideUserInterfaceStyle = .light
     }
@@ -19,7 +19,7 @@ struct VisualEffectBlur: UIViewRepresentable {
 
 struct LiveGlassmorphicModifier: ViewModifier {
     @EnvironmentObject var debugSettings: DebugSettings
-    
+
     let cornerRadius: CGFloat
     let blurRadius: CGFloat
     let gradientOpacity: (start: Double, end: Double)
@@ -129,7 +129,7 @@ extension View {
             gradientOpacity: gradientOpacity
         ))
     }
-    
+
     func liveGlassmorphicCell(
         cornerRadius: CGFloat = 15,
         gradientOpacity: (start: Double, end: Double) = (0.1, 0.4)

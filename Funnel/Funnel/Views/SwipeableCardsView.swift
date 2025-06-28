@@ -61,9 +61,13 @@ struct SwipeableCardsView: View {
                             .frame(width: cardWidth)
                             .id(1)
 
-                        TranscriptCard(transcript: recording.transcript ?? "")
+                        EditedTranscriptCard(editedTranscript: recording.editedTranscript ?? recording.transcript ?? "")
                             .frame(width: cardWidth)
                             .id(2)
+
+                        ThingsToThinkAboutCard(questions: recording.thingsToThinkAbout ?? [])
+                            .frame(width: cardWidth)
+                            .id(3)
                     }
                     .scrollTargetLayout()
                 }
@@ -97,6 +101,8 @@ struct SwipeableCardsView: View {
                 gradientManager.setTheme(.pinkRed)
             case 2:
                 gradientManager.setTheme(.blueTeal)
+            case 3:
+                gradientManager.setTheme(.purplePink)
             default:
                 gradientManager.setTheme(.defaultTheme)
             }
@@ -233,12 +239,12 @@ struct DiagramCard: View {
     }
 }
 
-struct TranscriptCard: View {
-    let transcript: String
+struct EditedTranscriptCard: View {
+    let editedTranscript: String
 
     var body: some View {
         ScrollView {
-            Text(transcript)
+            Text(try! AttributedString(markdown: editedTranscript))
                 .funnelCallout()
                 .foregroundColor(.white.opacity(0.9))
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -273,7 +279,61 @@ struct TranscriptCard: View {
         .liveGlassmorphicCell(cornerRadius: 9)
         .padding(.bottom, 100)
         .overlay(alignment: .bottomLeading) {
-            CardOptions(cardType: .transcript(transcript))
+            CardOptions(cardType: .transcript(editedTranscript))
+        }
+    }
+}
+
+struct ThingsToThinkAboutCard: View {
+    let questions: [String]
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Things to Think About")
+                .funnelBodyBold()
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+
+            VStack(alignment: .leading, spacing: 16) {
+                ForEach(Array(questions.enumerated()), id: \.offset) { index, question in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("\(index + 1).")
+                            .funnelCallout()
+                            .foregroundColor(.white.opacity(0.6))
+
+                        Text(question)
+                            .funnelCallout()
+                            .foregroundColor(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(25)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white, location: 0),
+                            .init(color: Color.white.opacity(0), location: 0.434),
+                            .init(color: Color.white, location: 1),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 4)
+        .liveGlassmorphicCell(cornerRadius: 10)
+        .padding(.bottom, 100)
+        .overlay(alignment: .bottomLeading) {
+            CardOptions(cardType: .thingsToThinkAbout(questions))
         }
     }
 }
@@ -282,17 +342,23 @@ struct TranscriptCard: View {
     SwipeableCardsView(recording: {
         let recording = Recording(audioFileName: "sample.m4a", duration: 60)
         recording.transcript = "This is a sample transcript that demonstrates the text content..."
+        recording.editedTranscript = "## Sample Recording\n\nThis is a **sample transcript** that demonstrates the text content with proper formatting."
         recording.bulletSummary = [
             "First key point from the recording",
             "Second important insight",
             "Third valuable observation",
             "Final summary point",
         ]
+        recording.thingsToThinkAbout = [
+            "What specific aspects of this idea excite you the most?",
+            "How might you validate this concept with potential users?",
+            "What resources or support would you need to make this successful?",
+        ]
         recording.diagramTitle = "Key Concepts"
         recording.diagramDescription = "Visual representation of main ideas"
         recording.diagramContent = "Concept A → Concept B → Result"
         return recording
     }())
-    .funnelPreviewEnvironment()
-    .background (GradientBackground())
+        .funnelPreviewEnvironment()
+        .background(GradientBackground())
 }

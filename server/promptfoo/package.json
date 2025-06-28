@@ -5,7 +5,9 @@
   "scripts": {
     "test": "deno test tests/",
     "promptfoo:eval": "promptfoo eval",
-    "promptfoo:view": "promptfoo view"
+    "promptfoo:view": "promptfoo view",
+    "promptfoo:eval:new": "promptfoo eval -c promptfooconfig-new-prompts.yaml",
+    "promptfoo:eval:all": "promptfoo eval && promptfoo eval -c promptfooconfig-with-assertions.yaml"
   },
   "devDependencies": {
     "promptfoo": "^0.115.1"

@@ -1,42 +1,140 @@
-# Simple promptfoo configuration for testing Funnel API prompts
-description: "Funnel API prompt testing"
+# Promptfoo configuration for testing new prompts only
+description: "Testing lightly edited transcript and things to think about prompts"
 
 prompts:
-  - file://./prompts/summarize.txt
-  - file://./prompts/diagram.txt
-  - file://./prompts/lightly-edited-transcript-prompt.txt
-  - file://./prompts/things-to-think-about-prompt.txt
+  - id: lightly-edited-transcript
+    file: ./prompts/lightly-edited-transcript-prompt.txt
+  - id: things-to-think-about
+    file: ./prompts/things-to-think-about-prompt.txt
 
 providers:
-  - anthropic:claude-3-5-sonnet-20241022
+  - id: claude
+    config:
+      id: anthropic:claude-3-5-sonnet-20241022
+
+defaultTest:
+  assert:
+    - type: not-contains
+      value: "Here is"
+    - type: not-contains
+      value: "I will"
+    - type: not-contains
+      value: "I'll provide"
 
 tests:
-  # Test 1: Joel's AI coding metaphor
-  - description: "AI coding metaphor summary"
+  # Test 1: Lightly edited transcript - AI coding metaphor
+  - description: "AI coding metaphor - lightly edited"
     vars:
       transcript: |
         Okay. So I am thinking about an idea I had for an article which is I wanna talk about how what coding With Agentic coding assistance like Claude Code, and Cursor, it feels like. And I've heard it described being a manager. You're gonna be a manager. It's like being a manager of humans. You've got all these AI agents. They're just like little humans that know, human engineers, and you just have to tell them what to do, and they'll magically write code for you and then maybe they do it wrong, and you just have to give them feedback, and then it'll work. But I don't really think that metaphor is super accurate. And but I've been trying to think of what is a better metaphor. We're like, what is this like? And, you know, is it using a machine? Is it using a is it coding with a broom or something? Or is it coding with a know, is it building with things with bricks? Or with, Construction equipment For what? And I think the best example I have come across is I was thinking of This video game I used to play, for, like, the Nintendo 64 maybe, that was your Mickey Mouse and you have a magic paintbrush. You can point this magic paintbrush of things in your black and white world, and it transforms them into colorful, amazing, magical things. But the thing about this video game is that it was also really confusing, and the UI was terrible, and it was just So this paintbrush that was so magical and powerful was extremely difficult to use. And oftentimes, wouldn't work at all because I didn't know how to Like, where to point it or how to use it or what to do with it. And so I think that is the metaphor I would say is it's like having a very difficult to use paintbrush magic paintbrush that if you use it perfectly, You can paint. Way faster then you can paint with a regular paintbrush. But how you use it is not the same as how you ask a human to do something for you.
+    options:
+      provider: claude
+      prompts:
+        - lightly-edited-transcript
+    assert:
+      - type: contains
+        value: "##"
+        metric: "Has section headers"
+      - type: not-contains-any
+        value: ["um", "uh", "you know", ", like,"]
+        metric: "Removed filler words"
+      - type: contains
+        value: "magic paintbrush"
+        metric: "Preserves key phrases"
+      - type: contains
+        value: "Nintendo 64"
+        metric: "Preserves specific details"
 
-  # Test 2: Startup pivot
-  - description: "Startup pivot decision"
+  # Test 2: Things to think about - Startup pivot
+  - description: "Startup pivot - thought questions"
     vars:
       transcript: |
         So we've been working on this product for six months now and I'm starting to think we need to pivot. The user feedback has been pretty mixed. Some people love the core idea but they're frustrated with the implementation. Others don't really get what we're trying to do at all. I keep thinking about what Paul Graham said about making something people want. Are we making something people want? I don't know. The metrics aren't terrible but they're not great either. We have about 500 users, maybe 50 are really active. That's not nothing but it's not product-market fit either. I wonder if we should double down on the power users or try to simplify for the masses. Or maybe we need to completely rethink this. The team is getting tired. We're burning through our runway. I estimate we have maybe 4 months left at current burn rate. We could extend that if we let someone go but I really don't want to do that. Everyone's been working so hard. Maybe we need to talk to more users. Or maybe we just need to ship faster and iterate. I don't know. This is hard.
+    options:
+      provider: claude
+      prompts:
+        - things-to-think-about
+    assert:
+      - type: contains
+        value: "•"
+        metric: "Uses bullet format"
+      - type: regex
+        pattern: "•.*\\?"
+        metric: "Questions end with ?"
+      - type: javascript
+        value: |
+          const bullets = output.match(/•[^•]+/g) || [];
+          bullets.length >= 2 && bullets.length <= 3
+        metric: "Has 2-3 questions"
 
-  # Test 3: Bike shop dream (for testing "things to think about")
-  - description: "Bike shop business idea"
+  # Test 3: Bike shop - lightly edited
+  - description: "Bike shop - lightly edited transcript"
     vars:
       transcript: |
         I've been thinking about opening a bike shop in San Leandro. I love bikes, I love working with my hands, and I think there's a real need for a good local bike shop in the area. The closest one is like 20 minutes away. I could do repairs, sell some bikes, maybe have a little coffee corner where people could hang out. Make it a community space, you know? I've got some savings, maybe 50k, and I think I could get a small business loan. My cousin knows a lot about bikes and said he'd help out on weekends. I found this empty storefront on East 14th that would be perfect. Good foot traffic, reasonable rent. I'm just tired of my corporate job. I want to do something that matters to the community, something where I can see the direct impact of my work. But I don't know, it's scary to leave a stable job.
+    options:
+      provider: claude
+      prompts:
+        - lightly-edited-transcript
+    assert:
+      - type: contains-all
+        value: ["50k", "East 14th", "cousin"]
+        metric: "Preserves specific details"
+      - type: not-contains
+        value: "you know?"
+        metric: "Removes filler phrases"
 
-  # Test 4: Short recording (for edge case testing)
-  - description: "Very short reminder"
+  # Test 4: Short reminder
+  - description: "Very short reminder - both prompts"
     vars:
       transcript: |
         Um, remember to, uh, email Sarah about the design mockups
+    options:
+      provider: claude
+    assert:
+      - type: javascript
+        value: |
+          // For edited transcript
+          if (output.includes("Remember to email Sarah")) {
+            return !output.includes("um") && !output.includes("uh");
+          }
+          // For questions - should handle gracefully
+          return true;
+        metric: "Handles short input appropriately"
 
-  # Test 5: Technical rambling (for section headers in edited transcript)
-  - description: "Technical architecture discussion"
+  # Test 5: Technical discussion - lightly edited
+  - description: "Technical architecture - lightly edited"
     vars:
       transcript: |
         Okay so I'm trying to figure out the best way to architect this new feature. Um, we need real-time updates but I'm not sure if we should use websockets or just poll every few seconds. Websockets would be better for performance but they're harder to implement and we'd need to handle reconnection logic and all that stuff. Actually wait, what about using Server-Sent Events? That might be a good middle ground. Oh but then we'd need to think about scalability. If we have thousands of users all connected at once, that could get expensive. Maybe we should start with polling and then upgrade to websockets later if we need to? But then we'd be building technical debt from the start. Ugh, architectural decisions are hard. Actually, you know what, let me think about this differently. What's the actual user requirement here? They need updates within, let's say, 5 seconds. So polling every 3 seconds would probably be fine for MVP. We can always optimize later.
+    options:
+      provider: claude
+      prompts:
+        - lightly-edited-transcript
+    assert:
+      - type: javascript
+        value: |
+          const headers = output.match(/##[^#\n]+/g) || [];
+          headers.length >= 2
+        metric: "Has multiple section headers"
+      - type: contains-all
+        value: ["websockets", "Server-Sent Events", "polling"]
+        metric: "Preserves all technical terms"
+
+  # Test 6: Personal reflection - things to think about
+  - description: "Career change reflection - thought questions"
+    vars:
+      transcript: |
+        I'm at a crossroads in my career. I've been a software engineer for 10 years and I'm good at it, but I don't feel passionate about it anymore. I keep thinking about teaching. Maybe I could teach computer science at a community college or do coding bootcamps. The pay would be less but I think I'd be happier. My wife is supportive but we have a mortgage and two kids. I'm 35 now, is it too late to change careers?
+    options:
+      provider: claude
+      prompts:
+        - things-to-think-about
+    assert:
+      - type: javascript
+        value: |
+          const output_lower = output.toLowerCase();
+          const hasDepthQuestions = output_lower.includes("fulfill") || output_lower.includes("passion") || output_lower.includes("impact") || output_lower.includes("meaning") || output_lower.includes("teach");
+          const hasPracticalQuestions = output_lower.includes("transition") || output_lower.includes("financial") || output_lower.includes("family") || output_lower.includes("income");
+          return hasDepthQuestions || hasPracticalQuestions;
+        metric: "Questions address core concerns"
