@@ -64,7 +64,7 @@ struct SwipeableCardsView: View {
                         EditedTranscriptCard(editedTranscript: recording.editedTranscript ?? recording.transcript ?? "")
                             .frame(width: cardWidth)
                             .id(2)
-                        
+
                         ThingsToThinkAboutCard(questions: recording.thingsToThinkAbout ?? [])
                             .frame(width: cardWidth)
                             .id(3)
@@ -286,21 +286,21 @@ struct EditedTranscriptCard: View {
 
 struct ThingsToThinkAboutCard: View {
     let questions: [String]
-    
+
     var body: some View {
         VStack(spacing: 20) {
             Text("Things to Think About")
                 .funnelBodyBold()
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-            
+
             VStack(alignment: .leading, spacing: 16) {
                 ForEach(Array(questions.enumerated()), id: \.offset) { index, question in
                     VStack(alignment: .leading, spacing: 8) {
                         Text("\(index + 1).")
                             .funnelCallout()
                             .foregroundColor(.white.opacity(0.6))
-                        
+
                         Text(question)
                             .funnelCallout()
                             .foregroundColor(.white.opacity(0.9))
@@ -308,7 +308,7 @@ struct ThingsToThinkAboutCard: View {
                     }
                 }
             }
-            
+
             Spacer()
         }
         .padding(25)
@@ -352,13 +352,13 @@ struct ThingsToThinkAboutCard: View {
         recording.thingsToThinkAbout = [
             "What specific aspects of this idea excite you the most?",
             "How might you validate this concept with potential users?",
-            "What resources or support would you need to make this successful?"
+            "What resources or support would you need to make this successful?",
         ]
         recording.diagramTitle = "Key Concepts"
         recording.diagramDescription = "Visual representation of main ideas"
         recording.diagramContent = "Concept A → Concept B → Result"
         return recording
     }())
-    .funnelPreviewEnvironment()
-    .background (GradientBackground())
+        .funnelPreviewEnvironment()
+        .background(GradientBackground())
 }

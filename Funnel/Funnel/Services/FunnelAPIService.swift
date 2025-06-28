@@ -17,9 +17,9 @@ class FunnelAPIService {
             fieldName: "audio"
         )
     }
-    
+
     // MARK: - Live Streaming
-    
+
     /// Finalize a live-streamed recording
     func finalizeRecording(recordingId: String) async throws -> ProcessedRecording {
         print("FunnelAPIService: Finalizing recording with ID: \(recordingId)")

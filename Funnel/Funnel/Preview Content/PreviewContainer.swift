@@ -52,7 +52,7 @@ extension ModelContainer {
             recording.thingsToThinkAbout = [
                 "What would be the biggest challenge in implementing this idea?",
                 "How might this impact our current users?",
-                "What resources would we need to make this successful?"
+                "What resources would we need to make this successful?",
             ]
             recording.diagramTitle = sampleDiagramTitles[index]
             recording.diagramDescription = "A visual representation of the key concepts discussed"
