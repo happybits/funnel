@@ -106,7 +106,7 @@ export const DEFAULT_TRANSCRIPTION_OPTIONS: LiveTranscriptionOptions = {
   // encoding: "linear16",
   // sample_rate: 16000,
   endpointing: 500,
-  interim_results: true,
+  interim_results: false,
   utterance_end_ms: 1000,
   vad_events: false,
 };
@@ -162,59 +162,12 @@ export interface TranscriptSegment {
 
 // Compute full transcript from events
 export function computeTranscriptFromEvents(events: TranscriptEvent[]): string {
-  // Filter for final events with non-empty transcripts
-  const finalEvents = events
-    .filter((e) =>
-      e.is_final &&
-      e.channel?.alternatives?.[0]?.transcript?.trim()
-    )
-    .sort((a, b) => a.start - b.start);
-
-  // Build transcript from all segments, handling overlaps properly
-  const segments: { start: number; end: number; text: string }[] = [];
-
-  for (const event of finalEvents) {
-    const transcript = event.channel.alternatives[0].transcript.trim();
-    if (!transcript) continue;
-
-    const start = event.start;
-    const end = event.start + event.duration;
-
-    // Check if this segment overlaps with any existing segments
-    let handled = false;
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-
-      // If segments overlap or are adjacent (within 0.1s)
-      if (start <= segment.end + 0.1 && end >= segment.start - 0.1) {
-        // Merge the segments
-        segment.start = Math.min(segment.start, start);
-        segment.end = Math.max(segment.end, end);
-
-        // For overlapping segments, append the new text if it's different
-        // This handles cases where Deepgram sends corrections or additional content
-        if (segment.text !== transcript) {
-          // If the new segment starts after the old one, append
-          if (start >= segment.start) {
-            segment.text = segment.text + " " + transcript;
-          } else {
-            // If the new segment starts before, prepend
-            segment.text = transcript + " " + segment.text;
-          }
-        }
-
-        handled = true;
-        break;
-      }
-    }
-
-    // If no overlap found, add as new segment
-    if (!handled) {
-      segments.push({ start, end, text: transcript });
-    }
-  }
-
-  // Sort segments by start time and join
-  segments.sort((a, b) => a.start - b.start);
-  return segments.map((s) => s.text).join(" ").trim();
+  // Simple approach: filter final events, sort by start time, filter empty strings, join with spaces
+  // Important to have interim_results disabled for this to work!
+  return events
+    .sort((a, b) => a.start - b.start) // Sort by start time
+    .map((e) => e.channel?.alternatives?.[0]?.transcript?.trim() || "") // Get transcript text
+    .filter((text) => text.length > 0) // Remove empty strings
+    .join(" ") // Join with spaces
+    .trim(); // Final trim
 }

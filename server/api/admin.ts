@@ -1,5 +1,5 @@
 import { Context } from "@hono/hono";
-import { RecordingData } from "../lib/deepgram.ts";
+import { computeTranscriptFromEvents, RecordingData } from "../lib/deepgram.ts";
 import { ProcessedRecording } from "../lib/ai-processing.ts";
 
 const kv = await Deno.openKv();
@@ -264,7 +264,9 @@ function generateAdminHTML(
               <th>Status</th>
               <th>Start Time</th>
               <th>Duration</th>
-              <th>Transcript</th>
+              <th>Events</th>
+              <th>Stored Transcript</th>
+              <th>Computed Transcript</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -281,6 +283,12 @@ function generateAdminHTML(
             )
             : "Recording...";
 
+          // Compute transcript from events
+          const computedTranscript =
+            recording.events && recording.events.length > 0
+              ? computeTranscriptFromEvents(recording.events)
+              : "No events";
+
           return `
                 <tr>
                   <td><code>${recording.id}</code></td>
@@ -291,11 +299,19 @@ function generateAdminHTML(
                   </td>
                   <td>${new Date(recording.startTime).toLocaleString()}</td>
                   <td>${duration}</td>
+                  <td>${recording.events?.length || 0}</td>
                   <td>
-                    <div class="transcript-preview">
+                    <div class="transcript-preview" title="${
+            recording.transcript || processedData?.transcript || "—"
+          }">
                       ${
             recording.transcript || processedData?.transcript || "—"
           }
+                    </div>
+                  </td>
+                  <td>
+                    <div class="transcript-preview" title="${computedTranscript}">
+                      ${computedTranscript}
                     </div>
                   </td>
                   <td>
@@ -309,7 +325,15 @@ function generateAdminHTML(
                       `
               : ""
           }
-                      <a href="/api/test" class="btn btn-secondary">Test API</a>
+                      ${
+            recording.events && recording.events.length > 0
+              ? `
+                        <button class="btn btn-secondary" onclick="showEvents('${recording.id}')">
+                          Events
+                        </button>
+                      `
+              : ""
+          }
                     </div>
                   </td>
                 </tr>
@@ -324,15 +348,73 @@ function generateAdminHTML(
   </div>
   
   <script>
+    // Store recordings data globally for event viewing
+    const recordingsData = ${JSON.stringify(recordings)};
+    
     function viewDetails(recordingId) {
       // In a real app, this would navigate to a detail view
       alert('Recording details for: ' + recordingId);
     }
     
-    // Auto-refresh every 5 seconds
+    function showEvents(recordingId) {
+      const recording = recordingsData.find(r => r.id === recordingId);
+      if (!recording || !recording.events) {
+        alert('No events found for this recording');
+        return;
+      }
+      
+      const eventsHtml = recording.events.map((event, index) => {
+        const transcript = event.channel?.alternatives?.[0]?.transcript || '';
+        return \`
+          <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+            <div><strong>Event #\${index + 1}</strong></div>
+            <div>Start: \${event.start}s, Duration: \${event.duration}s</div>
+            <div>Final: \${event.is_final ? 'Yes' : 'No'}</div>
+            <div>Transcript: "<strong>\${transcript}</strong>"</div>
+            <div style="font-size: 0.8em; color: #718096;">Received: \${new Date(event.receivedAt).toLocaleString()}</div>
+          </div>
+        \`;
+      }).join('');
+      
+      const computedTranscript = computeTranscriptFromEvents(recording.events);
+      
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+      
+      modal.innerHTML = \`
+        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 800px; max-height: 80vh; overflow-y: auto; width: 90%;">
+          <h2 style="margin-bottom: 20px;">Events for Recording \${recordingId}</h2>
+          <div style="margin-bottom: 20px;">
+            <h3>Computed Transcript:</h3>
+            <p style="padding: 15px; background: #e6fffa; border-radius: 8px; font-style: italic;">\${computedTranscript}</p>
+          </div>
+          <h3>Events (\${recording.events.length} total):</h3>
+          \${eventsHtml}
+          <button onclick="this.closest('div').parentElement.remove()" style="margin-top: 20px; padding: 10px 20px; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+        </div>
+      \`;
+      
+      document.body.appendChild(modal);
+    }
+    
+    // Re-implement computeTranscriptFromEvents in browser
+    // Important: interim_results must be disabled for this to work!
+    function computeTranscriptFromEvents(events) {
+      return events
+        .sort((a, b) => a.start - b.start)
+        .map(e => e.channel?.alternatives?.[0]?.transcript?.trim() || "")
+        .filter(text => text.length > 0)
+        .join(" ")
+        .trim();
+    }
+    
+    // Auto-refresh every 10 seconds (increased from 5)
     setTimeout(() => {
       window.location.reload();
-    }, 5000);
+    }, 10000);
   </script>
 </body>
 </html>
