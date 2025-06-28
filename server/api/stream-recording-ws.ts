@@ -9,6 +9,9 @@ import {
 
 const kv = await Deno.openKv();
 
+// In-memory storage for recording segments to prevent KV overwrite issues
+const recordingSegments = new Map<string, TranscriptSegment[]>();
+
 export function streamRecordingWsHandler(c: Context): Response {
   console.log(`WebSocket upgrade request for path: ${c.req.path}`);
 
@@ -36,10 +39,13 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
   let audioBuffer: Uint8Array = new Uint8Array(0);
   let isClosing = false;
   let isConfigured = false;
-  let audioFormat = "auto"; // auto-detect by default
+  // let audioFormat = "auto"; // auto-detect by default
 
   ws.onopen = async () => {
     console.log(`Client WebSocket connected for recording ${recordingId}`);
+
+    // Initialize in-memory segments array
+    recordingSegments.set(recordingId, []);
 
     // Initialize recording in KV
     const recording: RecordingData = {
@@ -104,22 +110,26 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
               isFinal: data.is_final || false,
             };
 
-            // Update recording in KV
+            // Get in-memory segments array
+            const segments = recordingSegments.get(recordingId) || [];
+            segments.push(segment);
+            recordingSegments.set(recordingId, segments);
+
+            // Build full transcript from all final segments
+            const fullTranscript = segments
+              .filter((s) => s.isFinal)
+              .map((s) => s.text)
+              .join(" ");
+
+            // Update recording in KV with the latest data
             const current = await kv.get<RecordingData>([
               "recordings",
               recordingId,
             ]);
             if (current.value) {
-              current.value.segments.push(segment);
-
-              // Update full transcript if this is a final segment
-              if (segment.isFinal) {
-                current.value.transcript = current.value.segments
-                  .filter((s) => s.isFinal)
-                  .map((s) => s.text)
-                  .join(" ");
-              }
-
+              // Update with all segments and the full transcript
+              current.value.segments = segments;
+              current.value.transcript = fullTranscript;
               await kv.set(["recordings", recordingId], current.value);
             }
 
@@ -127,7 +137,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
             ws.send(JSON.stringify({
               type: "transcript",
               segment,
-              fullTranscript: current.value?.transcript || "",
+              fullTranscript,
             }));
           }
         },
@@ -204,7 +214,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
             isConfigured = true;
             return;
           }
-        } catch (e) {
+        } catch (_e) {
           console.log(`Received non-JSON string message: ${event.data}`);
         }
       }
@@ -286,6 +296,9 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       current.value.endTime = new Date();
       await kv.set(["recordings", recordingId], current.value);
     }
+
+    // Clean up in-memory segments to prevent memory leaks
+    recordingSegments.delete(recordingId);
   };
 
   ws.onerror = (event) => {
@@ -298,6 +311,9 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
     if (deepgramConnection) {
       deepgramConnection.finish();
     }
+
+    // Clean up in-memory segments on error as well
+    recordingSegments.delete(recordingId);
   };
 }
 
