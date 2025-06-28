@@ -74,27 +74,39 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
       ? (recording.endTime.getTime() - recording.startTime.getTime()) / 1000
       : 0;
 
-    // Generate final transcript from independently stored events
+    // Generate final transcript from precalculated or independently stored events
     let finalTranscript = "";
 
-    // Fetch all transcript events for this recording from KV
-    const eventIterator = kv.list<TranscriptEvent>({
-      prefix: ["transcript_event", recordingId],
-    });
-    const events: TranscriptEvent[] = [];
-    for await (const entry of eventIterator) {
-      events.push(entry.value);
-    }
-
-    console.log(
-      `Found ${events.length} transcript events for recording ${recordingId}`,
-    );
-
-    if (events.length > 0) {
-      finalTranscript = computeTranscriptFromEvents(events);
+    // First try to get precalculated transcript
+    const precalculatedEntry = await kv.get<string>([
+      "precalculated_transcript",
+      recordingId,
+    ]);
+    if (precalculatedEntry.value) {
+      finalTranscript = precalculatedEntry.value;
       console.log(
-        `Computed transcript from ${events.length} events: "${finalTranscript}"`,
+        `Using precalculated transcript for recording ${recordingId}: "${finalTranscript}"`,
       );
+    } else {
+      // Fallback to computing from events
+      const eventIterator = kv.list<TranscriptEvent>({
+        prefix: ["transcript_event", recordingId],
+      });
+      const events: TranscriptEvent[] = [];
+      for await (const entry of eventIterator) {
+        events.push(entry.value);
+      }
+
+      console.log(
+        `Found ${events.length} transcript events for recording ${recordingId}`,
+      );
+
+      if (events.length > 0) {
+        finalTranscript = computeTranscriptFromEvents(events);
+        console.log(
+          `Computed transcript from ${events.length} events: "${finalTranscript}"`,
+        );
+      }
     }
 
     // Fall back to recording transcript field if no events

@@ -12,6 +12,7 @@ export async function adminHandler(c: Context): Promise<Response> {
   const recordings: RecordingData[] = [];
   const processed: ProcessedRecording[] = [];
   const recordingEvents: Map<string, TranscriptEvent[]> = new Map();
+  const precalculatedTranscripts: Map<string, string> = new Map();
 
   // Get all recordings
   const recordingIter = kv.list<RecordingData>({ prefix: ["recordings"] });
@@ -25,7 +26,7 @@ export async function adminHandler(c: Context): Promise<Response> {
     processed.push(entry.value);
   }
 
-  // Get all transcript events for each recording
+  // Get all transcript events and precalculated transcripts for each recording
   for (const recording of recordings) {
     const events: TranscriptEvent[] = [];
     const eventIter = kv.list<TranscriptEvent>({
@@ -35,6 +36,15 @@ export async function adminHandler(c: Context): Promise<Response> {
       events.push(entry.value);
     }
     recordingEvents.set(recording.id, events);
+
+    // Get precalculated transcript
+    const transcriptEntry = await kv.get<string>([
+      "precalculated_transcript",
+      recording.id,
+    ]);
+    if (transcriptEntry.value) {
+      precalculatedTranscripts.set(recording.id, transcriptEntry.value);
+    }
   }
 
   // Sort by start time (newest first)
@@ -42,7 +52,12 @@ export async function adminHandler(c: Context): Promise<Response> {
     new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
   );
 
-  const html = generateAdminHTML(recordings, processed, recordingEvents);
+  const html = generateAdminHTML(
+    recordings,
+    processed,
+    recordingEvents,
+    precalculatedTranscripts,
+  );
   return c.html(html);
 }
 
@@ -50,6 +65,7 @@ function generateAdminHTML(
   recordings: RecordingData[],
   processed: ProcessedRecording[],
   recordingEvents: Map<string, TranscriptEvent[]>,
+  precalculatedTranscripts: Map<string, string>,
 ): string {
   const processedMap = new Map(processed.map((p) => [p.id, p]));
 
@@ -304,10 +320,12 @@ function generateAdminHTML(
           // Get events from the Map
           const events = recordingEvents.get(recording.id) || [];
 
-          // Compute transcript from events
-          const computedTranscript = events.length > 0
-            ? computeTranscriptFromEvents(events)
-            : "No events";
+          // Use precalculated transcript if available, otherwise compute
+          const computedTranscript =
+            precalculatedTranscripts.get(recording.id) ||
+            (events.length > 0
+              ? computeTranscriptFromEvents(events)
+              : "No events");
 
           return `
                 <tr>

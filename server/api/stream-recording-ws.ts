@@ -116,30 +116,36 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
             }: "${eventText}"`,
           );
 
-          // Update recording metadata (without events array)
+          // Get all events for this recording from KV
+          const eventIterator = kv.list<TranscriptEvent>({
+            prefix: ["transcript_event", recordingId],
+          });
+          const events: TranscriptEvent[] = [];
+          for await (const entry of eventIterator) {
+            events.push(entry.value);
+          }
+
+          // Compute the full transcript from all events
+          const computedTranscript = computeTranscriptFromEvents(events);
+
+          // Save the precalculated transcript in a separate key
+          await kv.set(
+            ["precalculated_transcript", recordingId],
+            computedTranscript,
+          );
+
+          console.log(
+            `Computed and saved transcript from ${events.length} events: "${computedTranscript}"`,
+          );
+
+          // Update recording metadata
           const current = await kv.get<RecordingData>([
             "recordings",
             recordingId,
           ]);
           if (current.value) {
-            // Get all events for this recording from KV
-            const eventIterator = kv.list<TranscriptEvent>({
-              prefix: ["transcript_event", recordingId],
-            });
-            const events: TranscriptEvent[] = [];
-            for await (const entry of eventIterator) {
-              events.push(entry.value);
-            }
-
-            // Compute the full transcript from all events
-            const computedTranscript = computeTranscriptFromEvents(events);
             current.value.transcript = computedTranscript;
-
-            console.log(
-              `Computed transcript from ${events.length} events: "${computedTranscript}"`,
-            );
-
-            // Save the updated recording (without events array)
+            // Save the updated recording
             await kv.set(["recordings", recordingId], current.value);
 
             // Send transcript update to client
@@ -315,7 +321,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       console.log(
         `Waiting for final transcript events for recording ${recordingId}`,
       );
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     // Now update to processing status
