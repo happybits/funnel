@@ -19,6 +19,10 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private var urlSession: URLSession?
     private(set) var recordingId: String?
     private(set) var isLiveStreaming = false
+    
+    // Audio file writing properties
+    private var audioFile: AVAudioFile?
+    private(set) var audioFileURL: URL?
 
     override init() {
         super.init()
@@ -164,6 +168,11 @@ class AudioRecorderManager: NSObject, ObservableObject {
         isLiveStreaming = true
         print("AudioRecorderManager: Generated recording ID: \(recordingId!)")
         
+        // Create audio file for fallback
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        audioFileURL = documentsPath.appendingPathComponent("recording-\(recordingId!).m4a")
+        currentRecordingURL = audioFileURL // Store for compatibility
+        
         // Setup WebSocket connection
         setupWebSocket { [weak self] result in
             switch result {
@@ -258,6 +267,25 @@ class AudioRecorderManager: NSObject, ObservableObject {
             return
         }
         
+        // Create audio file for writing
+        if let audioFileURL = audioFileURL {
+            do {
+                // Create AAC format for the file (compressed m4a)
+                let settings: [String: Any] = [
+                    AVFormatIDKey: kAudioFormatMPEG4AAC,
+                    AVSampleRateKey: inputFormat.sampleRate,
+                    AVNumberOfChannelsKey: 1,
+                    AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+                ]
+                
+                audioFile = try AVAudioFile(forWriting: audioFileURL, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: true)
+                print("AudioRecorderManager: Created audio file at \(audioFileURL.path)")
+            } catch {
+                print("AudioRecorderManager: Failed to create audio file: \(error)")
+                // Continue without file writing - streaming still works
+            }
+        }
+        
         // Create converter node
         let converterNode = AVAudioMixerNode()
         let sinkNode = AVAudioMixerNode()
@@ -265,9 +293,16 @@ class AudioRecorderManager: NSObject, ObservableObject {
         audioEngine.attach(converterNode)
         audioEngine.attach(sinkNode)
         
-        // Install tap to capture audio
+        // Install tap to capture audio for streaming (PCM16)
         converterNode.installTap(onBus: 0, bufferSize: 1024, format: converterNode.outputFormat(forBus: 0)) { [weak self] buffer, _ in
             self?.processAudioBuffer(buffer)
+        }
+        
+        // Install tap for file writing (use input format for best quality)
+        if audioFile != nil {
+            inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
+                self?.writeAudioBufferToFile(buffer)
+            }
         }
         
         // Connect nodes
@@ -343,6 +378,16 @@ class AudioRecorderManager: NSObject, ObservableObject {
         return Data(bytes: audioBuffer.mData!, count: Int(audioBuffer.mDataByteSize))
     }
     
+    private func writeAudioBufferToFile(_ buffer: AVAudioPCMBuffer) {
+        guard let audioFile = audioFile else { return }
+        
+        do {
+            try audioFile.write(from: buffer)
+        } catch {
+            print("AudioRecorderManager: Failed to write buffer to file: \(error)")
+        }
+    }
+    
     private func stopLiveStreaming() {
         print("AudioRecorderManager: Stopping live streaming")
         print("AudioRecorderManager: Recording ID at stop: \(recordingId ?? "nil")")
@@ -360,6 +405,12 @@ class AudioRecorderManager: NSObject, ObservableObject {
         
         // Close WebSocket
         webSocket?.cancel(with: .goingAway, reason: nil)
+        
+        // Close audio file
+        audioFile = nil
+        if let audioFileURL = audioFileURL {
+            print("AudioRecorderManager: Audio file saved at \(audioFileURL.path)")
+        }
         
         // Reset state
         isRecording = false

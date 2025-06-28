@@ -56,6 +56,7 @@ struct CardOptions: View {
                 Image("share-btn")
             }
         }
+        .padding(.leading, -8)
     }
 }
 
