@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct FunnelApp: App {
     @StateObject private var debugSettings = DebugSettings()
+    @StateObject private var audioRecorderManager = AudioRecorderManager()
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -24,6 +25,7 @@ struct FunnelApp: App {
                 .preferredColorScheme(.dark)
                 .colorScheme(.light)
                 .environmentObject(debugSettings)
+                .environmentObject(audioRecorderManager)
         }
         .modelContainer(sharedModelContainer)
     }

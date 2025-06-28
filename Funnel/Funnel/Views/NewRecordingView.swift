@@ -6,6 +6,7 @@ struct NewRecordingView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var recordingManager: RecordingManager
     @EnvironmentObject var debugSettings: DebugSettings
+    @EnvironmentObject var audioRecorder: AudioRecorderManager
     @Query(sort: \Recording.timestamp, order: .reverse) private var recordings: [Recording]
 
     @State private var isRecording = false
@@ -13,7 +14,6 @@ struct NewRecordingView: View {
     @State private var waveformValues: [CGFloat] = []
     @State private var recordingError: Error?
 
-    private let audioRecorder = AudioRecorderManager()
     private var recordingTimer: Timer?
     private var levelTimer: Timer?
 
@@ -337,5 +337,6 @@ struct RecordingsListView: View {
             .funnelPreviewEnvironment()
             .environmentObject(RecordingManager())
             .environmentObject(DebugSettings())
+            .environmentObject(AudioRecorderManager())
     }
 }
