@@ -1,5 +1,9 @@
 import { Context } from "@hono/hono";
-import { computeTranscriptFromEvents, RecordingData } from "../lib/deepgram.ts";
+import {
+  computeTranscriptFromEvents,
+  RecordingData,
+  TranscriptEvent,
+} from "../lib/deepgram.ts";
 import { ProcessedRecording } from "../lib/ai-processing.ts";
 
 const kv = await Deno.openKv();
@@ -7,6 +11,7 @@ const kv = await Deno.openKv();
 export async function adminHandler(c: Context): Promise<Response> {
   const recordings: RecordingData[] = [];
   const processed: ProcessedRecording[] = [];
+  const recordingEvents: Map<string, TranscriptEvent[]> = new Map();
 
   // Get all recordings
   const recordingIter = kv.list<RecordingData>({ prefix: ["recordings"] });
@@ -20,18 +25,31 @@ export async function adminHandler(c: Context): Promise<Response> {
     processed.push(entry.value);
   }
 
+  // Get all transcript events for each recording
+  for (const recording of recordings) {
+    const events: TranscriptEvent[] = [];
+    const eventIter = kv.list<TranscriptEvent>({
+      prefix: ["transcript_event", recording.id],
+    });
+    for await (const entry of eventIter) {
+      events.push(entry.value);
+    }
+    recordingEvents.set(recording.id, events);
+  }
+
   // Sort by start time (newest first)
   recordings.sort((a, b) =>
     new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
   );
 
-  const html = generateAdminHTML(recordings, processed);
+  const html = generateAdminHTML(recordings, processed, recordingEvents);
   return c.html(html);
 }
 
 function generateAdminHTML(
   recordings: RecordingData[],
   processed: ProcessedRecording[],
+  recordingEvents: Map<string, TranscriptEvent[]>,
 ): string {
   const processedMap = new Map(processed.map((p) => [p.id, p]));
 
@@ -283,11 +301,13 @@ function generateAdminHTML(
             )
             : "Recording...";
 
+          // Get events from the Map
+          const events = recordingEvents.get(recording.id) || [];
+
           // Compute transcript from events
-          const computedTranscript =
-            recording.events && recording.events.length > 0
-              ? computeTranscriptFromEvents(recording.events)
-              : "No events";
+          const computedTranscript = events.length > 0
+            ? computeTranscriptFromEvents(events)
+            : "No events";
 
           return `
                 <tr>
@@ -299,7 +319,7 @@ function generateAdminHTML(
                   </td>
                   <td>${new Date(recording.startTime).toLocaleString()}</td>
                   <td>${duration}</td>
-                  <td>${recording.events?.length || 0}</td>
+                  <td>${events.length}</td>
                   <td>
                     <div class="transcript-preview" title="${
             recording.transcript || processedData?.transcript || "—"
@@ -326,7 +346,7 @@ function generateAdminHTML(
               : ""
           }
                       ${
-            recording.events && recording.events.length > 0
+            events.length > 0
               ? `
                         <button class="btn btn-secondary" onclick="showEvents('${recording.id}')">
                           Events
@@ -348,8 +368,9 @@ function generateAdminHTML(
   </div>
   
   <script>
-    // Store recordings data globally for event viewing
+    // Store recordings and events data globally for event viewing
     const recordingsData = ${JSON.stringify(recordings)};
+    const eventsData = ${JSON.stringify(Object.fromEntries(recordingEvents))};
     
     function viewDetails(recordingId) {
       // In a real app, this would navigate to a detail view
@@ -357,13 +378,13 @@ function generateAdminHTML(
     }
     
     function showEvents(recordingId) {
-      const recording = recordingsData.find(r => r.id === recordingId);
-      if (!recording || !recording.events) {
+      const events = eventsData[recordingId];
+      if (!events || events.length === 0) {
         alert('No events found for this recording');
         return;
       }
       
-      const eventsHtml = recording.events.map((event, index) => {
+      const eventsHtml = events.map((event, index) => {
         const transcript = event.channel?.alternatives?.[0]?.transcript || '';
         return \`
           <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
@@ -376,7 +397,7 @@ function generateAdminHTML(
         \`;
       }).join('');
       
-      const computedTranscript = computeTranscriptFromEvents(recording.events);
+      const computedTranscript = computeTranscriptFromEvents(events);
       
       const modal = document.createElement('div');
       modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
@@ -391,7 +412,7 @@ function generateAdminHTML(
             <h3>Computed Transcript:</h3>
             <p style="padding: 15px; background: #e6fffa; border-radius: 8px; font-style: italic;">\${computedTranscript}</p>
           </div>
-          <h3>Events (\${recording.events.length} total):</h3>
+          <h3>Events (\${events.length} total):</h3>
           \${eventsHtml}
           <button onclick="this.closest('div').parentElement.remove()" style="margin-top: 20px; padding: 10px 20px; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
         </div>

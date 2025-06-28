@@ -105,9 +105,6 @@ export const DEFAULT_TRANSCRIPTION_OPTIONS: LiveTranscriptionOptions = {
   // Remove encoding and sample_rate to let Deepgram auto-detect from WebM/Opus
   // encoding: "linear16",
   // sample_rate: 16000,
-  endpointing: 500,
-  interim_results: false,
-  utterance_end_ms: 1000,
   vad_events: false,
 };
 
@@ -145,7 +142,7 @@ export interface RecordingData {
   endTime?: Date;
   transcript: string;
   segments: TranscriptSegment[]; // Keep for backward compatibility
-  events: TranscriptEvent[]; // Store raw events
+  events?: TranscriptEvent[]; // Optional for backward compatibility
   status: "recording" | "finalizing" | "processing" | "completed" | "error";
   error?: string;
   audioSize?: number;

@@ -100,50 +100,46 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
             receivedAt: new Date(),
           };
 
-          // Update recording in KV
+          // Store event independently in KV using start and end time as key
+          const start = data.start || 0;
+          const end = start + (data.duration || 0);
+          const eventKey = ["transcript_event", recordingId, start, end];
+
+          // Save the event independently
+          await kv.set(eventKey, event);
+
+          // Log when we save a transcript event
+          const eventText = event.channel?.alternatives?.[0]?.transcript || "";
+          console.log(
+            `Saved transcript event to KV with key ${
+              JSON.stringify(eventKey)
+            }: "${eventText}"`,
+          );
+
+          // Update recording metadata (without events array)
           const current = await kv.get<RecordingData>([
             "recordings",
             recordingId,
           ]);
           if (current.value) {
-            // Initialize events array if it doesn't exist (for compatibility)
-            if (!current.value.events) {
-              current.value.events = [];
+            // Get all events for this recording from KV
+            const eventIterator = kv.list<TranscriptEvent>({
+              prefix: ["transcript_event", recordingId],
+            });
+            const events: TranscriptEvent[] = [];
+            for await (const entry of eventIterator) {
+              events.push(entry.value);
             }
-
-            // Add the event to the events array
-            current.value.events.push(event);
 
             // Compute the full transcript from all events
-            const computedTranscript = computeTranscriptFromEvents(
-              current.value.events,
-            );
+            const computedTranscript = computeTranscriptFromEvents(events);
             current.value.transcript = computedTranscript;
 
-            // Log when we save a transcript event
-            const eventText = event.channel?.alternatives?.[0]?.transcript ||
-              "";
             console.log(
-              `Saved transcript event from @${event.start}s (${event.duration}s): "${eventText}". Full transcript is now: "${computedTranscript}"`,
+              `Computed transcript from ${events.length} events: "${computedTranscript}"`,
             );
 
-            // Also update segments for backward compatibility
-            const transcript = data.channel?.alternatives?.[0];
-            if (transcript && transcript.transcript) {
-              console.log(
-                `Got transcript text: "${transcript.transcript}" (final: ${data.is_final})`,
-              );
-              const segment: TranscriptSegment = {
-                text: transcript.transcript,
-                confidence: transcript.confidence || 0,
-                start: data.start || 0,
-                end: data.start + data.duration || 0,
-                isFinal: data.is_final || false,
-              };
-              current.value.segments.push(segment);
-            }
-
-            // Save the updated recording
+            // Save the updated recording (without events array)
             await kv.set(["recordings", recordingId], current.value);
 
             // Send transcript update to client

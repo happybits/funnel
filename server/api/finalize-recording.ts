@@ -74,65 +74,35 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
       ? (recording.endTime.getTime() - recording.startTime.getTime()) / 1000
       : 0;
 
-    // Generate final transcript - try multiple sources
+    // Generate final transcript from independently stored events
     let finalTranscript = "";
 
-    // First, try to compute from events if available
-    if (recording.events && recording.events.length > 0) {
-      finalTranscript = computeTranscriptFromEvents(recording.events);
+    // Fetch all transcript events for this recording from KV
+    const eventIterator = kv.list<TranscriptEvent>({
+      prefix: ["transcript_event", recordingId],
+    });
+    const events: TranscriptEvent[] = [];
+    for await (const entry of eventIterator) {
+      events.push(entry.value);
+    }
+
+    console.log(
+      `Found ${events.length} transcript events for recording ${recordingId}`,
+    );
+
+    if (events.length > 0) {
+      finalTranscript = computeTranscriptFromEvents(events);
       console.log(
-        `Computed transcript from ${recording.events.length} events for recording ${recordingId}`,
+        `Computed transcript from ${events.length} events: "${finalTranscript}"`,
       );
     }
 
-    // If no events or empty result, fall back to segments
-    if (
-      !finalTranscript && recording.segments && recording.segments.length > 0
-    ) {
-      finalTranscript = recording.segments
-        .filter((s) => s.isFinal)
-        .map((s) => s.text)
-        .join(" ")
-        .trim();
-      console.log(
-        `Using segments for transcript (${recording.segments.length} segments) for recording ${recordingId}`,
-      );
-    }
-
-    // Also check the recording's transcript field as a fallback
+    // Fall back to recording transcript field if no events
     if (!finalTranscript && recording.transcript) {
       finalTranscript = recording.transcript;
       console.log(
-        `Using recording transcript field for recording ${recordingId}`,
+        `Using recording transcript field as fallback for recording ${recordingId}`,
       );
-    }
-
-    // If still no transcript, try reloading from KV one more time
-    if (!finalTranscript) {
-      console.log(
-        `No transcript found, reloading from KV for recording ${recordingId}`,
-      );
-      const reloadedEntry = await kv.get<RecordingData>([
-        "recordings",
-        recordingId,
-      ]);
-      if (reloadedEntry.value) {
-        recording = reloadedEntry.value;
-
-        // Try computing from events again
-        if (recording.events && recording.events.length > 0) {
-          finalTranscript = computeTranscriptFromEvents(recording.events);
-          console.log(
-            `Recomputed transcript from ${recording.events.length} events after reload`,
-          );
-        }
-
-        // Or use the transcript field
-        if (!finalTranscript && recording.transcript) {
-          finalTranscript = recording.transcript;
-          console.log(`Using transcript field after reload`);
-        }
-      }
     }
 
     if (!finalTranscript) {
