@@ -1,5 +1,5 @@
 import { Context } from "@hono/hono";
-import { RecordingData } from "../lib/deepgram.ts";
+import { computeTranscriptFromEvents, RecordingData } from "../lib/deepgram.ts";
 import {
   generateBulletSummary,
   generateDiagram,
@@ -26,7 +26,7 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
       return c.json({ error: "Recording not found" }, 404);
     }
 
-    const recording = recordingEntry.value;
+    let recording = recordingEntry.value;
 
     // Check if already processed
     if (recording.status === "completed") {
@@ -36,6 +36,31 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
       ]);
       if (processedEntry.value) {
         return c.json(processedEntry.value);
+      }
+    }
+
+    // If status is finalizing, wait for it to complete
+    if (recording.status === "finalizing") {
+      console.log(`Recording ${recordingId} is still finalizing, waiting...`);
+      let attempts = 0;
+      const maxAttempts = 10; // Wait up to 2 seconds (10 * 200ms)
+
+      while (recording.status === "finalizing" && attempts < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        const updated = await kv.get<RecordingData>([
+          "recordings",
+          recordingId,
+        ]);
+        if (updated.value) {
+          recording = updated.value;
+        }
+        attempts++;
+      }
+
+      if (recording.status === "finalizing") {
+        console.warn(
+          `Recording ${recordingId} stuck in finalizing status after ${attempts} attempts`,
+        );
       }
     }
 
@@ -49,14 +74,75 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
       ? (recording.endTime.getTime() - recording.startTime.getTime()) / 1000
       : 0;
 
-    // Generate final transcript from all final segments
-    const finalTranscript = recording.segments
-      .filter((s) => s.isFinal)
-      .map((s) => s.text)
-      .join(" ")
-      .trim();
+    // Generate final transcript - try multiple sources
+    let finalTranscript = "";
+
+    // First, try to compute from events if available
+    if (recording.events && recording.events.length > 0) {
+      finalTranscript = computeTranscriptFromEvents(recording.events);
+      console.log(
+        `Computed transcript from ${recording.events.length} events for recording ${recordingId}`,
+      );
+    }
+
+    // If no events or empty result, fall back to segments
+    if (
+      !finalTranscript && recording.segments && recording.segments.length > 0
+    ) {
+      finalTranscript = recording.segments
+        .filter((s) => s.isFinal)
+        .map((s) => s.text)
+        .join(" ")
+        .trim();
+      console.log(
+        `Using segments for transcript (${recording.segments.length} segments) for recording ${recordingId}`,
+      );
+    }
+
+    // Also check the recording's transcript field as a fallback
+    if (!finalTranscript && recording.transcript) {
+      finalTranscript = recording.transcript;
+      console.log(
+        `Using recording transcript field for recording ${recordingId}`,
+      );
+    }
+
+    // If still no transcript, try reloading from KV one more time
+    if (!finalTranscript) {
+      console.log(
+        `No transcript found, reloading from KV for recording ${recordingId}`,
+      );
+      const reloadedEntry = await kv.get<RecordingData>([
+        "recordings",
+        recordingId,
+      ]);
+      if (reloadedEntry.value) {
+        recording = reloadedEntry.value;
+
+        // Try computing from events again
+        if (recording.events && recording.events.length > 0) {
+          finalTranscript = computeTranscriptFromEvents(recording.events);
+          console.log(
+            `Recomputed transcript from ${recording.events.length} events after reload`,
+          );
+        }
+
+        // Or use the transcript field
+        if (!finalTranscript && recording.transcript) {
+          finalTranscript = recording.transcript;
+          console.log(`Using transcript field after reload`);
+        }
+      }
+    }
 
     if (!finalTranscript) {
+      // Log detailed debugging info
+      console.error(`No transcript available for recording ${recordingId}:`, {
+        eventsCount: recording.events?.length || 0,
+        segmentsCount: recording.segments?.length || 0,
+        transcriptLength: recording.transcript?.length || 0,
+        status: recording.status,
+      });
       throw new Error("No transcript available");
     }
 

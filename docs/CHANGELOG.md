@@ -5,6 +5,19 @@ All notable changes to the Funnel project will be documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- **Fixed race condition in transcript finalization**: Resolved timing issue where recordings failed with "No transcript available"
+  - Added "finalizing" status to prevent premature processing
+  - WebSocket handler now waits 500ms after closing for final events
+  - Finalize endpoint waits up to 2 seconds if recording is still finalizing
+  - Added retry logic with KV reload if transcript not found
+  - Computes final transcript one more time before marking as ready
+- **Improved transcript reliability with event-based storage**: Completely redesigned transcript storage to be bulletproof
+  - Now stores raw Deepgram transcript events verbatim with timestamps
+  - Computes full transcript by processing all events in chronological order
+  - Handles overlapping segments and out-of-order events correctly
+  - Preserves all timing information (start time and duration) for each segment
+  - Prevents data loss from empty final segments or timing issues
+  - Maintains backward compatibility with existing recordings
 - **iOS app now properly saves transcripts**: Fixed issue where iOS live streaming wasn't saving transcripts
   - Added finalize endpoint call after recording stops (matching web client behavior)
   - Updated RecordingManager to handle live streaming recordings differently

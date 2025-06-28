@@ -111,14 +111,42 @@ export const DEFAULT_TRANSCRIPTION_OPTIONS: LiveTranscriptionOptions = {
   vad_events: false,
 };
 
+// Raw transcript event from Deepgram (stored verbatim)
+export interface TranscriptEvent {
+  type: string;
+  channel_index: number[];
+  duration: number;
+  start: number;
+  is_final: boolean;
+  speech_final: boolean;
+  channel: {
+    alternatives: Array<{
+      transcript: string;
+      confidence: number;
+      words?: Array<{
+        word: string;
+        start: number;
+        end: number;
+        confidence: number;
+        punctuated_word?: string;
+      }>;
+    }>;
+  };
+  metadata?: any;
+  from_finalize?: boolean;
+  // Store when we received this event
+  receivedAt: Date;
+}
+
 // Recording data structure for Deno KV
 export interface RecordingData {
   id: string;
   startTime: Date;
   endTime?: Date;
   transcript: string;
-  segments: TranscriptSegment[];
-  status: "recording" | "processing" | "completed" | "error";
+  segments: TranscriptSegment[]; // Keep for backward compatibility
+  events: TranscriptEvent[]; // Store raw events
+  status: "recording" | "finalizing" | "processing" | "completed" | "error";
   error?: string;
   audioSize?: number;
   duration?: number;
@@ -130,4 +158,46 @@ export interface TranscriptSegment {
   start: number;
   end: number;
   isFinal: boolean;
+}
+
+// Compute full transcript from events
+export function computeTranscriptFromEvents(events: TranscriptEvent[]): string {
+  // Filter for final events with non-empty transcripts
+  const finalEvents = events
+    .filter((e) =>
+      e.is_final &&
+      e.channel?.alternatives?.[0]?.transcript?.trim()
+    )
+    .sort((a, b) => a.start - b.start);
+
+  // Build transcript from non-overlapping segments
+  const segments: { start: number; end: number; text: string }[] = [];
+
+  for (const event of finalEvents) {
+    const transcript = event.channel.alternatives[0].transcript.trim();
+    if (!transcript) continue;
+
+    const start = event.start;
+    const end = event.start + event.duration;
+
+    // Check if this segment overlaps with the last one
+    if (segments.length > 0) {
+      const lastSegment = segments[segments.length - 1];
+      if (start < lastSegment.end) {
+        // Overlapping segment - skip or merge based on which is longer
+        if (end > lastSegment.end) {
+          // This segment extends beyond the last one, update it
+          lastSegment.text = transcript;
+          lastSegment.end = end;
+        }
+        // Otherwise skip this segment as it's fully contained
+        continue;
+      }
+    }
+
+    segments.push({ start, end, text: transcript });
+  }
+
+  // Join all segments with spaces
+  return segments.map((s) => s.text).join(" ").trim();
 }

@@ -1,9 +1,11 @@
 import { Context } from "@hono/hono";
 import {
+  computeTranscriptFromEvents,
   DEFAULT_TRANSCRIPTION_OPTIONS,
   getDeepgramClient,
   LiveTranscriptionEvents,
   RecordingData,
+  TranscriptEvent,
   TranscriptSegment,
 } from "../lib/deepgram.ts";
 
@@ -47,6 +49,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       startTime: new Date(),
       transcript: "",
       segments: [],
+      events: [], // Initialize events array
       status: "recording",
       audioSize: 0,
     };
@@ -90,44 +93,70 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
             `Deepgram transcript event for recording ${recordingId}:`,
             JSON.stringify(data, null, 2),
           );
-          const transcript = data.channel?.alternatives?.[0];
 
-          if (transcript && transcript.transcript) {
-            console.log(
-              `Got transcript text: "${transcript.transcript}" (final: ${data.is_final})`,
-            );
-            const segment: TranscriptSegment = {
-              text: transcript.transcript,
-              confidence: transcript.confidence || 0,
-              start: data.start || 0,
-              end: data.start + data.duration || 0,
-              isFinal: data.is_final || false,
-            };
+          // Store the raw event with timestamp
+          const event: TranscriptEvent = {
+            ...data,
+            receivedAt: new Date(),
+          };
 
-            // Update recording in KV
-            const current = await kv.get<RecordingData>([
-              "recordings",
-              recordingId,
-            ]);
-            if (current.value) {
-              current.value.segments.push(segment);
-
-              // Update full transcript if this is a final segment
-              if (segment.isFinal) {
-                current.value.transcript = current.value.segments
-                  .filter((s) => s.isFinal)
-                  .map((s) => s.text)
-                  .join(" ");
-              }
-
-              await kv.set(["recordings", recordingId], current.value);
+          // Update recording in KV
+          const current = await kv.get<RecordingData>([
+            "recordings",
+            recordingId,
+          ]);
+          if (current.value) {
+            // Initialize events array if it doesn't exist (for compatibility)
+            if (!current.value.events) {
+              current.value.events = [];
             }
+
+            // Add the event to the events array
+            current.value.events.push(event);
+
+            // Compute the full transcript from all events
+            const computedTranscript = computeTranscriptFromEvents(
+              current.value.events,
+            );
+            current.value.transcript = computedTranscript;
+
+            // Log when we save a transcript event
+            const eventText = event.channel?.alternatives?.[0]?.transcript ||
+              "";
+            console.log(
+              `Saved transcript event from @${event.start}s (${event.duration}s): "${eventText}". Full transcript is now: "${computedTranscript}"`,
+            );
+
+            // Also update segments for backward compatibility
+            const transcript = data.channel?.alternatives?.[0];
+            if (transcript && transcript.transcript) {
+              console.log(
+                `Got transcript text: "${transcript.transcript}" (final: ${data.is_final})`,
+              );
+              const segment: TranscriptSegment = {
+                text: transcript.transcript,
+                confidence: transcript.confidence || 0,
+                start: data.start || 0,
+                end: data.start + data.duration || 0,
+                isFinal: data.is_final || false,
+              };
+              current.value.segments.push(segment);
+            }
+
+            // Save the updated recording
+            await kv.set(["recordings", recordingId], current.value);
 
             // Send transcript update to client
             ws.send(JSON.stringify({
               type: "transcript",
-              segment,
-              fullTranscript: current.value?.transcript || "",
+              segment: {
+                text: transcript?.transcript || "",
+                confidence: transcript?.confidence || 0,
+                start: data.start || 0,
+                end: data.start + data.duration || 0,
+                isFinal: data.is_final || false,
+              },
+              fullTranscript: computedTranscript,
             }));
           }
         },
@@ -275,16 +304,45 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
     console.log(`Client WebSocket disconnected for recording ${recordingId}`);
     isClosing = true;
 
-    if (deepgramConnection) {
-      deepgramConnection.finish();
-    }
-
-    // Update recording status
+    // First, update status to finalizing
     const current = await kv.get<RecordingData>(["recordings", recordingId]);
     if (current.value && current.value.status === "recording") {
-      current.value.status = "processing";
+      current.value.status = "finalizing";
       current.value.endTime = new Date();
       await kv.set(["recordings", recordingId], current.value);
+    }
+
+    if (deepgramConnection) {
+      deepgramConnection.finish();
+
+      // Wait for final transcript events to be processed
+      console.log(
+        `Waiting for final transcript events for recording ${recordingId}`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    // Now update to processing status
+    const finalCurrent = await kv.get<RecordingData>([
+      "recordings",
+      recordingId,
+    ]);
+    if (finalCurrent.value && finalCurrent.value.status === "finalizing") {
+      finalCurrent.value.status = "processing";
+
+      // Also compute final transcript one more time to ensure it's up to date
+      if (finalCurrent.value.events && finalCurrent.value.events.length > 0) {
+        finalCurrent.value.transcript = computeTranscriptFromEvents(
+          finalCurrent.value.events,
+        );
+      }
+
+      await kv.set(["recordings", recordingId], finalCurrent.value);
+      console.log(
+        `Recording ${recordingId} ready for finalization with ${
+          finalCurrent.value.events?.length || 0
+        } events`,
+      );
     }
   };
 
