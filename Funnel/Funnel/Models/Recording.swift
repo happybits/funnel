@@ -27,7 +27,9 @@ final class Recording {
 
     // Processed content
     var transcript: String?
+    var editedTranscript: String?
     var bulletSummary: [String]?
+    var thingsToThinkAbout: [String]?
     var diagramTitle: String?
     var diagramDescription: String?
     var diagramContent: String?

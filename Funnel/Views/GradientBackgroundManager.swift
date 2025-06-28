@@ -5,6 +5,7 @@ enum GradientTheme: String {
     case orange
     case pinkRed
     case blueTeal
+    case purplePink
 
     var colors: [Color] {
         switch self {
@@ -43,6 +44,15 @@ enum GradientTheme: String {
                 Color(red: 0.52, green: 0.85, blue: 1.0).opacity(0.9),
                 Color(red: 0.0, green: 0.8, blue: 0.8),
                 Color(red: 0.41, green: 0.47, blue: 1.0).opacity(0.7),
+            ]
+        case .purplePink:
+            return [
+                Color(red: 0.827, green: 0.435, blue: 0.749), // Purple/magenta from original gradient
+                Color(red: 0.93, green: 0.33, blue: 0.93), // Bright pink
+                Color(red: 0.576, green: 0.651, blue: 0.878), // Light blue/purple from original
+                Color(red: 0.827, green: 0.435, blue: 0.749).opacity(0.9),
+                Color(red: 0.93, green: 0.33, blue: 0.93).opacity(0.8),
+                Color(red: 0.576, green: 0.651, blue: 0.878).opacity(0.7),
             ]
         }
     }

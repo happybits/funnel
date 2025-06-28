@@ -62,8 +62,10 @@ class RecordingManager: ObservableObject {
             }
 
             recording.transcript = processedData.transcript
+            recording.editedTranscript = processedData.editedTranscript
             recording.duration = processedData.duration
             recording.bulletSummary = processedData.bulletSummary
+            recording.thingsToThinkAbout = processedData.thingsToThinkAbout
             recording.diagramTitle = processedData.diagram.title
             recording.diagramDescription = processedData.diagram.description
             recording.diagramContent = processedData.diagram.content

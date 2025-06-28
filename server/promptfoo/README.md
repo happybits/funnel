@@ -1,80 +1,71 @@
-# Promptfoo Testing for Funnel API Prompts
+# Promptfoo Testing for Funnel
 
-This directory contains promptfoo configuration for testing the LLM prompts used
-in the Funnel API.
+This directory contains prompt testing configurations for the Funnel API using promptfoo.
 
-## Setup
+## Prompts Being Tested
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Original Prompts
+1. **Summarize** - Creates bullet point summaries from transcripts
+2. **Diagram** - Generates ASCII art diagrams from concepts
 
-2. Set up environment variables:
-   ```bash
-   export ANTHROPIC_API_KEY=your_key_here
-   # or create a .env file
-   ```
+### New Prompts
+3. **Lightly Edited Transcript** - Formats raw transcripts for readability without changing wording
+4. **Things to Think About** - Generates 2-3 thought-provoking questions based on the user's ideas
 
 ## Running Tests
 
-Run all promptfoo tests:
-
+### Test the new prompts only:
 ```bash
-npm run promptfoo:eval
+npm run promptfoo:eval:new
 ```
 
-View test results in the web UI:
+### Test all prompts (original + new):
+```bash
+npm run promptfoo:eval:all
+```
 
+### View results in web browser:
 ```bash
 npm run promptfoo:view
 ```
 
-## Structure
+## What the New Prompts Do
 
-- **promptfooconfig.yaml**: Main configuration file with test cases
-- **lib/prompts/**: Actual prompt files used by the server
-  - `summarize-prompt.txt`: Prompt for generating bullet summaries
-  - `diagram-prompt.txt`: Prompt for generating ASCII diagrams
-- **prompts/**: Symlinks to the actual prompts for promptfoo to use
+### Lightly Edited Transcript
+- Adds section headers (##) for major topic shifts
+- Removes filler words (um, uh, like, you know)
+- Fixes punctuation and adds paragraph breaks
+- **DOES NOT** change wording or rephrase sentences
+- **DOES NOT** summarize or condense content
+- Preserves the speaker's exact words and voice
+
+### Things to Think About
+- Generates 2-3 thought-provoking questions
+- Questions are specific to the user's idea (not generic)
+- Balances challenging assumptions with inspiring new thinking
+- Helps users explore practical, emotional, and strategic aspects
+- Avoids yes/no questions - all questions are open-ended
 
 ## Test Cases
 
-### Summarize Prompt Tests
-
-1. **Joel's AI coding metaphor**: Tests conciseness, bullet count, and key
-   concept extraction
-2. **Startup pivot decision**: Tests extraction of key metrics and decision
-   points
-
-### Diagram Prompt Tests
-
-1. **AI coding metaphor diagram**: Tests proper formatting and size constraints
-2. **Software architecture decision**: Tests architectural concept visualization
+1. **AI Coding Metaphor** - Tests section organization and filler removal
+2. **Startup Pivot** - Tests question generation for business decisions
+3. **Bike Shop Dream** - Tests both prompts on a concrete business idea
+4. **Short Reminder** - Edge case: very brief transcript
+5. **Technical Discussion** - Tests multiple section headers and technical term preservation
 
 ## Assertions
 
-### Summarize Tests
+The tests include assertions to verify:
+- Edited transcripts have section headers and remove filler words
+- Original wording and key phrases are preserved
+- Questions follow the bullet format and end with "?"
+- 2-3 questions are generated (not more, not less)
+- Questions are specific to the content, not generic
 
-- Bullet count (3-6 bullets)
-- Bullet length (< 80 chars each)
-- Key concept inclusion
-- No unnecessary introductions
+## Environment Setup
 
-### Diagram Tests
-
-- Required sections (TITLE, DESCRIPTION, DIAGRAM)
-- Title conciseness (3-5 words)
-- Diagram size (≤ 15 lines, ≤ 60 chars wide)
-- Relevant concept representation
-
-## Modifying Prompts
-
-To modify prompts:
-
-1. Edit the files in `lib/prompts/`
-2. The symlinks in `prompts/` will automatically reflect changes
-3. Run `npm run promptfoo:eval` to test the updated prompts
-
-The server reads prompts from the same `lib/prompts/` files, ensuring
-consistency between testing and production.
+Make sure you have your Anthropic API key set:
+```bash
+export ANTHROPIC_API_KEY=your_key_here
+```
