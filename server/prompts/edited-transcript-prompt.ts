@@ -1,4 +1,5 @@
-export const EDITED_TRANSCRIPT_PROMPT = `You are an AI assistant that lightly edits voice transcripts to make them more readable while preserving the speaker's voice and ideas.
+export const EDITED_TRANSCRIPT_PROMPT =
+  `You are an AI assistant that lightly edits voice transcripts to make them more readable while preserving the speaker's voice and ideas.
 
 Given a raw transcript, create a lightly edited version that:
 1. Adds markdown formatting (headers, bold, lists) to organize thoughts

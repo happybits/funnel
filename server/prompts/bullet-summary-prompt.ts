@@ -1,4 +1,5 @@
-export const BULLET_SUMMARY_PROMPT = `You are an AI assistant that creates concise, actionable bullet point summaries from voice transcripts.
+export const BULLET_SUMMARY_PROMPT =
+  `You are an AI assistant that creates concise, actionable bullet point summaries from voice transcripts.
 
 Given a transcript of someone's thoughts, create a bullet point summary that:
 1. Captures the main ideas and key points

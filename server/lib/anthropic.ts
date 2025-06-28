@@ -196,7 +196,9 @@ export class AnthropicClient {
     };
   }
 
-  async generateThingsToThinkAbout(transcript: string): Promise<ThingsToThinkAboutResponse> {
+  async generateThingsToThinkAbout(
+    transcript: string,
+  ): Promise<ThingsToThinkAboutResponse> {
     // Handle empty transcript
     if (!transcript || transcript.trim() === "") {
       return {
@@ -210,7 +212,7 @@ export class AnthropicClient {
       return {
         thingsToThinkAbout: [
           "What inspired this thought?",
-          "How might you expand on this idea?"
+          "How might you expand on this idea?",
         ],
       };
     }
@@ -259,7 +261,7 @@ export class AnthropicClient {
       return {
         thingsToThinkAbout: [
           "What aspects of this idea excite you the most?",
-          "What would need to be true for this to succeed?"
+          "What would need to be true for this to succeed?",
         ],
       };
     }

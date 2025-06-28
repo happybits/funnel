@@ -41,9 +41,9 @@ tests:
     vars:
       transcript: |
         Let me talk about the user interface first. We need to make sure the buttons are accessible and the colors have good contrast. The current design is too cluttered.
-        
+
         Now switching to the backend architecture. I think we should use microservices instead of a monolith. This will help with scaling and deployment.
-        
+
         Finally, about the timeline. We're looking at about 3 months for the MVP if we have 2 developers full time.
     assert:
       - type: javascript

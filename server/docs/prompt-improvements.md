@@ -1,10 +1,12 @@
 # AI Prompt Improvements
 
-This document explains the improvements made to the AI prompts for better transcript processing.
+This document explains the improvements made to the AI prompts for better
+transcript processing.
 
 ## Overview
 
-We've enhanced the server's AI prompts to provide more useful and readable outputs from voice recordings. The improvements focus on:
+We've enhanced the server's AI prompts to provide more useful and readable
+outputs from voice recordings. The improvements focus on:
 
 1. Better handling of edge cases (empty/short recordings)
 2. More actionable bullet summaries
@@ -15,6 +17,7 @@ We've enhanced the server's AI prompts to provide more useful and readable outpu
 ### 1. Enhanced Bullet Summary
 
 The bullet summary prompt now:
+
 - Handles empty recordings gracefully with "Ah, the recording is empty!"
 - Provides meaningful output even for very short recordings
 - Focuses on actionable insights and key decisions
@@ -24,6 +27,7 @@ The bullet summary prompt now:
 ### 2. New Edited Transcript Feature
 
 Added a new `editedTranscript` field that:
+
 - Lightly edits raw transcripts for readability
 - Adds markdown formatting (headers, bold, lists)
 - Fixes grammar while preserving the speaker's voice
@@ -33,6 +37,7 @@ Added a new `editedTranscript` field that:
 ### 3. Edge Case Handling
 
 Special handling for:
+
 - **Empty recordings**: Returns friendly message instead of error
 - **Very short recordings** (< 5 words): Adds simple "Quick Note" header
 - **Single-word reminders**: Treats as valid input, not error
@@ -69,6 +74,7 @@ cd server
 ```
 
 This will test various scenarios including:
+
 - Empty recordings
 - Short reminders
 - Rambling thoughts
@@ -77,7 +83,8 @@ This will test various scenarios including:
 
 ## Benefits
 
-1. **Better User Experience**: Users get more useful summaries and readable transcripts
+1. **Better User Experience**: Users get more useful summaries and readable
+   transcripts
 2. **Consistent Output**: Edge cases are handled gracefully
 3. **Actionable Insights**: Bullet points focus on decisions and next steps
 4. **Improved Readability**: Edited transcripts are easy to scan and understand

@@ -70,15 +70,18 @@ export async function newRecordingHandler(c: Context): Promise<Response> {
     }
 
     // Step 2: Generate summary, edited transcript, questions, and diagram in parallel
-    console.log("Generating summary, edited transcript, questions, and diagram...");
+    console.log(
+      "Generating summary, edited transcript, questions, and diagram...",
+    );
     const anthropicClient = new AnthropicClient(anthropicKey);
 
-    const [summaryResult, editResult, questionsResult, diagramResult] = await Promise.all([
-      anthropicClient.summarizeTranscript(transcribeResult.transcript),
-      anthropicClient.editTranscript(transcribeResult.transcript),
-      anthropicClient.generateThingsToThinkAbout(transcribeResult.transcript),
-      anthropicClient.generateDiagram(transcribeResult.transcript),
-    ]);
+    const [summaryResult, editResult, questionsResult, diagramResult] =
+      await Promise.all([
+        anthropicClient.summarizeTranscript(transcribeResult.transcript),
+        anthropicClient.editTranscript(transcribeResult.transcript),
+        anthropicClient.generateThingsToThinkAbout(transcribeResult.transcript),
+        anthropicClient.generateDiagram(transcribeResult.transcript),
+      ]);
 
     // Combine all results
     const response: NewRecordingResponse = {
