@@ -170,7 +170,7 @@ export function computeTranscriptFromEvents(events: TranscriptEvent[]): string {
     )
     .sort((a, b) => a.start - b.start);
 
-  // Build transcript from non-overlapping segments
+  // Build transcript from all segments, handling overlaps properly
   const segments: { start: number; end: number; text: string }[] = [];
 
   for (const event of finalEvents) {
@@ -180,24 +180,41 @@ export function computeTranscriptFromEvents(events: TranscriptEvent[]): string {
     const start = event.start;
     const end = event.start + event.duration;
 
-    // Check if this segment overlaps with the last one
-    if (segments.length > 0) {
-      const lastSegment = segments[segments.length - 1];
-      if (start < lastSegment.end) {
-        // Overlapping segment - skip or merge based on which is longer
-        if (end > lastSegment.end) {
-          // This segment extends beyond the last one, update it
-          lastSegment.text = transcript;
-          lastSegment.end = end;
+    // Check if this segment overlaps with any existing segments
+    let handled = false;
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+
+      // If segments overlap or are adjacent (within 0.1s)
+      if (start <= segment.end + 0.1 && end >= segment.start - 0.1) {
+        // Merge the segments
+        segment.start = Math.min(segment.start, start);
+        segment.end = Math.max(segment.end, end);
+
+        // For overlapping segments, append the new text if it's different
+        // This handles cases where Deepgram sends corrections or additional content
+        if (segment.text !== transcript) {
+          // If the new segment starts after the old one, append
+          if (start >= segment.start) {
+            segment.text = segment.text + " " + transcript;
+          } else {
+            // If the new segment starts before, prepend
+            segment.text = transcript + " " + segment.text;
+          }
         }
-        // Otherwise skip this segment as it's fully contained
-        continue;
+
+        handled = true;
+        break;
       }
     }
 
-    segments.push({ start, end, text: transcript });
+    // If no overlap found, add as new segment
+    if (!handled) {
+      segments.push({ start, end, text: transcript });
+    }
   }
 
-  // Join all segments with spaces
+  // Sort segments by start time and join
+  segments.sort((a, b) => a.start - b.start);
   return segments.map((s) => s.text).join(" ").trim();
 }
