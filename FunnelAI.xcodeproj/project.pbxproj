@@ -6,11 +6,6 @@
 	objectVersion = 70;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		496CB4082E13214C00D82080 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 496CB4072E13214C00D82080 /* Starscream */; };
-		496CB40B2E13215300D82080 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 496CB40A2E13215300D82080 /* Starscream */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		49880ECB2E131B73003049B0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -46,7 +41,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				496CB40B2E13215300D82080 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,7 +48,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				496CB4082E13214C00D82080 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,7 +101,6 @@
 			);
 			name = FunnelAITests;
 			packageProductDependencies = (
-				496CB40A2E13215300D82080 /* Starscream */,
 			);
 			productName = FunnelAITests;
 			productReference = 49880EC72E131B73003049B0 /* FunnelAITests.xctest */;
@@ -131,7 +123,6 @@
 			);
 			name = FunnelAI;
 			packageProductDependencies = (
-				496CB4072E13214C00D82080 /* Starscream */,
 			);
 			productName = Funnel;
 			productReference = 0A9BC078DD4AC38F123687A2 /* FunnelAI.app */;
@@ -149,6 +140,7 @@
 				TargetAttributes = {
 					49880EC62E131B73003049B0 = {
 						CreatedOnToolsVersion = 16.4;
+						TestTargetID = E705CE53ADF353E0B1DC4CDB;
 					};
 					E705CE53ADF353E0B1DC4CDB = {
 						DevelopmentTeam = 6L379HCV5Q;
@@ -166,7 +158,6 @@
 			mainGroup = D9581316AE7A5E7CB95F6728;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				496CB4062E13214C00D82080 /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			projectDirPath = "";
 			projectRoot = "";
@@ -349,6 +340,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -369,6 +361,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FunnelAI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FunnelAI";
 			};
 			name = Debug;
 		};
@@ -376,6 +369,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -391,6 +385,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FunnelAI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FunnelAI";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -488,30 +483,6 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		496CB4062E13214C00D82080 /* XCRemoteSwiftPackageReference "Starscream" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/daltoniam/Starscream";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.8;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		496CB4072E13214C00D82080 /* Starscream */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 496CB4062E13214C00D82080 /* XCRemoteSwiftPackageReference "Starscream" */;
-			productName = Starscream;
-		};
-		496CB40A2E13215300D82080 /* Starscream */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 496CB4062E13214C00D82080 /* XCRemoteSwiftPackageReference "Starscream" */;
-			productName = Starscream;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 907C3DDE5BB93C24658194DA /* Project object */;
 }
