@@ -12,6 +12,9 @@ const kv = await Deno.openKv();
 // In-memory storage for recording segments to prevent KV overwrite issues
 const recordingSegments = new Map<string, TranscriptSegment[]>();
 
+// In-memory storage for active Deepgram connections
+export const activeDeepgramConnections = new Map<string, any>();
+
 export function streamRecordingWsHandler(c: Context): Response {
   console.log(`WebSocket upgrade request for path: ${c.req.path}`);
 
@@ -77,6 +80,9 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
 
       // Cast to any to avoid type mismatch with SDK
       deepgramConnection = deepgram.listen.live(transcriptionOptions);
+      
+      // Store the connection for access from finalize endpoint
+      activeDeepgramConnections.set(recordingId, deepgramConnection);
 
       // Handle transcription events
       deepgramConnection.on(LiveTranscriptionEvents.Open, () => {
@@ -155,11 +161,21 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
         console.log(
           `Deepgram connection closed for recording ${recordingId}`,
         );
+        // Remove from active connections
+        activeDeepgramConnections.delete(recordingId);
       });
 
-      // Add metadata event handler to debug connection
+      // Add metadata event handler to forward to client
       deepgramConnection.on(LiveTranscriptionEvents.Metadata, (data: any) => {
         console.log(`Deepgram metadata for recording ${recordingId}:`, data);
+        
+        // Forward metadata to client, especially the final one with duration: 0
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: "Metadata",
+            ...data
+          }));
+        }
       });
 
       // Add utterance end event handler
@@ -299,6 +315,8 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
 
     // Clean up in-memory segments to prevent memory leaks
     recordingSegments.delete(recordingId);
+    // Also remove from active connections if still there
+    activeDeepgramConnections.delete(recordingId);
   };
 
   ws.onerror = (event) => {

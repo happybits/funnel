@@ -1,10 +1,11 @@
 import { Context } from "@hono/hono";
-import { RecordingData } from "../lib/deepgram.ts";
+import { RecordingData, LiveTranscriptionEvents } from "../lib/deepgram.ts";
 import {
   generateBulletSummary,
   generateDiagram,
   ProcessedRecording,
 } from "../lib/ai-processing.ts";
+import { activeDeepgramConnections } from "./stream-recording-ws.ts";
 
 const kv = await Deno.openKv();
 
@@ -16,6 +17,44 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
   }
 
   try {
+    // Check if there's an active Deepgram connection
+    const deepgramConnection = activeDeepgramConnections.get(recordingId);
+    if (deepgramConnection) {
+      console.log(`Found active Deepgram connection for ${recordingId}, sending CloseStream`);
+      
+      // Set up promise to wait for metadata response
+      // According to Deepgram docs, any Metadata response after CloseStream indicates completion
+      // See: https://developers.deepgram.com/docs/close-stream
+      const metadataPromise = new Promise<void>((resolve, reject) => {
+        const metadataHandler = (data: any) => {
+          console.log(`Received metadata for ${recordingId}:`, data);
+          console.log(`Received metadata confirmation for ${recordingId} - transcription complete`);
+          deepgramConnection.removeListener(LiveTranscriptionEvents.Metadata, metadataHandler);
+          resolve();
+        };
+        deepgramConnection.on(LiveTranscriptionEvents.Metadata, metadataHandler);
+        
+        // Set timeout
+        setTimeout(() => {
+          deepgramConnection.removeListener(LiveTranscriptionEvents.Metadata, metadataHandler);
+          reject(new Error("Timeout waiting for metadata"));
+        }, 30000); // 30 second timeout
+      });
+      
+      // Send CloseStream message
+      console.log(`Sending CloseStream to Deepgram for ${recordingId}`);
+      deepgramConnection.send(JSON.stringify({ type: "CloseStream" }));
+      
+      // Wait for metadata response
+      try {
+        await metadataPromise;
+        console.log(`Deepgram confirmed all transcripts processed for ${recordingId}`);
+      } catch (error) {
+        console.error(`Error waiting for Deepgram confirmation: ${error instanceof Error ? error.message : String(error)}`);
+        // Continue anyway, but log the error
+      }
+    }
+
     // Get recording from KV
     const recordingEntry = await kv.get<RecordingData>([
       "recordings",
