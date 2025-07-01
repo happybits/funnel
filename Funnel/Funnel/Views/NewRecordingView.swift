@@ -32,7 +32,7 @@ struct NewRecordingView: View {
                     FunnelLogo()
                         .padding(.leading, 30)
                     Spacer()
-                    
+
                     // Blur toggle for debugging
                     // Toggle("Blur", isOn: $debugSettings.blurEnabled)
                     //     .toggleStyle(CheckboxToggleStyle())
@@ -189,7 +189,7 @@ struct RecordingControlsView: View {
         let wasLiveStreaming = audioRecorder.isLiveStreaming
         let recordingId = audioRecorder.recordingId
         let recordingURL = audioRecorder.currentRecordingURL
-        
+
         print("RecordingControlsView: Stopping recording - wasLiveStreaming: \(wasLiveStreaming), recordingId: \(recordingId ?? "nil")")
 
         audioRecorder.stopRecording()

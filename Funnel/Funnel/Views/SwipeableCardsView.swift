@@ -293,6 +293,6 @@ struct TranscriptCard: View {
         recording.diagramContent = "Concept A → Concept B → Result"
         return recording
     }())
-    .funnelPreviewEnvironment()
-    .background (GradientBackground())
+        .funnelPreviewEnvironment()
+        .background(GradientBackground())
 }
