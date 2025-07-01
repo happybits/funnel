@@ -101,7 +101,7 @@ After recording, view your content in different formats via fullscreen swipeable
 ## Development Setup
 
 ### Build Commands
-The project includes a Makefile for simplified building and development:
+The project includes a Makefile for simplified building and development. **For detailed documentation, see `docs/makefile-guide.md`**.
 
 ```bash
 make build      # Build the app
