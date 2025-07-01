@@ -9,6 +9,10 @@ import { streamRecordingWsHandler } from "./api/stream-recording-ws.ts";
 import { finalizeRecordingHandler } from "./api/finalize-recording.ts";
 import { adminHandler } from "./api/admin.ts";
 import { testPageHandler } from "./api/test-page.ts";
+// V2 API imports
+import { streamRecordingWsV2Handler } from "./api/stream-recording-ws-v2.ts";
+import { finalizeRecordingV2Handler } from "./api/finalize-recording-v2.ts";
+import { getRecordingV2Handler } from "./api/get-recording-v2.ts";
 
 // Load environment variables
 await load({ export: true });
@@ -43,6 +47,10 @@ app.get("/", (c) => {
       "WebSocket /api/live-transcription",
       "WebSocket /api/recordings/:recordingId/stream",
       "POST /api/recordings/:recordingId/done",
+      // V2 endpoints
+      "WebSocket /api/v2/recordings/:recordingId/stream",
+      "POST /api/v2/recordings/:recordingId/finalize",
+      "GET /api/v2/recordings/:recordingId",
     ],
   });
 });
@@ -52,6 +60,11 @@ app.post("/api/new-recording", newRecordingHandler);
 app.get("/api/live-transcription", liveTranscriptionHandler);
 app.get("/api/recordings/:recordingId/stream", streamRecordingWsHandler);
 app.post("/api/recordings/:recordingId/done", finalizeRecordingHandler);
+
+// V2 API endpoints
+app.get("/api/v2/recordings/:recordingId/stream", streamRecordingWsV2Handler);
+app.post("/api/v2/recordings/:recordingId/finalize", finalizeRecordingV2Handler);
+app.get("/api/v2/recordings/:recordingId", getRecordingV2Handler);
 
 // Admin and test pages
 app.get("/api/admin", adminHandler);
