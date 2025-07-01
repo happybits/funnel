@@ -25,6 +25,7 @@ logs/
 coverage/
 .promptfoo/
 promptfoo-output/
+*.xcresult/
 
 # IDE
 .idea/
@@ -41,6 +42,7 @@ deno.lock
 *.mode2v3
 *.perspectivev3
 xcuserdata/
+xcshareddata/
 *.xccheckout
 *.moved-aside
 *.xcscmblueprint

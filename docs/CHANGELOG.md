@@ -4,6 +4,19 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- **Testing Infrastructure** (2025-06-30)
+  - Added comprehensive iOS testing guide (`docs/ios-testing-guide.md`)
+  - Enhanced Makefile with improved test commands:
+    - `make test` - Run all tests with result bundle
+    - `make test-class CLASS=Name` - Run specific test class
+    - `make test-method TEST=Class/method` - Run specific test method
+    - `make test-results` - Show test results summary
+    - `make test-failures` - Show test failures with details
+    - `make clean-tests` - Clean test result bundles
+  - Documented best practices for making test output visible to automated tools
+  - Added examples of using assertions for test visibility instead of print statements
+
 ### Fixed
 - **iOS app now properly saves transcripts**: Fixed issue where iOS live streaming wasn't saving transcripts
   - Added finalize endpoint call after recording stops (matching web client behavior)
