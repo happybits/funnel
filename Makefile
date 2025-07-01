@@ -85,6 +85,7 @@ run: build
 test:
 	@echo "$(GREEN)Running all tests...$(NC)"
 	@rm -rf TestOutput.xcresult 2>/dev/null || true
+	@rm -rf test-results 2>/dev/null || true
 	@xcodebuild test \
 		-project $(PROJECT) \
 		-scheme FunnelAITests \
@@ -92,6 +93,15 @@ test:
 		-resultBundlePath TestOutput.xcresult \
 		2>&1 | grep -E "(Test Suite|passed|failed)" || true
 	@echo "$(GREEN)✅ Test run complete. Results saved to TestOutput.xcresult$(NC)"
+	@echo "$(YELLOW)Generating HTML report...$(NC)"
+	@xchtmlreport TestOutput.xcresult
+	@echo "$(GREEN)✅ HTML report generated$(NC)"
+	@echo ""
+	@echo "$(GREEN)📊 View test report:$(NC)"
+	@echo "    file://$(PWD)/index.html"
+	@echo ""
+	@echo "$(YELLOW)Click the link above or run:$(NC)"
+	@echo "    open index.html"
 
 # Run specific test class
 test-class:
@@ -159,6 +169,8 @@ clean-tests:
 	@rm -rf test-results.xcresult
 	@rm -rf SimplePrintTest.xcresult
 	@rm -rf FreshTestOutput.xcresult
+	@rm -rf test-results
+	@rm -f index.html
 	@echo "$(GREEN)✅ Test results cleaned$(NC)"
 
 # Format Swift code

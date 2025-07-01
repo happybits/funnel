@@ -26,6 +26,8 @@ coverage/
 .promptfoo/
 promptfoo-output/
 *.xcresult/
+test-results/
+index.html
 
 # IDE
 .idea/
