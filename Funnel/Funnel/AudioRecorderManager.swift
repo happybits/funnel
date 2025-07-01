@@ -24,9 +24,18 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private var audioFile: AVAudioFile?
     private(set) var audioFileURL: URL?
 
-    override init() {
+    // Dependency injection for testing
+    private let audioSource: AudioSourceProtocol
+
+    init(audioSource: AudioSourceProtocol? = nil) {
+        self.audioSource = audioSource ?? MicrophoneAudioSource()
         super.init()
-        setupAudioSession()
+
+        // Skip audio session setup in test environment
+        let isTestEnvironment = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        if !isTestEnvironment {
+            setupAudioSession()
+        }
     }
 
     private func setupAudioSession() {
@@ -196,68 +205,72 @@ class AudioRecorderManager: NSObject, ObservableObject {
     }
 
     private func startAudioEngine(completion: @escaping (Result<Void, Error>) -> Void) {
-        let inputNode = audioEngine.inputNode
-        let inputFormat = inputNode.inputFormat(forBus: 0)
-
-        // Create output format - PCM 16-bit as recommended by Deepgram
-        guard let outputFormat = AVAudioFormat(
-            commonFormat: .pcmFormatInt16,
-            sampleRate: inputFormat.sampleRate, // Use device's native sample rate
-            channels: 1,
-            interleaved: true
-        ) else {
-            completion(.failure(FunnelError.recordingFailed(reason: "Failed to create audio format")))
-            return
-        }
-
-        // Create audio file for writing
-        if let audioFileURL = audioFileURL {
-            do {
-                // Create AAC format for the file (compressed m4a)
-                let settings: [String: Any] = [
-                    AVFormatIDKey: kAudioFormatMPEG4AAC,
-                    AVSampleRateKey: inputFormat.sampleRate,
-                    AVNumberOfChannelsKey: 1,
-                    AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
-                ]
-
-                audioFile = try AVAudioFile(forWriting: audioFileURL, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: true)
-                print("AudioRecorderManager: Created audio file at \(audioFileURL.path)")
-            } catch {
-                print("AudioRecorderManager: Failed to create audio file: \(error)")
-                // Continue without file writing - streaming still works
-            }
-        }
-
-        // Create converter node
-        let converterNode = AVAudioMixerNode()
-        let sinkNode = AVAudioMixerNode()
-
-        audioEngine.attach(converterNode)
-        audioEngine.attach(sinkNode)
-
-        // Install tap to capture audio for streaming (PCM16)
-        converterNode.installTap(onBus: 0, bufferSize: 1024, format: converterNode.outputFormat(forBus: 0)) { [weak self] buffer, _ in
-            self?.processAudioBuffer(buffer)
-        }
-
-        // Install tap for file writing (use input format for best quality)
-        if audioFile != nil {
-            inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
-                self?.writeAudioBufferToFile(buffer)
-            }
-        }
-
-        // Connect nodes
-        audioEngine.connect(inputNode, to: converterNode, format: inputFormat)
-        audioEngine.connect(converterNode, to: sinkNode, format: outputFormat)
-
-        // Prepare and start engine
-        audioEngine.prepare()
-
         do {
+            // Get the audio source node
+            let sourceNode = try audioSource.attachToEngine(audioEngine)
+            let inputFormat = audioSource.outputFormat
+
+            // Create output format - PCM 16-bit as recommended by Deepgram
+            guard let outputFormat = AVAudioFormat(
+                commonFormat: .pcmFormatInt16,
+                sampleRate: inputFormat.sampleRate, // Use device's native sample rate
+                channels: 1,
+                interleaved: true
+            ) else {
+                completion(.failure(FunnelError.recordingFailed(reason: "Failed to create audio format")))
+                return
+            }
+
+            // Create audio file for writing
+            if let audioFileURL = audioFileURL {
+                do {
+                    // Create AAC format for the file (compressed m4a)
+                    let settings: [String: Any] = [
+                        AVFormatIDKey: kAudioFormatMPEG4AAC,
+                        AVSampleRateKey: inputFormat.sampleRate,
+                        AVNumberOfChannelsKey: 1,
+                        AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+                    ]
+
+                    audioFile = try AVAudioFile(forWriting: audioFileURL, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: true)
+                    print("AudioRecorderManager: Created audio file at \(audioFileURL.path)")
+                } catch {
+                    print("AudioRecorderManager: Failed to create audio file: \(error)")
+                    // Continue without file writing - streaming still works
+                }
+            }
+
+            // Create converter node
+            let converterNode = AVAudioMixerNode()
+            let sinkNode = AVAudioMixerNode()
+
+            audioEngine.attach(converterNode)
+            audioEngine.attach(sinkNode)
+
+            // Install tap to capture audio for streaming (PCM16)
+            converterNode.installTap(onBus: 0, bufferSize: 1024, format: converterNode.outputFormat(forBus: 0)) { [weak self] buffer, _ in
+                self?.processAudioBuffer(buffer)
+            }
+
+            // Install tap for file writing (use input format for best quality)
+            if audioFile != nil {
+                sourceNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
+                    self?.writeAudioBufferToFile(buffer)
+                }
+            }
+
+            // Connect nodes
+            audioEngine.connect(sourceNode, to: converterNode, format: inputFormat)
+            audioEngine.connect(converterNode, to: sinkNode, format: outputFormat)
+
+            // Prepare and start engine
+            audioEngine.prepare()
+
             try AVAudioSession.sharedInstance().setCategory(.record)
             try audioEngine.start()
+
+            // Start the audio source (e.g., start file playback)
+            try audioSource.startPlayback()
 
             isRecording = true
             recordingTime = 0
@@ -334,6 +347,9 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private func stopLiveStreaming() {
         print("AudioRecorderManager: Stopping live streaming")
         print("AudioRecorderManager: Recording ID at stop: \(recordingId ?? "nil")")
+
+        // Stop audio source
+        audioSource.stopPlayback()
 
         // Stop audio engine
         audioEngine.stop()
