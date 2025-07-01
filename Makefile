@@ -12,7 +12,7 @@ YELLOW = \033[0;33m
 RED = \033[0;31m
 NC = \033[0m # No Color
 
-.PHONY: help build clean install run test format lint all
+.PHONY: help build clean install run test build-test format lint all
 
 # Default target
 all: build
@@ -27,6 +27,7 @@ help:
 	@echo "  $(YELLOW)make quick$(NC)         - Quick build with minimal output"
 	@echo ""
 	@echo "$(YELLOW)Testing:$(NC)"
+	@echo "  $(YELLOW)make build-test$(NC)    - Build tests without running (verify compilation)"
 	@echo "  $(YELLOW)make test$(NC)          - Run all tests"
 	@echo "  $(YELLOW)make test-class CLASS=Name$(NC)  - Run specific test class"
 	@echo "  $(YELLOW)make test-method TEST=Class/method$(NC) - Run specific test"
@@ -80,6 +81,15 @@ run: build
 		build
 	@xcrun simctl install booted .build/Build/Products/Debug-iphonesimulator/$(SCHEME).app
 	@xcrun simctl launch booted com.joya.funnel
+
+# Build tests without running (equivalent to Cmd-Shift-U in Xcode)
+build-test:
+	@echo "$(GREEN)Building tests for $(SIMULATOR)...$(NC)"
+	@xcodebuild build-for-testing \
+		-project $(PROJECT) \
+		-scheme FunnelAITests \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-quiet && echo "$(GREEN)✅ Test build succeeded$(NC)" || (echo "$(RED)❌ Test build failed$(NC)" && exit 1)
 
 # Run all tests
 test:
