@@ -4,7 +4,7 @@ import Foundation
 
 /// Tests for the simplified V2 audio streaming API
 class AudioStreamingServerV2Tests: XCTestCase {
-    let serverURL = "https://funnel-api.deno.dev"
+    let serverURL = "http://localhost:8000"
     let testAudioDuration = 5.0 // 5 seconds of test audio
     
     override func setUp() {
@@ -50,7 +50,7 @@ class AudioStreamingServerV2Tests: XCTestCase {
     private func streamAudioViaWebSocket(recordingId: String) async throws {
         print("\n1️⃣ Starting WebSocket audio streaming...")
         
-        let wsURL = URL(string: "\(serverURL.replacingOccurrences(of: "https", with: "wss"))/api/v2/recordings/\(recordingId)/stream")!
+        let wsURL = URL(string: "\(serverURL.replacingOccurrences(of: "http", with: "ws"))/api/v2/recordings/\(recordingId)/stream")!
         
         let session = URLSession(configuration: .default)
         let socket = session.webSocketTask(with: wsURL)
