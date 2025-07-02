@@ -44,15 +44,9 @@ class DeepgramClient {
         }
     }
     
-    init(serverBaseURL: String? = nil) {
-        // Use APIClient's base URL if not provided
-        if let baseURL = serverBaseURL {
-            self.serverBaseURL = baseURL
-        } else {
-            // Get base URL from APIClient
-            let useLocalServer = false
-            self.serverBaseURL = useLocalServer ? "http://127.0.0.1:8000" : "https://funnel-api.deno.dev"
-        }
+    init(serverBaseURL: String) {
+        self.serverBaseURL = serverBaseURL
+        print("DeepgramClient: Initialized with server URL: \(self.serverBaseURL)")
     }
     
     /// Get the current recording ID

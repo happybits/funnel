@@ -15,7 +15,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
 
     // Live streaming properties
     private var audioEngine = AVAudioEngine()
-    private let deepgramClient = DeepgramClient()
+    private let deepgramClient = DeepgramClient(serverBaseURL: APIClient.shared.baseURL)
     private(set) var recordingId: String?
     private(set) var isLiveStreaming = false
     private var audioDataContinuation: AsyncStream<Data?>.Continuation?
@@ -142,11 +142,15 @@ class AudioRecorderManager: NSObject, ObservableObject {
         // Start streaming with DeepgramClient
         Task {
             do {
+                var isFirstChunk = true
                 let processedRecording = try await deepgramClient.streamRecording {
-                    // Update recordingId after DeepgramClient creates it
-                    await MainActor.run {
-                        self.recordingId = self.deepgramClient.currentRecordingId
-                        print("AudioRecorderManager: Recording ID set to: \(self.recordingId ?? "nil")")
+                    // Update recordingId only once after DeepgramClient creates it
+                    if isFirstChunk {
+                        await MainActor.run {
+                            self.recordingId = self.deepgramClient.currentRecordingId
+                            print("AudioRecorderManager: Recording ID set to: \(self.recordingId ?? "nil")")
+                        }
+                        isFirstChunk = false
                     }
                     
                     // This will be called repeatedly to get audio chunks
