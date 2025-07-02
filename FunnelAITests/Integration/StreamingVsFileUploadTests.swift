@@ -78,6 +78,7 @@ class StreamingVsFileUploadTests: XCTestCase {
         
         var streamedBytes = 0
         var chunkCount = 0
+        var lastChunkSentTime: Date?
         
         let result = try await client.streamRecording(sampleRate: 16000) {
             guard streamedBytes < audioData.count else {
@@ -96,6 +97,12 @@ class StreamingVsFileUploadTests: XCTestCase {
             // Wait to simulate real-time streaming
             try await Task.sleep(for: .milliseconds(100))
             
+            // Track when we send the last chunk
+            if end >= audioData.count {
+                lastChunkSentTime = Date()
+                print("📤 Last chunk sent at \(String(format: "%.2f", lastChunkSentTime!.timeIntervalSince(startTime)))s")
+            }
+            
             if chunkCount % 50 == 0 || chunkCount == 1 {
                 let progress = Double(streamedBytes) / Double(audioData.count) * 100
                 print("⏳ Streamed chunk \(chunkCount)/\(totalChunks) (\(String(format: "%.1f", progress))%)")
@@ -104,17 +111,28 @@ class StreamingVsFileUploadTests: XCTestCase {
             return chunk
         }
         
-        let totalTime = Date().timeIntervalSince(startTime)
+        let resultReceivedTime = Date()
+        let totalTime = resultReceivedTime.timeIntervalSince(startTime)
+        
+        // Calculate the critical metric: time from last chunk sent to result received
+        let processingTimeAfterLastChunk: TimeInterval
+        if let lastChunkTime = lastChunkSentTime {
+            processingTimeAfterLastChunk = resultReceivedTime.timeIntervalSince(lastChunkTime)
+        } else {
+            processingTimeAfterLastChunk = 0
+            print("⚠️ Warning: Could not determine last chunk time")
+        }
         
         print("\n📊 Realistic Streaming Results:")
         print("   Total time: \(String(format: "%.2f", totalTime))s")
         print("   Expected streaming time: \(String(format: "%.2f", audioDurationSeconds))s")
-        print("   Processing overhead: \(String(format: "%.2f", totalTime - audioDurationSeconds))s")
+        print("   🎯 Time from last chunk to result: \(String(format: "%.2f", processingTimeAfterLastChunk))s")
         print("   Transcript length: \(result.transcript.count) characters")
         print("   Bullet points: \(result.bulletSummary.count)")
         
         XCTAssertNotNil(result.transcript)
         XCTAssertNotNil(result.bulletSummary)
         XCTAssertNotNil(result.diagram)
+        XCTAssertGreaterThan(processingTimeAfterLastChunk, 0, "Should have measured processing time after last chunk")
     }
 }
