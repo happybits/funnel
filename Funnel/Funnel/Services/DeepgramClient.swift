@@ -1,7 +1,7 @@
 import Foundation
 import AVFoundation
 
-/// Client for streaming audio to the server and receiving processed transcripts
+/// Client for streaming audio to our Deno server (which then forwards to Deepgram API)
 class DeepgramClient {
     private let serverBaseURL: String
     private var webSocketTask: URLSessionWebSocketTask?
