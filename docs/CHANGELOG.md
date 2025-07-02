@@ -4,6 +4,15 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **Updated StreamingVsFileUploadTests** (2025-07-02)
+  - Now uses `APIClient.shared.processAudio()` instead of manual URLSession multipart form construction
+  - Simplified test code by leveraging existing API client infrastructure
+- **Consolidated API layer** (2025-07-02)
+  - Removed redundant `FunnelAPIService` class
+  - Moved `processAudio()` method directly into `APIClient`
+  - Updated all references to use `APIClient.shared` directly
+
 ### Added
 - **New simplified V2 API endpoints for audio streaming** (2025-01-01)
   - `WebSocket /api/v2/recordings/:recordingId/stream` - Stream audio without receiving partial transcripts

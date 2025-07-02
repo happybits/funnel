@@ -10,9 +10,6 @@ class StreamingVsFileUploadTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         
-        // Verify server is running
-        try await verifyServerIsRunning()
-        
         // Get test audio file
         guard let url = Bundle(for: type(of: self)).url(
             forResource: "sample-recording-mary-had-lamb",
@@ -25,80 +22,24 @@ class StreamingVsFileUploadTests: XCTestCase {
         testAudioURL = url
     }
     
-    private func verifyServerIsRunning() async throws {
-        guard let url = URL(string: "\(serverBaseURL)/health") else {
-            XCTFail("Invalid server URL")
-            return
-        }
-        
-        do {
-            let (_, response) = try await URLSession.shared.data(from: url)
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200
-            else {
-                XCTFail("Server health check failed. Make sure the server is running with 'deno task dev'")
-                return
-            }
-        } catch {
-            XCTFail("Could not connect to server at \(serverBaseURL). Make sure the server is running with 'deno task dev'. Error: \(error)")
-        }
-    }
-    
     /// Test full file upload performance
     func testFullFileUpload() async throws {
         print("\n🎯 Testing full file upload...")
         
         let startTime = Date()
         
-        // Read the entire file
+        // Read the file to get size info
         let audioData = try Data(contentsOf: testAudioURL)
         print("📦 File size: \(audioData.count / 1024) KB")
-        
-        // Create multipart form data
-        let boundary = UUID().uuidString
-        var body = Data()
-        
-        // Add audio file part
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"audio\"; filename=\"test-audio.m4a\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: audio/mp4\r\n\r\n".data(using: .utf8)!)
-        body.append(audioData)
-        body.append("\r\n".data(using: .utf8)!)
-        
-        // Add closing boundary
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        // Create request
-        guard let url = URL(string: "\(serverBaseURL)/api/new-recording") else {
-            XCTFail("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.httpBody = body
-        request.timeoutInterval = 120 // 2 minutes timeout
         
         print("⬆️ Uploading file...")
         let uploadStartTime = Date()
         
-        // Upload and get response
-        let (data, response) = try await URLSession.shared.data(for: request)
+        // Use APIClient to upload the file
+        let result = try await APIClient.shared.processAudio(fileURL: testAudioURL)
         
         let uploadTime = Date().timeIntervalSince(uploadStartTime)
         print("✅ Upload completed in \(String(format: "%.2f", uploadTime))s")
-        
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200
-        else {
-            let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
-            XCTFail("Upload failed: \(errorMessage)")
-            return
-        }
-        
-        // Parse response
-        let result = try JSONDecoder().decode(ProcessedRecording.self, from: data)
         
         let totalTime = Date().timeIntervalSince(startTime)
         
@@ -138,7 +79,7 @@ class StreamingVsFileUploadTests: XCTestCase {
         var streamedBytes = 0
         var chunkCount = 0
         
-        let result = try await client.streamRecording {
+        let result = try await client.streamRecording(sampleRate: 16000) {
             guard streamedBytes < audioData.count else {
                 print("✅ Finished streaming all chunks")
                 return nil
@@ -195,7 +136,7 @@ class StreamingVsFileUploadTests: XCTestCase {
         var streamedBytes = 0
         var chunkCount = 0
         
-        let result = try await client.streamRecording {
+        let result = try await client.streamRecording(sampleRate: 16000) {
             guard streamedBytes < audioData.count else {
                 print("✅ Finished streaming all chunks")
                 return nil

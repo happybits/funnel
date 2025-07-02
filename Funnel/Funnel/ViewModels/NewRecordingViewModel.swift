@@ -9,7 +9,7 @@ class NewRecordingViewModel: ObservableObject {
     @Published var processingError: Error?
     @Published var presentedRecording: Recording?
 
-    private let apiService = FunnelAPIService.shared
+    private let apiClient = APIClient.shared
 
     func processRecording(processedData: ProcessedRecording, modelContext: ModelContext) async {
         isProcessing = true
@@ -89,7 +89,7 @@ class NewRecordingViewModel: ObservableObject {
             processingStatus = "Processing audio..."
             try? modelContext.save()
 
-            let processedData = try await apiService.processAudio(fileURL: recording.audioFileURL)
+            let processedData = try await apiClient.processAudio(fileURL: recording.audioFileURL)
 
             recording.transcript = processedData.transcript
             recording.duration = processedData.duration

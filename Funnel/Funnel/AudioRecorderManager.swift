@@ -143,7 +143,9 @@ class AudioRecorderManager: NSObject, ObservableObject {
         Task {
             do {
                 var isFirstChunk = true
-                let processedRecording = try await deepgramClient.streamRecording {
+                // Get the device's sample rate
+                let sampleRate = AVAudioSession.sharedInstance().sampleRate
+                let processedRecording = try await deepgramClient.streamRecording(sampleRate: sampleRate) {
                     // Update recordingId only once after DeepgramClient creates it
                     if isFirstChunk {
                         await MainActor.run {

@@ -57,9 +57,10 @@ class DeepgramClient {
     
     /// Start a new recording session and stream audio data
     /// - Parameters:
+    ///   - sampleRate: The sample rate of the audio data being provided
     ///   - audioDataProvider: Async closure that provides audio chunks
     /// - Returns: The processed recording with transcript, summary, and diagram
-    func streamRecording(audioDataProvider: @escaping () async throws -> Data?) async throws -> ProcessedRecording {
+    func streamRecording(sampleRate: Double, audioDataProvider: @escaping () async throws -> Data?) async throws -> ProcessedRecording {
         // Reset state
         metadataReceived = false
         
@@ -97,7 +98,7 @@ class DeepgramClient {
         let config: [String: Any] = [
             "type": "config",
             "format": "pcm16",
-            "sampleRate": Int(AVAudioSession.sharedInstance().sampleRate), // Send actual device sample rate
+            "sampleRate": Int(sampleRate),
             "channels": 1,
         ]
         let configData = try JSONSerialization.data(withJSONObject: config)

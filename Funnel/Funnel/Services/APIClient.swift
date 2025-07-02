@@ -173,6 +173,17 @@ class APIClient {
         return URL(string: wsURLString)
     }
 
+    // MARK: - Audio Processing
+    
+    /// Process audio file through the new-recording endpoint
+    func processAudio(fileURL: URL) async throws -> ProcessedRecording {
+        return try await uploadMultipart(
+            "/api/new-recording",
+            fileURL: fileURL,
+            fieldName: "audio"
+        )
+    }
+
     // MARK: - Helper Methods
 
     private func mimeType(for pathExtension: String) -> String {

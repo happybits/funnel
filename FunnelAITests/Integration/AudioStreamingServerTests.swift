@@ -32,7 +32,6 @@ class AudioStreamingServerTests: XCTestCase {
 
         // Verify server is running
         serverURL = URL(string: "http://localhost:8000")!
-        try await verifyServerIsRunning()
 
         // Get test audio file from the test bundle
         guard let url = Bundle(for: type(of: self)).url(
@@ -45,25 +44,6 @@ class AudioStreamingServerTests: XCTestCase {
         
         testAudioURL = url
         print("📦 Using audio file from test bundle: \(url)")
-    }
-
-    private func verifyServerIsRunning() async throws {
-        let request = URLRequest(url: serverURL)
-        do {
-            let (_, response) = try await URLSession.shared.data(for: request)
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200
-            else {
-                print("❌ Server returned status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
-                XCTFail("Server is not running at \(serverURL!). Please start the server with 'cd server && deno task dev'")
-                throw XCTSkip("Server not running")
-            }
-            print("✅ Server is running at \(serverURL!)")
-        } catch {
-            print("❌ Cannot connect to server: \(error)")
-            XCTFail("Cannot connect to server at \(serverURL!): \(error)")
-            throw XCTSkip("Server not running")
-        }
     }
 
     /// Receive messages from WebSocket
