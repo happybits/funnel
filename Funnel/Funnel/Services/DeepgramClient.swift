@@ -1,4 +1,3 @@
-import AVFoundation
 import Foundation
 
 /// Client for streaming audio to the server and receiving processed transcripts
@@ -108,25 +107,6 @@ class DeepgramClient {
         return processedRecording
     }
     
-    /// Stream audio from a file for testing
-    func streamAudioFile(at url: URL) async throws -> ProcessedRecording {
-        // Load and convert audio to PCM
-        let audioFile = try AVAudioFile(forReading: url)
-        let pcmData = try audioFile.convertToPCM()
-        
-        let chunkSize = 16000 // 1 second at 16kHz mono 16-bit
-        var offset = 0
-        
-        return try await streamRecording { [pcmData] in
-            guard offset < pcmData.count else { return nil }
-            
-            let chunkEnd = min(offset + chunkSize, pcmData.count)
-            let chunk = pcmData[offset ..< chunkEnd]
-            offset = chunkEnd
-            
-            return chunk
-        }
-    }
     
     private func receiveMessages() async {
         guard let webSocketTask = webSocketTask else { return }

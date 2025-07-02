@@ -50,51 +50,10 @@ class DeepgramClientTests: XCTestCase {
         }
     }
 
-    /// Test streaming audio file using DeepgramClient
-    func testStreamAudioFileWithDeepgramClient() async throws {
+
+    /// Test streaming audio data using DeepgramClient
+    func testStreamAudioDataWithDeepgramClient() async throws {
         print("\n🎤 === DEEPGRAM CLIENT AUDIO STREAMING TEST START ===")
-
-        // Stream the audio file
-        let startTime = Date()
-        let processedRecording = try await client.streamAudioFile(at: testAudioURL)
-        let elapsedTime = Date().timeIntervalSince(startTime)
-
-        print("\n⏱️ Total processing time: \(String(format: "%.2f", elapsedTime)) seconds")
-
-        // Verify the results
-        print("\n🎯 === PROCESSED RECORDING ===")
-        print("Duration: \(processedRecording.duration) seconds")
-        print("Full transcript: \"\(processedRecording.transcript)\"")
-        print("Bullet summary (\(processedRecording.bulletSummary.count) items):")
-        for (index, bullet) in processedRecording.bulletSummary.enumerated() {
-            print("  \(index + 1). \(bullet)")
-        }
-        print("Diagram title: \(processedRecording.diagram.title)")
-        print("Diagram description: \(processedRecording.diagram.description)")
-        print("Diagram content preview: \(String(processedRecording.diagram.content.prefix(100)))...")
-        print("=========================\n")
-
-        // Assertions
-        XCTAssertGreaterThan(processedRecording.duration, 0, "Duration should be greater than 0")
-        XCTAssertFalse(processedRecording.transcript.isEmpty, "Transcript should not be empty")
-        XCTAssertFalse(processedRecording.bulletSummary.isEmpty, "Bullet summary should not be empty")
-        XCTAssertFalse(processedRecording.diagram.title.isEmpty, "Diagram title should not be empty")
-        XCTAssertFalse(processedRecording.diagram.description.isEmpty, "Diagram description should not be empty")
-        XCTAssertFalse(processedRecording.diagram.content.isEmpty, "Diagram content should not be empty")
-
-        // Verify transcript contains expected content
-        let transcriptLower = processedRecording.transcript.lowercased()
-        XCTAssertTrue(
-            transcriptLower.contains("mary") || transcriptLower.contains("lamb"),
-            "Transcript should contain words from Mary Had a Little Lamb"
-        )
-
-        print("✅ DeepgramClient test completed successfully!")
-    }
-
-    /// Test streaming with custom audio data provider
-    func testStreamWithCustomDataProvider() async throws {
-        print("\n🎤 === CUSTOM DATA PROVIDER TEST START ===")
 
         // Load audio data
         let audioFile = try AVAudioFile(forReading: testAudioURL)
@@ -124,15 +83,34 @@ class DeepgramClientTests: XCTestCase {
             return chunk
         }
 
-        // Verify results
-        print("\n🎯 === RESULTS ===")
+        // Verify the results
+        print("\n🎯 === PROCESSED RECORDING ===")
         print("Total chunks sent: \(chunkCount)")
-        print("Transcript length: \(processedRecording.transcript.count) characters")
-        print("Bullet points: \(processedRecording.bulletSummary.count)")
-        
+        print("Duration: \(processedRecording.duration) seconds")
+        print("Full transcript: \"\(processedRecording.transcript)\"")
+        print("Bullet summary (\(processedRecording.bulletSummary.count) items):")
+        for (index, bullet) in processedRecording.bulletSummary.enumerated() {
+            print("  \(index + 1). \(bullet)")
+        }
+        print("Diagram title: \(processedRecording.diagram.title)")
+        print("Diagram description: \(processedRecording.diagram.description)")
+        print("=========================\n")
+
+        // Assertions
+        XCTAssertGreaterThan(processedRecording.duration, 0, "Duration should be greater than 0")
         XCTAssertFalse(processedRecording.transcript.isEmpty, "Transcript should not be empty")
         XCTAssertFalse(processedRecording.bulletSummary.isEmpty, "Bullet summary should not be empty")
+        XCTAssertFalse(processedRecording.diagram.title.isEmpty, "Diagram title should not be empty")
+        XCTAssertFalse(processedRecording.diagram.description.isEmpty, "Diagram description should not be empty")
+        XCTAssertFalse(processedRecording.diagram.content.isEmpty, "Diagram content should not be empty")
+
+        // Verify transcript contains expected content
+        let transcriptLower = processedRecording.transcript.lowercased()
+        XCTAssertTrue(
+            transcriptLower.contains("mary") || transcriptLower.contains("lamb"),
+            "Transcript should contain words from Mary Had a Little Lamb"
+        )
         
-        print("✅ Custom data provider test completed successfully!")
+        print("✅ DeepgramClient test completed successfully!")
     }
 }
