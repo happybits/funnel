@@ -4,7 +4,7 @@ import SwiftUI
 
 struct NewRecordingView: View {
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject var recordingManager: RecordingManager
+    @EnvironmentObject var viewModel: NewRecordingViewModel
     @EnvironmentObject var debugSettings: DebugSettings
     @EnvironmentObject var audioRecorder: AudioRecorderManager
     @Query(sort: \Recording.timestamp, order: .reverse) private var recordings: [Recording]
@@ -73,17 +73,8 @@ struct NewRecordingView: View {
                 waveformValues: $waveformValues,
                 recordingError: $recordingError,
                 audioRecorder: audioRecorder,
-                onRecordingComplete: { audioURL, duration, recordingId, isLiveStreaming in
-                    Task {
-                        await recordingManager.processRecording(
-                            audioURL: audioURL,
-                            duration: duration,
-                            modelContext: modelContext,
-                            recordingId: recordingId,
-                            isLiveStreaming: isLiveStreaming
-                        )
-                    }
-                }
+                viewModel: viewModel,
+                modelContext: modelContext
             )
             .padding(.horizontal, 15)
         }
@@ -98,7 +89,8 @@ struct RecordingControlsView: View {
     @Binding var recordingError: Error?
 
     let audioRecorder: AudioRecorderManager
-    let onRecordingComplete: (URL, TimeInterval, String?, Bool) -> Void
+    let viewModel: NewRecordingViewModel
+    let modelContext: ModelContext
 
     @State private var isPressed = false
     @State private var recordingTimer: Timer?
@@ -163,16 +155,27 @@ struct RecordingControlsView: View {
 
             audioRecorder.startRecording { result in
                 switch result {
-                case .success:
+                case let .success(processedRecording):
                     DispatchQueue.main.async {
-                        isRecording = true
-                        recordingTime = 0
-                        waveformValues = []
-                        startTimers()
+                        // Recording has been processed, save it
+                        Task {
+                            await viewModel.processRecording(
+                                processedData: processedRecording,
+                                modelContext: modelContext
+                            )
+                        }
                     }
                 case let .failure(error):
                     recordingError = error
                 }
+            }
+            
+            // Update UI immediately
+            DispatchQueue.main.async {
+                isRecording = true
+                recordingTime = 0
+                waveformValues = []
+                startTimers()
             }
         }
     }
@@ -185,29 +188,11 @@ struct RecordingControlsView: View {
             return
         }
 
-        // Capture these values BEFORE stopping (they get reset in stopRecording)
-        let wasLiveStreaming = audioRecorder.isLiveStreaming
-        let recordingId = audioRecorder.recordingId
-        let recordingURL = audioRecorder.currentRecordingURL
-
-        print("RecordingControlsView: Stopping recording - wasLiveStreaming: \(wasLiveStreaming), recordingId: \(recordingId ?? "nil")")
-
         audioRecorder.stopRecording()
         recordingTimer?.invalidate()
         levelTimer?.invalidate()
 
         isRecording = false
-
-        // For live streaming, we need to use a dummy URL and pass the recording ID
-        if wasLiveStreaming {
-            // Create a dummy URL for compatibility
-            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let dummyURL = documentsPath.appendingPathComponent("live-stream-\(recordingId ?? "unknown").m4a")
-            onRecordingComplete(dummyURL, duration, recordingId, true)
-        } else if let audioURL = recordingURL {
-            // Traditional file-based recording
-            onRecordingComplete(audioURL, duration, nil, false)
-        }
     }
 
     private func startTimers() {
@@ -286,14 +271,14 @@ struct WaveformView: View {
 
 struct RecordingsListView: View {
     let recordings: [Recording]
-    @EnvironmentObject var recordingManager: RecordingManager
+    @EnvironmentObject var viewModel: NewRecordingViewModel
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 ForEach(recordings) { recording in
                     Button {
-                        recordingManager.presentedRecording = recording
+                        viewModel.presentedRecording = recording
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
@@ -335,7 +320,7 @@ struct RecordingsListView: View {
         GradientBackground()
         NewRecordingView()
             .funnelPreviewEnvironment()
-            .environmentObject(RecordingManager())
+            .environmentObject(NewRecordingViewModel())
             .environmentObject(DebugSettings())
             .environmentObject(AudioRecorderManager())
     }

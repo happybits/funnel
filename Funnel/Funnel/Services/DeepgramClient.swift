@@ -7,12 +7,20 @@ class DeepgramClient {
     private var recordingId: String?
     private var metadataReceived = false
     
+    // Callbacks for UI updates
+    var onAudioLevel: ((Float) -> Void)?
+    var onStatusUpdate: ((String) -> Void)?
+    var onError: ((DeepgramError) -> Void)?
+    
     enum DeepgramError: LocalizedError {
         case invalidServerURL
         case noRecordingId
         case webSocketError(String)
         case streamingError(String)
         case finalizeError(String)
+        case microphonePermissionDenied
+        case recordingTooShort(minimumDuration: TimeInterval)
+        case connectionFailed(String)
         
         var errorDescription: String? {
             switch self {
@@ -26,12 +34,30 @@ class DeepgramClient {
                 return "Streaming error: \(message)"
             case let .finalizeError(message):
                 return "Finalize error: \(message)"
+            case .microphonePermissionDenied:
+                return "Microphone permission denied"
+            case let .recordingTooShort(minimumDuration):
+                return "Recording too short (minimum \(minimumDuration)s)"
+            case let .connectionFailed(message):
+                return "Connection failed: \(message)"
             }
         }
     }
     
-    init(serverBaseURL: String = "http://localhost:8000") {
-        self.serverBaseURL = serverBaseURL
+    init(serverBaseURL: String? = nil) {
+        // Use APIClient's base URL if not provided
+        if let baseURL = serverBaseURL {
+            self.serverBaseURL = baseURL
+        } else {
+            // Get base URL from APIClient
+            let useLocalServer = false
+            self.serverBaseURL = useLocalServer ? "http://127.0.0.1:8000" : "https://funnel-api.deno.dev"
+        }
+    }
+    
+    /// Get the current recording ID
+    var currentRecordingId: String? {
+        return recordingId
     }
     
     /// Start a new recording session and stream audio data
@@ -39,11 +65,16 @@ class DeepgramClient {
     ///   - audioDataProvider: Async closure that provides audio chunks
     /// - Returns: The processed recording with transcript, summary, and diagram
     func streamRecording(audioDataProvider: @escaping () async throws -> Data?) async throws -> ProcessedRecording {
+        // Reset state
+        metadataReceived = false
+        
         // Generate new recording ID
         recordingId = UUID().uuidString
         guard let recordingId = recordingId else {
             throw DeepgramError.noRecordingId
         }
+        
+        onStatusUpdate?("Connecting...")
         
         // Create WebSocket URL
         let wsURLString = serverBaseURL.replacingOccurrences(of: "http://", with: "ws://")
@@ -79,14 +110,24 @@ class DeepgramClient {
         
         try await webSocketTask?.send(.string(configString))
         
+        onStatusUpdate?("Recording...")
+        
         try await Task.sleep(for: .milliseconds(100))
         
         // Stream audio data
         while let chunk = try await audioDataProvider() {
             guard !chunk.isEmpty else { break }
+            
+            // Calculate audio level from PCM data
+            if let audioLevel = calculateAudioLevel(from: chunk) {
+                onAudioLevel?(audioLevel)
+            }
+            
             try await webSocketTask?.send(.data(chunk))
             try await Task.sleep(for: .milliseconds(100))
         }
+        
+        onStatusUpdate?("Processing...")
         
         // Finalize recording
         let processedRecording = try await finalizeRecording(recordingId: recordingId)
@@ -167,6 +208,35 @@ class DeepgramClient {
         } catch {
             throw DeepgramError.finalizeError("Failed to decode response: \(error)")
         }
+    }
+    
+    /// Calculate audio level from PCM16 data
+    private func calculateAudioLevel(from data: Data) -> Float? {
+        let int16Array = data.withUnsafeBytes { bytes in
+            bytes.bindMemory(to: Int16.self)
+        }
+        
+        guard !int16Array.isEmpty else { return nil }
+        
+        // Calculate RMS (Root Mean Square)
+        let sum = int16Array.reduce(Float(0)) { result, sample in
+            let floatSample = Float(sample) / Float(Int16.max)
+            return result + (floatSample * floatSample)
+        }
+        
+        let rms = sqrt(sum / Float(int16Array.count))
+        
+        // Convert to dB
+        let avgPower = 20 * log10(max(0.00001, rms))
+        
+        // Normalize to 0-1 range
+        let minDb: Float = -50
+        let maxDb: Float = -10
+        let normalizedLevel = (avgPower - minDb) / (maxDb - minDb)
+        let clampedLevel = max(0, min(1, normalizedLevel))
+        
+        // Apply power curve for better visual response
+        return pow(clampedLevel, 2.5)
     }
 }
 

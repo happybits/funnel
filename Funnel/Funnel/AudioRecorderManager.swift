@@ -11,14 +11,14 @@ class AudioRecorderManager: NSObject, ObservableObject {
     private var timer: Timer?
     private var levelTimer: Timer?
     private(set) var currentRecordingURL: URL?
-    private var recordingCompletion: ((Result<URL, Error>) -> Void)?
+    private var recordingCompletion: ((Result<ProcessedRecording, Error>) -> Void)?
 
     // Live streaming properties
     private var audioEngine = AVAudioEngine()
-    private var webSocket: URLSessionWebSocketTask?
-    private var urlSession: URLSession?
+    private let deepgramClient = DeepgramClient()
     private(set) var recordingId: String?
     private(set) var isLiveStreaming = false
+    private var audioDataContinuation: AsyncStream<Data?>.Continuation?
 
     // Audio file writing properties
     private var audioFile: AVAudioFile?
@@ -57,20 +57,11 @@ class AudioRecorderManager: NSObject, ObservableObject {
         }
     }
 
-    func startRecording(completion: @escaping (Result<URL, Error>) -> Void) {
+    func startRecording(completion: @escaping (Result<ProcessedRecording, Error>) -> Void) {
         print("AudioRecorderManager: startRecording called")
-
-        startLiveStreaming { result in
-            switch result {
-            case .success:
-                // Create a dummy URL for compatibility
-                let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                let dummyURL = documentsPath.appendingPathComponent("live-stream-\(self.recordingId ?? "unknown").m4a")
-                completion(.success(dummyURL))
-            case let .failure(error):
-                completion(.failure(error))
-            }
-        }
+        
+        recordingCompletion = completion
+        startLiveStreaming()
     }
 
     func stopRecording() {
@@ -112,99 +103,72 @@ class AudioRecorderManager: NSObject, ObservableObject {
 
     // MARK: - Live Streaming Methods
 
-    func startLiveStreaming(completion: @escaping (Result<Void, Error>) -> Void) {
+    func startLiveStreaming() {
         print("AudioRecorderManager: Starting live streaming")
 
-        recordingId = UUID().uuidString
         isLiveStreaming = true
-        print("AudioRecorderManager: Generated recording ID: \(recordingId!)")
-
+        
         // Create audio file for fallback
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        audioFileURL = documentsPath.appendingPathComponent("recording-\(recordingId!).m4a")
+        audioFileURL = documentsPath.appendingPathComponent("recording-\(UUID().uuidString).m4a")
         currentRecordingURL = audioFileURL // Store for compatibility
 
-        // Setup WebSocket connection
-        setupWebSocket { [weak self] result in
-            switch result {
-            case .success:
-                self?.startAudioEngine(completion: completion)
-            case let .failure(error):
-                completion(.failure(error))
+        // Setup DeepgramClient callbacks
+        deepgramClient.onAudioLevel = { [weak self] level in
+            DispatchQueue.main.async {
+                self?.audioLevel = level
             }
         }
+        
+        deepgramClient.onStatusUpdate = { [weak self] status in
+            print("AudioRecorderManager: DeepgramClient status: \(status)")
+        }
+        
+        deepgramClient.onError = { [weak self] error in
+            self?.recordingCompletion?(.failure(error))
+            self?.recordingCompletion = nil
+        }
+
+        // Start audio engine
+        startAudioEngine()
     }
 
-    private func setupWebSocket(completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let recordingId = recordingId else {
-            completion(.failure(FunnelError.recordingFailed(reason: "No recording ID")))
-            return
-        }
 
-        // Create URLSession for WebSocket
-        let config = URLSessionConfiguration.default
-        urlSession = URLSession(configuration: config, delegate: self, delegateQueue: OperationQueue())
-
-        // Use APIClient to construct WebSocket URL
-        guard let url = APIClient.shared.webSocketURL(for: "/api/recordings/\(recordingId)/stream") else {
-            completion(.failure(FunnelError.recordingFailed(reason: "Invalid WebSocket URL")))
-            return
-        }
-
-        webSocket = urlSession?.webSocketTask(with: url)
-        webSocket?.resume()
-
-        // Listen for messages
-        receiveWebSocketMessage()
-
-        // Send audio format configuration after connection
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            guard let self = self else { return }
-
-            // Send configuration message to indicate PCM format
-            let config: [String: Any] = [
-                "type": "config",
-                "format": "pcm16",
-                "sampleRate": Int(AVAudioSession.sharedInstance().sampleRate), // Send actual device sample rate
-                "channels": 1,
-            ]
-
-            if let jsonData = try? JSONSerialization.data(withJSONObject: config),
-               let jsonString = String(data: jsonData, encoding: .utf8)
-            {
-                self.webSocket?.send(.string(jsonString)) { error in
-                    if let error = error {
-                        print("Failed to send config: \(error)")
+    private func startAudioEngine() {
+        // Create audio data stream
+        let (stream, continuation) = AsyncStream.makeStream(of: Data?.self)
+        audioDataContinuation = continuation
+        
+        // Start streaming with DeepgramClient
+        Task {
+            do {
+                let processedRecording = try await deepgramClient.streamRecording {
+                    // Update recordingId after DeepgramClient creates it
+                    await MainActor.run {
+                        self.recordingId = self.deepgramClient.currentRecordingId
+                        print("AudioRecorderManager: Recording ID set to: \(self.recordingId ?? "nil")")
                     }
+                    
+                    // This will be called repeatedly to get audio chunks
+                    for await data in stream {
+                        return data
+                    }
+                    return nil
+                }
+                
+                // Recording completed successfully
+                await MainActor.run {
+                    self.recordingCompletion?(.success(processedRecording))
+                    self.recordingCompletion = nil
+                }
+            } catch {
+                await MainActor.run {
+                    self.recordingCompletion?(.failure(error))
+                    self.recordingCompletion = nil
                 }
             }
-
-            completion(.success(()))
         }
-    }
-
-    private func receiveWebSocketMessage() {
-        webSocket?.receive { [weak self] result in
-            switch result {
-            case let .success(message):
-                switch message {
-                case let .string(text):
-                    print("WebSocket received text: \(text)")
-                // Handle transcript responses here if needed
-                case let .data(data):
-                    print("WebSocket received data: \(data.count) bytes")
-                @unknown default:
-                    break
-                }
-                // Continue listening
-                self?.receiveWebSocketMessage()
-            case let .failure(error):
-                print("WebSocket receive error: \(error)")
-            }
-        }
-    }
-
-    private func startAudioEngine(completion: @escaping (Result<Void, Error>) -> Void) {
+        
         do {
             // Get the audio source node
             let sourceNode = try audioSource.attachToEngine(audioEngine)
@@ -217,8 +181,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
                 channels: 1,
                 interleaved: true
             ) else {
-                completion(.failure(FunnelError.recordingFailed(reason: "Failed to create audio format")))
-                return
+                throw FunnelError.recordingFailed(reason: "Failed to create audio format")
             }
 
             // Create audio file for writing
@@ -286,46 +249,20 @@ class AudioRecorderManager: NSObject, ObservableObject {
             }
 
             print("AudioRecorderManager: Audio engine started successfully")
-            completion(.success(()))
         } catch {
             print("AudioRecorderManager: Failed to start audio engine: \(error)")
-            completion(.failure(error))
+            recordingCompletion?(.failure(error))
+            recordingCompletion = nil
         }
     }
 
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
-        guard let channelData = buffer.int16ChannelData else { return }
-
-        let channelDataValue = channelData.pointee
-        let channelDataValueArray = stride(from: 0, to: Int(buffer.frameLength), by: buffer.stride)
-            .map { channelDataValue[$0] }
-
-        // Calculate audio level for visualization
-        let rms = sqrt(channelDataValueArray
-            .map { Double($0) * Double($0) }
-            .reduce(0, +) / Double(channelDataValueArray.count))
-
-        let avgPower = 20 * log10(rms / 32768.0) // Convert to dB
-        let minDb: Float = -50
-        let maxDb: Float = -10
-        let normalizedLevel = Float((avgPower - Double(minDb)) / Double(maxDb - minDb))
-        let clampedLevel = max(0, min(1, normalizedLevel))
-        let curvedLevel = pow(clampedLevel, 2.5)
-
-        DispatchQueue.main.async { [weak self] in
-            self?.audioLevel = curvedLevel
-        }
-
-        // Convert buffer to Data for WebSocket
+        // Convert buffer to Data
         let data = toData(buffer: buffer)
-
-        // Send data through WebSocket
+        
+        // Send data through the continuation
         if let data = data {
-            webSocket?.send(.data(data)) { error in
-                if let error = error {
-                    print("WebSocket send error: \(error)")
-                }
-            }
+            audioDataContinuation?.yield(data)
         }
     }
 
@@ -348,6 +285,10 @@ class AudioRecorderManager: NSObject, ObservableObject {
         print("AudioRecorderManager: Stopping live streaming")
         print("AudioRecorderManager: Recording ID at stop: \(recordingId ?? "nil")")
 
+        // Signal end of audio stream
+        audioDataContinuation?.finish()
+        audioDataContinuation = nil
+
         // Stop audio source
         audioSource.stopPlayback()
 
@@ -362,9 +303,6 @@ class AudioRecorderManager: NSObject, ObservableObject {
         timer?.invalidate()
         levelTimer?.invalidate()
 
-        // Close WebSocket
-        webSocket?.cancel(with: .goingAway, reason: nil)
-
         // Close audio file
         audioFile = nil
         if let audioFileURL = audioFileURL {
@@ -376,29 +314,16 @@ class AudioRecorderManager: NSObject, ObservableObject {
         isLiveStreaming = false
         audioLevel = 0
         recordingId = nil
-        webSocket = nil
-        urlSession = nil
     }
 }
 
-extension AudioRecorderManager: URLSessionWebSocketDelegate {
-    func urlSession(_: URLSession, webSocketTask _: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
-        print("WebSocket connected with protocol: \(String(describing: `protocol`))")
-    }
-
-    func urlSession(_: URLSession, webSocketTask _: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason _: Data?) {
-        print("WebSocket closed with code: \(closeCode)")
-    }
-}
 
 extension AudioRecorderManager: AVAudioRecorderDelegate {
     func audioRecorderDidFinishRecording(_: AVAudioRecorder, successfully flag: Bool) {
         if flag {
             print("AudioRecorderManager: Recording finished successfully")
-            if let url = currentRecordingURL {
-                print("AudioRecorderManager: Saved recording to: \(url.path)")
-                recordingCompletion?(.success(url))
-            }
+            // For non-streaming recordings, we would need to upload the file
+            // This delegate is not used in streaming mode
         } else {
             recordingCompletion?(.failure(FunnelError.recordingFailed(reason: "Recording was interrupted")))
         }

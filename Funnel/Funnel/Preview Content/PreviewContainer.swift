@@ -110,7 +110,7 @@ extension View {
     func funnelPreviewEnvironment() -> some View {
         modelContainer(ModelContainer.previewContainer)
             .environmentObject(GradientBackgroundManager())
-            .environmentObject(RecordingManager())
+            .environmentObject(NewRecordingViewModel())
     }
 }
 
