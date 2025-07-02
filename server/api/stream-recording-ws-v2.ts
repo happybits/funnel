@@ -49,7 +49,7 @@ export const streamRecordingWsV2Handler = (c: Context) => {
     return response;
   }
 
-  const deepgramWs = new WebSocket(deepgramUrl.href, {
+  const deepgramWs = new WebSocket(deepgramUrl.href, [], {
     headers: {
       Authorization: `Token ${deepgramApiKey}`,
     },
