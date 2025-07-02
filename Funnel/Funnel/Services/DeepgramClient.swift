@@ -1,4 +1,5 @@
 import Foundation
+import AVFoundation
 
 /// Client for streaming audio to the server and receiving processed transcripts
 class DeepgramClient {
@@ -96,7 +97,7 @@ class DeepgramClient {
         let config: [String: Any] = [
             "type": "config",
             "format": "pcm16",
-            "sampleRate": 16000,
+            "sampleRate": Int(AVAudioSession.sharedInstance().sampleRate), // Send actual device sample rate
             "channels": 1,
         ]
         let configData = try JSONSerialization.data(withJSONObject: config)

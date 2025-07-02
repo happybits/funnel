@@ -253,6 +253,8 @@ class AudioRecorderManager: NSObject, ObservableObject {
             }
 
             print("AudioRecorderManager: Audio engine started successfully")
+            print("AudioRecorderManager: Input format: \(inputFormat)")
+            print("AudioRecorderManager: Output format: \(outputFormat)")
         } catch {
             print("AudioRecorderManager: Failed to start audio engine: \(error)")
             recordingCompletion?(.failure(error))
@@ -261,12 +263,64 @@ class AudioRecorderManager: NSObject, ObservableObject {
     }
 
     private func processAudioBuffer(_ buffer: AVAudioPCMBuffer) {
-        // Convert buffer to Data
-        let data = toData(buffer: buffer)
-        
-        // Send data through the continuation
-        if let data = data {
-            audioDataContinuation?.yield(data)
+        // First check if we have int16 data (PCM16 format)
+        if let channelData = buffer.int16ChannelData {
+            // Buffer is already in PCM16 format
+            let data = toData(buffer: buffer)
+            if let data = data {
+                audioDataContinuation?.yield(data)
+            }
+            
+            // Calculate audio level from PCM16 data
+            let channelDataValue = channelData.pointee
+            let channelDataValueArray = stride(from: 0, to: Int(buffer.frameLength), by: buffer.stride)
+                .map { channelDataValue[$0] }
+            
+            let rms = sqrt(channelDataValueArray
+                .map { Double($0) * Double($0) }
+                .reduce(0, +) / Double(channelDataValueArray.count))
+            
+            let avgPower = 20 * log10(rms / 32768.0) // Convert to dB
+            let minDb: Float = -50
+            let maxDb: Float = -10
+            let normalizedLevel = Float((avgPower - Double(minDb)) / Double(maxDb - minDb))
+            let clampedLevel = max(0, min(1, normalizedLevel))
+            let curvedLevel = pow(clampedLevel, 2.5)
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.audioLevel = curvedLevel
+            }
+        } else if let channelData = buffer.floatChannelData {
+            // Buffer is in Float32 format, need to convert to PCM16
+            let frameCount = Int(buffer.frameLength)
+            var int16Data = Data(count: frameCount * 2) // 2 bytes per sample
+            
+            int16Data.withUnsafeMutableBytes { int16Ptr in
+                let int16Buffer = int16Ptr.bindMemory(to: Int16.self)
+                let floatData = channelData.pointee
+                
+                for i in 0..<frameCount {
+                    // Convert Float32 (-1.0 to 1.0) to Int16
+                    let sample = max(-1.0, min(1.0, floatData[i]))
+                    int16Buffer[i] = Int16(sample * Float(Int16.max))
+                }
+            }
+            
+            audioDataContinuation?.yield(int16Data)
+            
+            // Calculate audio level from float data
+            let floatData = channelData.pointee
+            let rms = sqrt((0..<frameCount).map { Double(floatData[$0]) * Double(floatData[$0]) }.reduce(0, +) / Double(frameCount))
+            let avgPower = 20 * log10(max(0.00001, rms))
+            let minDb: Float = -50
+            let maxDb: Float = -10
+            let normalizedLevel = Float((avgPower - Double(minDb)) / Double(maxDb - minDb))
+            let clampedLevel = max(0, min(1, normalizedLevel))
+            let curvedLevel = pow(clampedLevel, 2.5)
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.audioLevel = curvedLevel
+            }
         }
     }
 
