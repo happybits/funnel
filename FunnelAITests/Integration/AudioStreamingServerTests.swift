@@ -34,31 +34,17 @@ class AudioStreamingServerTests: XCTestCase {
         serverURL = URL(string: "http://localhost:8000")!
         try await verifyServerIsRunning()
 
-        // Get test audio file - use direct path since it's not in the test bundle
-        let projectPath = URL(fileURLWithPath: #file)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("Funnel")
-            .appendingPathComponent("Funnel")
-            .appendingPathComponent("sample-recording-mary-had-lamb.m4a")
-
-        if FileManager.default.fileExists(atPath: projectPath.path) {
-            testAudioURL = projectPath
-            print("📁 Using audio file from: \(projectPath)")
-        } else {
-            // Try Bundle as fallback
-            if let url = Bundle(for: type(of: self)).url(
-                forResource: "sample-recording-mary-had-lamb",
-                withExtension: "m4a"
-            ) {
-                testAudioURL = url
-                print("📦 Using audio file from test bundle")
-            } else {
-                XCTFail("Could not find test audio file 'sample-recording-mary-had-lamb.m4a' at \(projectPath)")
-                return
-            }
+        // Get test audio file from the test bundle
+        guard let url = Bundle(for: type(of: self)).url(
+            forResource: "sample-recording-mary-had-lamb",
+            withExtension: "m4a"
+        ) else {
+            XCTFail("Could not find test audio file 'sample-recording-mary-had-lamb.m4a' in test bundle")
+            return
         }
+        
+        testAudioURL = url
+        print("📦 Using audio file from test bundle: \(url)")
     }
 
     private func verifyServerIsRunning() async throws {

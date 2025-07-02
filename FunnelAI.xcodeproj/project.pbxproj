@@ -25,15 +25,23 @@
 		49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Funnel/sample-recording-mary-had-lamb.m4a",
 				Info.plist,
 			);
 			target = E705CE53ADF353E0B1DC4CDB /* FunnelAI */;
+		};
+		5DB81D822E14D10900B30D64 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Funnel/sample-recording-mary-had-lamb.m4a",
+			);
+			target = 49880EC62E131B73003049B0 /* FunnelAITests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		49880EC82E131B73003049B0 /* FunnelAITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FunnelAITests; sourceTree = "<group>"; };
-		49E8777E2E03892C00721933 /* Funnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Funnel; sourceTree = "<group>"; };
+		49E8777E2E03892C00721933 /* Funnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 5DB81D822E14D10900B30D64 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Funnel; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
