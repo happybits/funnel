@@ -2,6 +2,12 @@
 
 Backend API for the Funnel audio note summarizer app built with Deno.
 
+## Documentation
+
+- [Deepgram Integration Guide](./docs/deepgram-integration.md) - How we use Deepgram for real-time transcription
+- [Deepgram Sequence Diagram](./docs/deepgram-sequence-diagram.md) - Visual flow of the transcription process
+- [Recording Flow](./docs/recording-flow.md) - Overall recording and processing flow
+
 ## Setup
 
 1. Copy `.env.example` to `.env` and add your API keys:

@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var recordingManager = RecordingManager()
+    @StateObject private var newRecordingViewModel = NewRecordingViewModel()
     @StateObject private var gradientManager = GradientBackgroundManager()
     @State private var navigationDestination: NavigationDestination = .recording
 
@@ -15,17 +15,17 @@ struct ContentView: View {
                 // Main recording view
                 NewRecordingView()
                     .overlay {
-                        if recordingManager.isProcessing {
+                        if newRecordingViewModel.isProcessing {
                             ProcessingOverlay()
                                 .transition(.opacity.combined(with: .scale(scale: 0.9)))
                         }
                     }
-                    .animation(.easeInOut(duration: 0.3), value: recordingManager.isProcessing)
+                    .animation(.easeInOut(duration: 0.3), value: newRecordingViewModel.isProcessing)
             }
         }
-        .environmentObject(recordingManager)
+        .environmentObject(newRecordingViewModel)
         .environmentObject(gradientManager)
-        .onChange(of: recordingManager.presentedRecording) { _, newValue in
+        .onChange(of: newRecordingViewModel.presentedRecording) { _, newValue in
             if let recording = newValue {
                 navigationDestination = .cards(recording)
             } else {
@@ -37,7 +37,7 @@ struct ContentView: View {
 
 // Processing overlay that appears on top of recording view
 struct ProcessingOverlay: View {
-    @EnvironmentObject var recordingManager: RecordingManager
+    @EnvironmentObject var viewModel: NewRecordingViewModel
 
     private var processingBox: some View {
         VStack(spacing: 8) {
@@ -51,7 +51,7 @@ struct ProcessingOverlay: View {
                 .whiteSandGradientEffect()
                 .multilineTextAlignment(.center)
 
-            if let error = recordingManager.processingError {
+            if let error = viewModel.processingError {
                 Text("Error: \(error.localizedDescription)")
                     .font(.system(size: 14))
                     .foregroundColor(.red)
@@ -59,7 +59,7 @@ struct ProcessingOverlay: View {
                     .padding(.horizontal, 40)
                     .padding(.top, 10)
 
-                Button(action: { recordingManager.dismissError() }) {
+                Button(action: { viewModel.dismissError() }) {
                     Text("Dismiss")
                         .funnelBody()
                         .padding(.horizontal, 30)

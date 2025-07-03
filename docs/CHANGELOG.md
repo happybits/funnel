@@ -4,6 +4,78 @@ All notable changes to the Funnel project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **Updated StreamingVsFileUploadTests** (2025-07-02)
+  - Now uses `APIClient.shared.processAudio()` instead of manual URLSession multipart form construction
+  - Simplified test code by leveraging existing API client infrastructure
+- **Consolidated API layer** (2025-07-02)
+  - Removed redundant `FunnelAPIService` class
+  - Moved `processAudio()` method directly into `APIClient`
+  - Updated all references to use `APIClient.shared` directly
+
+### Added
+- **New simplified V2 API endpoints for audio streaming** (2025-01-01)
+  - `WebSocket /api/v2/recordings/:recordingId/stream` - Stream audio without receiving partial transcripts
+  - `POST /api/v2/recordings/:recordingId/finalize` - Finalize recording and save transcript to KV
+  - `GET /api/v2/recordings/:recordingId` - Retrieve transcript and generate AI summaries on-demand
+- **Comprehensive iOS integration tests for V2 APIs**
+  - `AudioStreamingServerV2Tests` - Tests with generated sine wave audio
+  - `AudioStreamingServerV2RealAudioTests` - Tests with real audio files and speech synthesis
+
+### Changed
+- **V2 API simplified flow**:
+  - V2 WebSocket endpoint only sends `ready` and `processingComplete` messages (no partial transcripts)
+  - V2 finalization saves complete transcript to Deno KV for later retrieval
+  - V2 GET endpoint generates AI summaries on-demand instead of during finalization
+  - Client no longer needs to handle partial transcripts or maintain transcript state
+
+### Changed
+- **Improved transcription finalization flow** (2025-01-07)
+  - Server: Removed premature `transcription_complete` WebSocket message
+  - Server: Updated finalize endpoint to send Deepgram `CloseStream` message when called
+  - Server: Finalize endpoint waits for Deepgram metadata response confirming all audio processed
+  - Server: Added in-memory storage of active Deepgram connections for access during finalization
+  - Test: Added `testSimpleStreamAudioToServer` for testing the complete audio streaming flow
+  - Test: Streams all audio chunks, then calls finalize endpoint (no arbitrary waits)
+  - Test: Finalize endpoint blocks until Deepgram confirms completion, ensuring full transcript
+
+### Added
+- **Two-tier integration testing strategy** (2025-01-07)
+  - Tier 1: WebSocket Integration Test - Tests server API contracts without hardware dependencies
+  - Tier 2: Audio Pipeline Integration Test - Tests complete audio processing with file input
+  - DirectWebSocketStreamer for isolated WebSocket testing
+  - Integration with xctesthtmlreport for visual test results
+- **Dependency injection for AudioRecorderManager**
+  - Created AudioSourceProtocol for abstracting audio input sources
+  - Implemented MicrophoneAudioSource for production use
+  - Implemented FilePlaybackAudioSource for testing with audio files
+  - Modified AudioRecorderManager to accept audio source via dependency injection
+
+### Changed
+- **Enhanced Makefile test command**: Now automatically generates HTML test reports
+  - Runs xctesthtmlreport after test execution
+  - Shows clickable file:// URL for viewing results
+  - Added test-results to .gitignore and clean-tests target
+
+### Technical Details
+- Tests can run on simulator without microphone hardware
+- File playback flows through the exact same audio pipeline as microphone input
+- Tests verify: audio format conversion, WebSocket streaming, live transcription, bullet summaries, and diagram generation
+- Comprehensive test coverage for both API integration and audio processing pipeline
+
+### Added
+- **Testing Infrastructure** (2025-06-30)
+  - Added comprehensive iOS testing guide (`docs/ios-testing-guide.md`)
+  - Enhanced Makefile with improved test commands:
+    - `make test` - Run all tests with result bundle
+    - `make test-class CLASS=Name` - Run specific test class
+    - `make test-method TEST=Class/method` - Run specific test method
+    - `make test-results` - Show test results summary
+    - `make test-failures` - Show test failures with details
+    - `make clean-tests` - Clean test result bundles
+  - Documented best practices for making test output visible to automated tools
+  - Added examples of using assertions for test visibility instead of print statements
+
 ### Fixed
 - **iOS app now properly saves transcripts**: Fixed issue where iOS live streaming wasn't saving transcripts
   - Added finalize endpoint call after recording stops (matching web client behavior)

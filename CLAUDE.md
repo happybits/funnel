@@ -1,5 +1,47 @@
 # Funnel - Audio Note Summarizer
 
+## Development Commands - ALWAYS Use Makefile
+
+**ALWAYS prefer using Makefile commands over writing your own CLI commands.** The project includes comprehensive Makefiles for both iOS and server development. Only write custom commands if the Makefile doesn't have what you need.
+
+### iOS Commands (from root directory)
+```bash
+# Building & Running
+make build         # Build the app
+make run           # Build and run on simulator
+make release       # Build for release
+make quick         # Quick build with minimal output
+
+# Testing
+make build-test    # Build tests without running (verify compilation)
+make test          # Run all tests
+make test-class CLASS=Name     # Run specific test class
+make test-method TEST=Class/method  # Run specific test method
+
+# Maintenance
+make clean         # Clean build artifacts
+make deep-clean    # Deep clean including DerivedData
+make format        # Format Swift code
+make lint          # Run SwiftLint (if installed)
+make install       # Install required tools
+```
+
+### Server Commands (from server/ directory)
+```bash
+# Development
+make dev           # Run development server
+make test          # Run tests
+
+# Deployment
+make deploy-prod   # Deploy to production
+make deploy-preview # Deploy preview
+make logs          # View production logs
+
+# Code Quality
+make format        # Format code
+make lint          # Run linter
+make precommit     # Run format and lint
+```
 
 ## App Concept
 A SwiftUI app that captures stream-of-consciousness audio recordings and transforms them into multiple visual representations. Perfect for capturing ideas on-the-go when inspiration strikes.
@@ -101,7 +143,7 @@ After recording, view your content in different formats via fullscreen swipeable
 ## Development Setup
 
 ### Build Commands
-The project includes a Makefile for simplified building and development:
+The project includes a Makefile for simplified building and development. **For detailed documentation, see `docs/makefile-guide.md`**.
 
 ```bash
 make build      # Build the app

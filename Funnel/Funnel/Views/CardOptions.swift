@@ -4,32 +4,32 @@ enum CardType {
     case bulletSummary([String])
     case diagram(Recording.Diagram?)
     case transcript(String)
-    
+
     var shareContent: String {
         switch self {
-        case .bulletSummary(let bullets):
+        case let .bulletSummary(bullets):
             return bullets.joined(separator: "\n• ").prepending("• ")
-        case .diagram(let diagram):
+        case let .diagram(diagram):
             if let diagram = diagram {
                 return "\(diagram.title)\n\n\(diagram.description)\n\n\(diagram.content)"
             }
             return ""
-        case .transcript(let text):
+        case let .transcript(text):
             return text
         }
     }
-    
+
     var copyContent: String {
         return shareContent
     }
-    
+
     var canShare: Bool {
         switch self {
-        case .bulletSummary(let bullets):
+        case let .bulletSummary(bullets):
             return !bullets.isEmpty
-        case .diagram(let diagram):
+        case let .diagram(diagram):
             return diagram != nil
-        case .transcript(let text):
+        case let .transcript(text):
             return !text.isEmpty
         }
     }
@@ -37,7 +37,7 @@ enum CardType {
 
 struct CardOptions: View {
     let cardType: CardType
-    
+
     var body: some View {
         HStack(spacing: -16) {
             Button {
@@ -47,7 +47,7 @@ struct CardOptions: View {
             }
             .disabled(!cardType.canShare)
             .opacity(cardType.canShare ? 1.0 : 0.5)
-            
+
             if cardType.canShare {
                 ShareLink(item: cardType.shareContent) {
                     Image("share-btn")
@@ -63,5 +63,4 @@ struct CardOptions: View {
 #Preview {
     CardOptions(cardType: .diagram(nil))
         .background(GradientBackground())
-
 }

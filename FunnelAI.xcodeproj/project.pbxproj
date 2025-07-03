@@ -6,25 +6,52 @@
 	objectVersion = 70;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		49880ECB2E131B73003049B0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 907C3DDE5BB93C24658194DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E705CE53ADF353E0B1DC4CDB;
+			remoteInfo = FunnelAI;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		0A9BC078DD4AC38F123687A2 /* FunnelAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunnelAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		49880EC72E131B73003049B0 /* FunnelAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunnelAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Funnel/sample-recording-mary-had-lamb.m4a",
 				Info.plist,
 			);
 			target = E705CE53ADF353E0B1DC4CDB /* FunnelAI */;
 		};
+		5DB81D822E14D10900B30D64 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Funnel/sample-recording-mary-had-lamb.m4a",
+			);
+			target = 49880EC62E131B73003049B0 /* FunnelAITests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		49E8777E2E03892C00721933 /* Funnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Funnel; sourceTree = "<group>"; };
+		49880EC82E131B73003049B0 /* FunnelAITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FunnelAITests; sourceTree = "<group>"; };
+		49E8777E2E03892C00721933 /* Funnel */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (49E877A72E03892C00721933 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 5DB81D822E14D10900B30D64 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Funnel; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		49880EC42E131B73003049B0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5DBA9E842E089E35000F4006 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -39,21 +66,54 @@
 			isa = PBXGroup;
 			children = (
 				0A9BC078DD4AC38F123687A2 /* FunnelAI.app */,
+				49880EC72E131B73003049B0 /* FunnelAITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		496CB4092E13215300D82080 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		D9581316AE7A5E7CB95F6728 = {
 			isa = PBXGroup;
 			children = (
 				49E8777E2E03892C00721933 /* Funnel */,
+				49880EC82E131B73003049B0 /* FunnelAITests */,
 				30EF63C64EAF6A14571B0920 /* Products */,
+				496CB4092E13215300D82080 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		49880EC62E131B73003049B0 /* FunnelAITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 49880ECF2E131B73003049B0 /* Build configuration list for PBXNativeTarget "FunnelAITests" */;
+			buildPhases = (
+				49880EC32E131B73003049B0 /* Sources */,
+				49880EC42E131B73003049B0 /* Frameworks */,
+				49880EC52E131B73003049B0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				49880ECC2E131B73003049B0 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				49880EC82E131B73003049B0 /* FunnelAITests */,
+			);
+			name = FunnelAITests;
+			packageProductDependencies = (
+			);
+			productName = FunnelAITests;
+			productReference = 49880EC72E131B73003049B0 /* FunnelAITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E705CE53ADF353E0B1DC4CDB /* FunnelAI */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FCB18D299A4B72C484FECEBA /* Build configuration list for PBXNativeTarget "FunnelAI" */;
@@ -83,8 +143,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					49880EC62E131B73003049B0 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = E705CE53ADF353E0B1DC4CDB;
+					};
 					E705CE53ADF353E0B1DC4CDB = {
 						DevelopmentTeam = 6L379HCV5Q;
 					};
@@ -106,11 +171,19 @@
 			projectRoot = "";
 			targets = (
 				E705CE53ADF353E0B1DC4CDB /* FunnelAI */,
+				49880EC62E131B73003049B0 /* FunnelAITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		49880EC52E131B73003049B0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C671E455E945581A2E307E36 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -121,6 +194,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		49880EC32E131B73003049B0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DACB6B35E162417B9E12F0EF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -129,6 +209,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		49880ECC2E131B73003049B0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E705CE53ADF353E0B1DC4CDB /* FunnelAI */;
+			targetProxy = 49880ECB2E131B73003049B0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		41474B8474F2F99D20E98F10 /* Debug */ = {
@@ -256,6 +344,60 @@
 			};
 			name = Release;
 		};
+		49880ECD2E131B73003049B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6L379HCV5Q;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.happybits.FunnelAITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FunnelAI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FunnelAI";
+			};
+			name = Debug;
+		};
+		49880ECE2E131B73003049B0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6L379HCV5Q;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.happybits.FunnelAITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FunnelAI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FunnelAI";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		8440D62CD32492C03CDC0E30 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -321,6 +463,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		49880ECF2E131B73003049B0 /* Build configuration list for PBXNativeTarget "FunnelAITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				49880ECD2E131B73003049B0 /* Debug */,
+				49880ECE2E131B73003049B0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		CB3ABF991FBF2692B01ADB52 /* Build configuration list for PBXProject "FunnelAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

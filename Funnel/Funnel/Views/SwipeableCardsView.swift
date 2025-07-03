@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 struct SwipeableCardsView: View {
-    @EnvironmentObject var recordingManager: RecordingManager
+    @EnvironmentObject var viewModel: NewRecordingViewModel
     @EnvironmentObject var gradientManager: GradientBackgroundManager
     @Environment(\.modelContext) private var modelContext
     @State private var currentPage = 0
@@ -29,7 +29,7 @@ struct SwipeableCardsView: View {
     private var header: some View {
         HStack {
             Button {
-                recordingManager.presentedRecording = nil
+                viewModel.presentedRecording = nil
             } label: {
                 Image("BackBtn")
             }
@@ -293,6 +293,6 @@ struct TranscriptCard: View {
         recording.diagramContent = "Concept A → Concept B → Result"
         return recording
     }())
-    .funnelPreviewEnvironment()
-    .background (GradientBackground())
+        .funnelPreviewEnvironment()
+        .background(GradientBackground())
 }
