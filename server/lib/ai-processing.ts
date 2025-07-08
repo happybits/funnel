@@ -3,6 +3,7 @@ import { AnthropicClient } from "./anthropic.ts";
 export interface ProcessedRecording {
   id: string;
   transcript: string;
+  lightlyEditedTranscript: string;
   duration: number;
   bulletSummary: string[];
   diagram: {
@@ -44,4 +45,17 @@ export async function generateDiagram(transcript: string): Promise<{
     description: result.description,
     content: result.diagram,
   };
+}
+
+export async function generateLightlyEditedTranscript(
+  transcript: string,
+): Promise<string> {
+  const anthropicKey = Deno.env.get("ANTHROPIC_API_KEY");
+  if (!anthropicKey) {
+    throw new Error("ANTHROPIC_API_KEY not configured");
+  }
+
+  const client = new AnthropicClient(anthropicKey);
+  const result = await client.generateLightlyEditedTranscript(transcript);
+  return result.lightlyEditedTranscript;
 }

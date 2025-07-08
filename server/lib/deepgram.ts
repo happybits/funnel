@@ -1,7 +1,6 @@
 import {
   createClient,
   DeepgramClient as SDKDeepgramClient,
-  LiveTranscriptionEvents,
 } from "@deepgram/sdk";
 
 // Re-export types from SDK
@@ -44,9 +43,9 @@ export class DeepgramClient {
     this.apiKey = config.apiKey;
   }
 
-  async connectLive(
+  connectLive(
     options: LiveTranscriptionOptions = {},
-  ): Promise<WebSocket> {
+  ): WebSocket {
     const defaultOptions: LiveTranscriptionOptions = {
       model: "nova-3",
       language: "en-US",

@@ -61,7 +61,7 @@ struct SwipeableCardsView: View {
                             .frame(width: cardWidth)
                             .id(1)
 
-                        TranscriptCard(transcript: recording.transcript ?? "")
+                        TranscriptCard(transcript: recording.lightlyEditedTranscript ?? recording.transcript ?? "")
                             .frame(width: cardWidth)
                             .id(2)
                     }
@@ -282,6 +282,7 @@ struct TranscriptCard: View {
     SwipeableCardsView(recording: {
         let recording = Recording(audioFileName: "sample.m4a", duration: 60)
         recording.transcript = "This is a sample transcript that demonstrates the text content..."
+        recording.lightlyEditedTranscript = "This is a sample transcript that demonstrates the text content."
         recording.bulletSummary = [
             "First key point from the recording",
             "Second important insight",

@@ -10,9 +10,9 @@ interface LiveTranscriptionMessage {
   };
 }
 
-export async function liveTranscriptionHandler(
+export function liveTranscriptionHandler(
   c: Context,
-): Promise<Response | void> {
+): Response | void {
   const upgradeHeader = c.req.header("upgrade");
   if (!upgradeHeader || upgradeHeader !== "websocket") {
     return c.text("Expected websocket connection", 426);
@@ -72,7 +72,7 @@ function handleWebSocketConnection(clientWs: WebSocket) {
     closeDeepgramConnection();
   };
 
-  async function initializeDeepgramConnection() {
+  function initializeDeepgramConnection() {
     const deepgramApiKey = Deno.env.get("DEEPGRAM_API_KEY");
     if (!deepgramApiKey) {
       clientWs.send(JSON.stringify({
@@ -85,7 +85,7 @@ function handleWebSocketConnection(clientWs: WebSocket) {
 
     try {
       const deepgramClient = new DeepgramClient({ apiKey: deepgramApiKey });
-      deepgramWs = await deepgramClient.connectLive({
+      deepgramWs = deepgramClient.connectLive({
         model: "nova-3",
         language: "en-US",
         smart_format: true,

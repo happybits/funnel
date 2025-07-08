@@ -29,6 +29,7 @@ class NewRecordingViewModel: ObservableObject {
         do {
             // Save the processed data to the recording
             recording.transcript = processedData.transcript
+            recording.lightlyEditedTranscript = processedData.lightlyEditedTranscript
             recording.duration = processedData.duration
             recording.bulletSummary = processedData.bulletSummary
             recording.diagramTitle = processedData.diagram.title

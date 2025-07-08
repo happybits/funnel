@@ -8,6 +8,10 @@ interface DiagramResponse {
   description: string;
 }
 
+interface EditTranscriptResponse {
+  lightlyEditedTranscript: string;
+}
+
 export class AnthropicClient {
   private apiKey: string;
   private baseUrl = "https://api.anthropic.com/v1";
@@ -117,6 +121,47 @@ export class AnthropicClient {
       title: titleMatch[1].trim(),
       description: descriptionMatch[1].trim(),
       diagram: diagramMatch[1].trim(),
+    };
+  }
+
+  async generateLightlyEditedTranscript(
+    transcript: string,
+  ): Promise<EditTranscriptResponse> {
+    // Read prompt from file
+    const promptTemplate = await Deno.readTextFile(
+      new URL("./prompts/edit-transcript-prompt.txt", import.meta.url),
+    );
+    const prompt = promptTemplate.replace("{{transcript}}", transcript);
+
+    const response = await fetch(`${this.baseUrl}/messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 4096,
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Anthropic API error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    const content = data.content[0].text;
+
+    return {
+      lightlyEditedTranscript: content.trim(),
     };
   }
 }

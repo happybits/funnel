@@ -3,6 +3,7 @@ import { RecordingData, LiveTranscriptionEvents } from "../lib/deepgram.ts";
 import {
   generateBulletSummary,
   generateDiagram,
+  generateLightlyEditedTranscript,
   ProcessedRecording,
 } from "../lib/ai-processing.ts";
 import { activeDeepgramConnections } from "./stream-recording-ws.ts";
@@ -26,7 +27,7 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
       // According to Deepgram docs, any Metadata response after CloseStream indicates completion
       // See: https://developers.deepgram.com/docs/close-stream
       const metadataPromise = new Promise<void>((resolve, reject) => {
-        const metadataHandler = (data: any) => {
+        const metadataHandler = (data: unknown) => {
           console.log(`Received metadata for ${recordingId}:`, data);
           console.log(`Received metadata confirmation for ${recordingId} - transcription complete`);
           deepgramConnection.removeListener(LiveTranscriptionEvents.Metadata, metadataHandler);
@@ -106,11 +107,13 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
     // Generate AI properties in parallel
     let bulletSummary: string[];
     let diagram: { title: string; description: string; content: string };
+    let lightlyEditedTranscript: string;
 
     try {
-      [bulletSummary, diagram] = await Promise.all([
+      [bulletSummary, diagram, lightlyEditedTranscript] = await Promise.all([
         generateBulletSummary(finalTranscript),
         generateDiagram(finalTranscript),
+        generateLightlyEditedTranscript(finalTranscript),
       ]);
     } catch (error) {
       console.error("Error generating AI content:", error);
@@ -133,12 +136,22 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
           content: "[Diagram generation failed]",
         };
       }
+
+      try {
+        lightlyEditedTranscript = await generateLightlyEditedTranscript(
+          finalTranscript,
+        );
+      } catch (e) {
+        console.error("Failed to generate lightly edited transcript:", e);
+        lightlyEditedTranscript = finalTranscript; // Fallback to raw transcript
+      }
     }
 
     // Create processed recording
     const processedRecording: ProcessedRecording = {
       id: recordingId,
       transcript: finalTranscript,
+      lightlyEditedTranscript,
       duration: Math.round(duration),
       bulletSummary,
       diagram,

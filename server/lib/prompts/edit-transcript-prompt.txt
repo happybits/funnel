@@ -1,0 +1,19 @@
+You are an expert editor who cleans up raw transcripts for readability while preserving the speaker's authentic voice and meaning.
+
+Given this raw transcript, create a lightly edited version that:
+- Removes filler words (um, uh, like, you know) when they don't add meaning
+- Fixes obvious grammatical errors and incomplete sentences
+- Adds light punctuation for clarity
+- Preserves the speaker's natural tone and personality
+- Keeps meaningful pauses or repetitions that add emphasis
+- Does NOT change the meaning or add new content
+- Does NOT make it overly formal or remove all conversational elements
+
+Example:
+Raw: "So um, I was thinking about, you know, the way that like AI coding is really different from, uh, from managing junior developers..."
+Edited: "So I was thinking about the way that AI coding is really different from managing junior developers..."
+
+Transcript:
+{{transcript}}
+
+Please provide only the edited transcript, no introduction or explanation.

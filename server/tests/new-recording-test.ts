@@ -161,6 +161,7 @@ if (fixtureExists) {
 
       // Real audio should produce meaningful results
       console.log("\n📝 Real Transcript:", body.transcript);
+      console.log("\n✨ Lightly Edited Transcript:", body.lightlyEditedTranscript);
       console.log("\n⏱️  Real Duration:", body.duration, "seconds");
 
       console.log("\n📋 Real Bullet Summary:");
@@ -179,6 +180,12 @@ if (fixtureExists) {
         true,
         "Should have non-empty transcript",
       );
+      assertEquals(
+        body.lightlyEditedTranscript.length > 0,
+        true,
+        "Should have non-empty lightly edited transcript",
+      );
+      assertExists(body.lightlyEditedTranscript, "Should have lightly edited transcript field");
       assertEquals(body.duration > 0, true, "Should have positive duration");
 
       // Bullet summary might be empty for very short/simple recordings

@@ -64,6 +64,7 @@ class DeepgramClientTests: XCTestCase {
         print("Total chunks sent: \(chunkCount)")
         print("Duration: \(processedRecording.duration) seconds")
         print("Full transcript: \"\(processedRecording.transcript)\"")
+        print("Lightly edited transcript: \"\(processedRecording.lightlyEditedTranscript)\"")
         print("Bullet summary (\(processedRecording.bulletSummary.count) items):")
         for (index, bullet) in processedRecording.bulletSummary.enumerated() {
             print("  \(index + 1). \(bullet)")
@@ -75,6 +76,8 @@ class DeepgramClientTests: XCTestCase {
         // Assertions
         XCTAssertGreaterThan(processedRecording.duration, 0, "Duration should be greater than 0")
         XCTAssertFalse(processedRecording.transcript.isEmpty, "Transcript should not be empty")
+        XCTAssertFalse(processedRecording.lightlyEditedTranscript.isEmpty, "Lightly edited transcript should not be empty")
+        XCTAssertNotEqual(processedRecording.transcript, processedRecording.lightlyEditedTranscript, "Lightly edited transcript should differ from raw transcript")
         XCTAssertFalse(processedRecording.bulletSummary.isEmpty, "Bullet summary should not be empty")
         XCTAssertFalse(processedRecording.diagram.title.isEmpty, "Diagram title should not be empty")
         XCTAssertFalse(processedRecording.diagram.description.isEmpty, "Diagram description should not be empty")

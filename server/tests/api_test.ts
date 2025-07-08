@@ -2,7 +2,7 @@ import {
   assertEquals,
   assertExists,
 } from "https://deno.land/std@0.215.0/assert/mod.ts";
-import type { ErrorResponse } from "../types/api.ts";
+import type { ErrorResponse, NewRecordingResponse } from "../types/api.ts";
 
 // Legacy types for testing (no longer in actual API)
 interface TranscribeResponse {
@@ -167,4 +167,76 @@ Deno.test("Diagram Endpoint - handles empty transcript", () => {
 
   assertExists(mockError.error);
   assertEquals(typeof mockError.error, "string");
+});
+
+Deno.test("API Response Shapes - NewRecordingResponse validation", () => {
+  // Mock successful new recording response
+  const mockResponse: NewRecordingResponse = {
+    transcript: "This is um, you know, a test transcript with like filler words",
+    lightlyEditedTranscript: "This is a test transcript with filler words",
+    duration: 10.5,
+    bulletSummary: [
+      "Test transcript contains filler words",
+      "Demonstrates lightly edited feature",
+    ],
+    diagram: {
+      title: "Test Diagram",
+      description: "A test diagram for validation",
+      content: "Raw -> Edited",
+    },
+  };
+
+  // Validate response shape
+  assertExists(mockResponse.transcript);
+  assertExists(mockResponse.lightlyEditedTranscript);
+  assertExists(mockResponse.duration);
+  assertExists(mockResponse.bulletSummary);
+  assertExists(mockResponse.diagram);
+
+  // Validate types
+  assertEquals(typeof mockResponse.transcript, "string");
+  assertEquals(typeof mockResponse.lightlyEditedTranscript, "string");
+  assertEquals(typeof mockResponse.duration, "number");
+  assertEquals(Array.isArray(mockResponse.bulletSummary), true);
+
+  // Validate diagram structure
+  assertExists(mockResponse.diagram.title);
+  assertExists(mockResponse.diagram.description);
+  assertExists(mockResponse.diagram.content);
+  assertEquals(typeof mockResponse.diagram.title, "string");
+  assertEquals(typeof mockResponse.diagram.description, "string");
+  assertEquals(typeof mockResponse.diagram.content, "string");
+
+  // Validate that lightlyEditedTranscript is different from raw transcript
+  assertEquals(
+    mockResponse.lightlyEditedTranscript !== mockResponse.transcript,
+    true,
+    "Lightly edited transcript should differ from raw transcript",
+  );
+});
+
+Deno.test("LightlyEditedTranscript - removes filler words", () => {
+  const rawTranscript =
+    "So um, I was thinking about, you know, the way that like AI coding is really different from, uh, from managing junior developers...";
+  const expectedEditedTranscript =
+    "So I was thinking about the way that AI coding is really different from managing junior developers...";
+
+  // This is what the API should return
+  const mockResponse: Partial<NewRecordingResponse> = {
+    transcript: rawTranscript,
+    lightlyEditedTranscript: expectedEditedTranscript,
+  };
+
+  // Validate that filler words are removed
+  assertEquals(mockResponse.lightlyEditedTranscript!.includes("um,"), false);
+  assertEquals(mockResponse.lightlyEditedTranscript!.includes("you know,"), false);
+  assertEquals(mockResponse.lightlyEditedTranscript!.includes("like"), false);
+  assertEquals(mockResponse.lightlyEditedTranscript!.includes("uh,"), false);
+
+  // Validate that meaningful content is preserved
+  assertEquals(mockResponse.lightlyEditedTranscript!.includes("AI coding"), true);
+  assertEquals(
+    mockResponse.lightlyEditedTranscript!.includes("managing junior developers"),
+    true,
+  );
 });

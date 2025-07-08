@@ -1,5 +1,6 @@
 export interface NewRecordingResponse {
   transcript: string;
+  lightlyEditedTranscript: string;
   duration: number;
   bulletSummary: string[];
   diagram: {

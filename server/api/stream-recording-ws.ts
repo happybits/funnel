@@ -9,11 +9,19 @@ import {
 
 const kv = await Deno.openKv();
 
+// Type for Deepgram connection event handlers
+interface DeepgramConnection {
+  on(event: string, handler: (data: unknown) => void): void;
+  removeAllListeners(): void;
+  send(data: ArrayBuffer | string): void;
+}
+
 // In-memory storage for recording segments to prevent KV overwrite issues
 const recordingSegments = new Map<string, TranscriptSegment[]>();
 
 // In-memory storage for active Deepgram connections
-export const activeDeepgramConnections = new Map<string, any>();
+// Using type from Deepgram SDK
+export const activeDeepgramConnections = new Map<string, DeepgramConnection>();
 
 export function streamRecordingWsHandler(c: Context): Response {
   console.log(`WebSocket upgrade request for path: ${c.req.path}`);
@@ -38,7 +46,7 @@ export function streamRecordingWsHandler(c: Context): Response {
 }
 
 function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
-  let deepgramConnection: any = null;
+  let deepgramConnection: DeepgramConnection | null = null;
   let audioBuffer: Uint8Array = new Uint8Array(0);
   let isClosing = false;
   let isConfigured = false;
@@ -64,7 +72,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
   };
 
   // Helper function to initialize Deepgram with appropriate settings
-  const initializeDeepgram = (options: any = {}) => {
+  const initializeDeepgram = (options: Record<string, unknown> = {}) => {
     try {
       const deepgram = getDeepgramClient();
       console.log(
@@ -76,10 +84,10 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       const transcriptionOptions = {
         ...DEFAULT_TRANSCRIPTION_OPTIONS,
         ...options,
-      } as any;
+      };
 
-      // Cast to any to avoid type mismatch with SDK
-      deepgramConnection = deepgram.listen.live(transcriptionOptions);
+      // Cast to our interface type
+      deepgramConnection = deepgram.listen.live(transcriptionOptions) as DeepgramConnection;
       
       // Store the connection for access from finalize endpoint
       activeDeepgramConnections.set(recordingId, deepgramConnection);
@@ -97,23 +105,37 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
 
       deepgramConnection.on(
         LiveTranscriptionEvents.Transcript,
-        async (data: any) => {
+        async (data: unknown) => {
           console.log(
             `Deepgram transcript event for recording ${recordingId}:`,
             JSON.stringify(data, null, 2),
           );
-          const transcript = data.channel?.alternatives?.[0];
+          
+          // Type guard for Deepgram transcript data
+          const transcriptData = data as {
+            channel?: {
+              alternatives?: Array<{
+                transcript: string;
+                confidence: number;
+              }>;
+            };
+            is_final?: boolean;
+            start?: number;
+            duration?: number;
+          };
+          
+          const transcript = transcriptData.channel?.alternatives?.[0];
 
           if (transcript && transcript.transcript) {
             console.log(
-              `Got transcript text: "${transcript.transcript}" (final: ${data.is_final})`,
+              `Got transcript text: "${transcript.transcript}" (final: ${transcriptData.is_final})`,
             );
             const segment: TranscriptSegment = {
               text: transcript.transcript,
               confidence: transcript.confidence || 0,
-              start: data.start || 0,
-              end: data.start + data.duration || 0,
-              isFinal: data.is_final || false,
+              start: transcriptData.start || 0,
+              end: (transcriptData.start || 0) + (transcriptData.duration || 0),
+              isFinal: transcriptData.is_final || false,
             };
 
             // Get in-memory segments array
@@ -149,7 +171,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
         },
       );
 
-      deepgramConnection.on(LiveTranscriptionEvents.Error, (error: any) => {
+      deepgramConnection.on(LiveTranscriptionEvents.Error, (error: unknown) => {
         console.error(`Deepgram error for recording ${recordingId}:`, error);
         ws.send(JSON.stringify({
           type: "error",
@@ -166,7 +188,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       });
 
       // Add metadata event handler to forward to client
-      deepgramConnection.on(LiveTranscriptionEvents.Metadata, (data: any) => {
+      deepgramConnection.on(LiveTranscriptionEvents.Metadata, (data: unknown) => {
         console.log(`Deepgram metadata for recording ${recordingId}:`, data);
         
         // Forward metadata to client, especially the final one with duration: 0
@@ -181,7 +203,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       // Add utterance end event handler
       deepgramConnection.on(
         LiveTranscriptionEvents.UtteranceEnd,
-        (data: any) => {
+        (data: unknown) => {
           console.log(
             `Deepgram utterance end for recording ${recordingId}:`,
             data,
