@@ -8,7 +8,7 @@ class SimpleWebSocketTest: XCTestCase {
         print("\n🚀 === SIMPLE WEBSOCKET TEST START ===")
 
         // Check server
-        let serverURL = URL(string: "http://localhost:8000")!
+        let serverURL = URL(string: Constants.API.localBaseURL)!
         do {
             let (_, response) = try await URLSession.shared.data(for: URLRequest(url: serverURL))
             print("✅ Server responded with status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
@@ -19,7 +19,7 @@ class SimpleWebSocketTest: XCTestCase {
 
         // Create WebSocket
         let recordingId = UUID().uuidString
-        let wsURL = URL(string: "ws://localhost:8000/api/recordings/\(recordingId)/stream")!
+        let wsURL = URL(string: "\(Constants.API.webSocketScheme)://\(Constants.API.webSocketHost)/api/recordings/\(recordingId)/stream")!
         print("🔌 Connecting to: \(wsURL)")
 
         let session = URLSession(configuration: .default)

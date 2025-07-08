@@ -69,8 +69,7 @@ app.onError((err, c) => {
   return c.json({ error: "Internal server error" }, 500);
 });
 
-const port = parseInt(Deno.env.get("PORT") || "8000");
-
+const port = 9000;
 console.log(`Server starting on port ${port}...`);
 console.log(`Health check: http://localhost:${port}/`);
 console.log(`\nAvailable endpoints:`);

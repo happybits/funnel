@@ -59,7 +59,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
 
     func startRecording(completion: @escaping (Result<ProcessedRecording, Error>) -> Void) {
         print("AudioRecorderManager: startRecording called")
-        
+
         recordingCompletion = completion
         startLiveStreaming()
     }
@@ -107,7 +107,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
         print("AudioRecorderManager: Starting live streaming")
 
         isLiveStreaming = true
-        
+
         // Create audio file for fallback
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         audioFileURL = documentsPath.appendingPathComponent("recording-\(UUID().uuidString).m4a")
@@ -119,11 +119,11 @@ class AudioRecorderManager: NSObject, ObservableObject {
                 self?.audioLevel = level
             }
         }
-        
+
         deepgramClient.onStatusUpdate = { [weak self] status in
             print("AudioRecorderManager: DeepgramClient status: \(status)")
         }
-        
+
         deepgramClient.onError = { [weak self] error in
             self?.recordingCompletion?(.failure(error))
             self?.recordingCompletion = nil
@@ -133,12 +133,11 @@ class AudioRecorderManager: NSObject, ObservableObject {
         startAudioEngine()
     }
 
-
     private func startAudioEngine() {
         // Create audio data stream
         let (stream, continuation) = AsyncStream.makeStream(of: Data?.self)
         audioDataContinuation = continuation
-        
+
         // Start streaming with DeepgramClient
         Task {
             do {
@@ -154,14 +153,14 @@ class AudioRecorderManager: NSObject, ObservableObject {
                         }
                         isFirstChunk = false
                     }
-                    
+
                     // This will be called repeatedly to get audio chunks
                     for await data in stream {
                         return data
                     }
                     return nil
                 }
-                
+
                 // Recording completed successfully
                 await MainActor.run {
                     self.recordingCompletion?(.success(processedRecording))
@@ -174,7 +173,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
                 }
             }
         }
-        
+
         do {
             // Get the audio source node
             let sourceNode = try audioSource.attachToEngine(audioEngine)
@@ -272,23 +271,23 @@ class AudioRecorderManager: NSObject, ObservableObject {
             if let data = data {
                 audioDataContinuation?.yield(data)
             }
-            
+
             // Calculate audio level from PCM16 data
             let channelDataValue = channelData.pointee
             let channelDataValueArray = stride(from: 0, to: Int(buffer.frameLength), by: buffer.stride)
                 .map { channelDataValue[$0] }
-            
+
             let rms = sqrt(channelDataValueArray
                 .map { Double($0) * Double($0) }
                 .reduce(0, +) / Double(channelDataValueArray.count))
-            
+
             let avgPower = 20 * log10(rms / 32768.0) // Convert to dB
             let minDb: Float = -50
             let maxDb: Float = -10
             let normalizedLevel = Float((avgPower - Double(minDb)) / Double(maxDb - minDb))
             let clampedLevel = max(0, min(1, normalizedLevel))
             let curvedLevel = pow(clampedLevel, 2.5)
-            
+
             DispatchQueue.main.async { [weak self] in
                 self?.audioLevel = curvedLevel
             }
@@ -296,30 +295,30 @@ class AudioRecorderManager: NSObject, ObservableObject {
             // Buffer is in Float32 format, need to convert to PCM16
             let frameCount = Int(buffer.frameLength)
             var int16Data = Data(count: frameCount * 2) // 2 bytes per sample
-            
+
             int16Data.withUnsafeMutableBytes { int16Ptr in
                 let int16Buffer = int16Ptr.bindMemory(to: Int16.self)
                 let floatData = channelData.pointee
-                
-                for i in 0..<frameCount {
+
+                for i in 0 ..< frameCount {
                     // Convert Float32 (-1.0 to 1.0) to Int16
                     let sample = max(-1.0, min(1.0, floatData[i]))
                     int16Buffer[i] = Int16(sample * Float(Int16.max))
                 }
             }
-            
+
             audioDataContinuation?.yield(int16Data)
-            
+
             // Calculate audio level from float data
             let floatData = channelData.pointee
-            let rms = sqrt((0..<frameCount).map { Double(floatData[$0]) * Double(floatData[$0]) }.reduce(0, +) / Double(frameCount))
+            let rms = sqrt((0 ..< frameCount).map { Double(floatData[$0]) * Double(floatData[$0]) }.reduce(0, +) / Double(frameCount))
             let avgPower = 20 * log10(max(0.00001, rms))
             let minDb: Float = -50
             let maxDb: Float = -10
             let normalizedLevel = Float((avgPower - Double(minDb)) / Double(maxDb - minDb))
             let clampedLevel = max(0, min(1, normalizedLevel))
             let curvedLevel = pow(clampedLevel, 2.5)
-            
+
             DispatchQueue.main.async { [weak self] in
                 self?.audioLevel = curvedLevel
             }
@@ -376,7 +375,6 @@ class AudioRecorderManager: NSObject, ObservableObject {
         recordingId = nil
     }
 }
-
 
 extension AudioRecorderManager: AVAudioRecorderDelegate {
     func audioRecorderDidFinishRecording(_: AVAudioRecorder, successfully flag: Bool) {

@@ -18,7 +18,7 @@ class NewRecordingViewModel: ObservableObject {
 
         // Create a unique filename for the recording
         let audioFileName = "recording-\(UUID().uuidString).m4a"
-        
+
         let recording = Recording(
             audioFileName: audioFileName,
             duration: processedData.duration
@@ -35,28 +35,28 @@ class NewRecordingViewModel: ObservableObject {
             recording.diagramDescription = processedData.diagram.description
             recording.diagramContent = processedData.diagram.content
             recording.processingStatus = .completed
-            
+
             if let firstBullet = recording.bulletSummary?.first {
                 recording.title = String(firstBullet.prefix(50))
             }
-            
+
             try modelContext.save()
-            
+
             processingStatus = "Recording saved!"
             isProcessing = false
             presentedRecording = recording
-            
+
         } catch {
             recording.processingStatus = .failed
             recording.errorMessage = error.localizedDescription
             processingError = error
             processingStatus = "Save failed"
             isProcessing = false
-            
+
             try? modelContext.save()
         }
     }
-    
+
     // Legacy method for file upload flow
     func processRecordingFromFile(audioURL: URL, duration: TimeInterval, modelContext: ModelContext) async {
         isProcessing = true
@@ -78,7 +78,7 @@ class NewRecordingViewModel: ObservableObject {
         }
     }
 
-    private func processRecordingSteps(recording: Recording, modelContext: ModelContext, recordingId: String? = nil, isLiveStreaming: Bool = false) async {
+    private func processRecordingSteps(recording: Recording, modelContext: ModelContext, recordingId _: String? = nil, isLiveStreaming _: Bool = false) async {
         do {
             // Traditional file upload flow
             recording.processingStatus = .uploading

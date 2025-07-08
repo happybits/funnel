@@ -11,7 +11,7 @@ class DeepgramClientTests: XCTestCase {
         try await super.setUp()
 
         // Initialize client
-        client = DeepgramClient(serverBaseURL: "http://localhost:8000")
+        client = DeepgramClient(serverBaseURL: Constants.API.localBaseURL)
 
         // Get test audio file from the test bundle
         guard let url = Bundle(for: type(of: self)).url(
@@ -90,4 +90,3 @@ class DeepgramClientTests: XCTestCase {
         print("✅ DeepgramClient test completed successfully!")
     }
 }
-

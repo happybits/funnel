@@ -169,7 +169,7 @@ struct RecordingControlsView: View {
                     recordingError = error
                 }
             }
-            
+
             // Update UI immediately
             DispatchQueue.main.async {
                 isRecording = true

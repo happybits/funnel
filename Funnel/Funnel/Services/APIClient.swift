@@ -5,7 +5,7 @@ class APIClient {
     static let shared = APIClient()
 
     private let session: URLSession
-    let baseURL: String  // Made public for other services to use
+    let baseURL: String // Made public for other services to use
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
 
@@ -18,8 +18,7 @@ class APIClient {
         decoder = JSONDecoder()
         encoder = JSONEncoder()
 
-        let useLocalServer = true
-        baseURL = useLocalServer ? "http://127.0.0.1:8000" : "https://funnel-api.deno.dev"
+        baseURL = Constants.API.baseURL
     }
 
     // MARK: - Generic Request Methods
@@ -164,17 +163,12 @@ class APIClient {
     // MARK: - WebSocket URL Generation
 
     func webSocketURL(for endpoint: String) -> URL? {
-        let scheme = baseURL.hasPrefix("https") ? "wss" : "ws"
-        let host = baseURL
-            .replacingOccurrences(of: "https://", with: "")
-            .replacingOccurrences(of: "http://", with: "")
-
-        let wsURLString = "\(scheme)://\(host)\(endpoint)"
+        let wsURLString = "\(Constants.API.webSocketScheme)://\(Constants.API.webSocketHost)\(endpoint)"
         return URL(string: wsURLString)
     }
 
     // MARK: - Audio Processing
-    
+
     /// Process audio file through the new-recording endpoint
     func processAudio(fileURL: URL) async throws -> ProcessedRecording {
         return try await uploadMultipart(
