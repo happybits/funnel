@@ -35,7 +35,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E1A1D5BB2C1D5A8E00C1D17A"
+               BlueprintIdentifier = "49880EC62E131B73003049B0"
                BuildableName = "FunnelAITests.xctest"
                BlueprintName = "FunnelAITests"
                ReferencedContainer = "container:FunnelAI.xcodeproj">
