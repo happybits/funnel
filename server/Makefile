@@ -11,7 +11,7 @@ NC = \033[0m # No Color
 PROJECT_NAME = funnel-api
 ENTRYPOINT = main.ts
 
-.PHONY: help dev test deploy-prod deploy-preview clean format lint precommit logs
+.PHONY: help dev test deploy-prod deploy-preview clean format lint precommit logs log
 
 # Default target
 help:
@@ -29,7 +29,14 @@ help:
 # Run development server
 dev:
 	@echo "$(GREEN)Starting development server...$(NC)"
-	@deno task dev
+	@mkdir -p logs
+	@LOG_FILE="logs/server-$(shell date +%Y%m%d-%H%M%S).log" && \
+	deno task dev 2>&1 | tee $$LOG_FILE & \
+	echo $$! > logs/server.pid && \
+	ln -sf $$(basename $$LOG_FILE) logs/latest.log && \
+	echo "$(GREEN)Server logging to: $$LOG_FILE$(NC)" && \
+	echo "$(GREEN)Latest log symlink: logs/latest.log$(NC)" && \
+	wait
 
 # Run tests
 test:
@@ -55,6 +62,15 @@ deploy-preview:
 logs:
 	@echo "$(GREEN)Fetching production logs...$(NC)"
 	@deployctl logs --project=$(PROJECT_NAME)
+
+# View latest local server log
+log:
+	@if [ -f logs/latest.log ]; then \
+		echo "$(GREEN)Viewing latest server log:$(NC)"; \
+		tail -f logs/latest.log; \
+	else \
+		echo "$(RED)No log file found. Run 'make dev' first.$(NC)"; \
+	fi
 
 # Format code
 format:
