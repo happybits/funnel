@@ -4,6 +4,7 @@ import {
   generateBulletSummary,
   generateDiagram,
   generateLightlyEditedTranscript,
+  generateThoughtProvokingQuestions,
   ProcessedRecording,
 } from "../lib/ai-processing.ts";
 import { activeDeepgramConnections } from "./stream-recording-ws.ts";
@@ -108,12 +109,14 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
     let bulletSummary: string[];
     let diagram: { title: string; description: string; content: string };
     let lightlyEditedTranscript: string;
+    let thoughtProvokingQuestions: string[];
 
     try {
-      [bulletSummary, diagram, lightlyEditedTranscript] = await Promise.all([
+      [bulletSummary, diagram, lightlyEditedTranscript, thoughtProvokingQuestions] = await Promise.all([
         generateBulletSummary(finalTranscript),
         generateDiagram(finalTranscript),
         generateLightlyEditedTranscript(finalTranscript),
+        generateThoughtProvokingQuestions(finalTranscript),
       ]);
     } catch (error) {
       console.error("Error generating AI content:", error);
@@ -145,6 +148,15 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
         console.error("Failed to generate lightly edited transcript:", e);
         lightlyEditedTranscript = finalTranscript; // Fallback to raw transcript
       }
+
+      try {
+        thoughtProvokingQuestions = await generateThoughtProvokingQuestions(
+          finalTranscript,
+        );
+      } catch (e) {
+        console.error("Failed to generate thought-provoking questions:", e);
+        thoughtProvokingQuestions = []; // Fallback to empty array
+      }
     }
 
     // Create processed recording
@@ -155,6 +167,7 @@ export async function finalizeRecordingHandler(c: Context): Promise<Response> {
       duration: Math.round(duration),
       bulletSummary,
       diagram,
+      thoughtProvokingQuestions,
       createdAt: recording.startTime,
       audioSize: recording.audioSize,
     };

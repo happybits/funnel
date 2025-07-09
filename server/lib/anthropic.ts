@@ -12,6 +12,10 @@ interface EditTranscriptResponse {
   lightlyEditedTranscript: string;
 }
 
+interface ThoughtProvokingQuestionsResponse {
+  thoughtProvokingQuestions: string[];
+}
+
 export class AnthropicClient {
   private apiKey: string;
   private baseUrl = "https://api.anthropic.com/v1";
@@ -162,6 +166,53 @@ export class AnthropicClient {
 
     return {
       lightlyEditedTranscript: content.trim(),
+    };
+  }
+
+  async generateThoughtProvokingQuestions(
+    transcript: string,
+  ): Promise<ThoughtProvokingQuestionsResponse> {
+    // Read prompt from file
+    const promptTemplate = await Deno.readTextFile(
+      new URL("./prompts/idea-exploration-prompt.txt", import.meta.url),
+    );
+    const prompt = promptTemplate.replace("{{transcript}}", transcript);
+
+    const response = await fetch(`${this.baseUrl}/messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 1024,
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Anthropic API error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    const content = data.content[0].text;
+
+    // Parse bullet points from the response
+    const questions = content
+      .split("\n")
+      .filter((line: string) => line.trim().startsWith("•"))
+      .map((line: string) => line.trim().substring(1).trim());
+
+    return {
+      thoughtProvokingQuestions: questions,
     };
   }
 }

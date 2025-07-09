@@ -16,6 +16,7 @@ struct ProcessedRecording: Codable {
     let duration: Double
     let bulletSummary: [String]
     let diagram: DiagramData
+    let thoughtProvokingQuestions: [String]
 
     struct DiagramData: Codable {
         let title: String

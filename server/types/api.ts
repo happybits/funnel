@@ -8,6 +8,7 @@ export interface NewRecordingResponse {
     description: string;
     content: string;
   };
+  thoughtProvokingQuestions: string[];
 }
 
 export interface ErrorResponse {

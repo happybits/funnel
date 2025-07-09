@@ -184,6 +184,11 @@ Deno.test("API Response Shapes - NewRecordingResponse validation", () => {
       description: "A test diagram for validation",
       content: "Raw -> Edited",
     },
+    thoughtProvokingQuestions: [
+      "What makes this approach unique?",
+      "How might this scale in the future?",
+      "What challenges haven't been considered?",
+    ],
   };
 
   // Validate response shape
@@ -192,12 +197,14 @@ Deno.test("API Response Shapes - NewRecordingResponse validation", () => {
   assertExists(mockResponse.duration);
   assertExists(mockResponse.bulletSummary);
   assertExists(mockResponse.diagram);
+  assertExists(mockResponse.thoughtProvokingQuestions);
 
   // Validate types
   assertEquals(typeof mockResponse.transcript, "string");
   assertEquals(typeof mockResponse.lightlyEditedTranscript, "string");
   assertEquals(typeof mockResponse.duration, "number");
   assertEquals(Array.isArray(mockResponse.bulletSummary), true);
+  assertEquals(Array.isArray(mockResponse.thoughtProvokingQuestions), true);
 
   // Validate diagram structure
   assertExists(mockResponse.diagram.title);
