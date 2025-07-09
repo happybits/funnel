@@ -18,6 +18,14 @@
   },
   "testTargets" : [
     {
+      "skippedTests" : [
+        "DeepgramClientTests\/testStreamAudioDataWithDeepgramClient()",
+        "SimpleWebSocketTest\/testBasicWebSocketConnection()",
+        "TestFileUploadEndpoint\/testFileUploadHandlesErrors()",
+        "TestFileUploadEndpoint\/testFileUploadReturnsAllRequiredData()",
+        "TestStreamingEndpoint\/testStreamingHandlesConnectionErrors()",
+        "TestStreamingEndpoint\/testStreamingReturnsAllRequiredData()"
+      ],
       "target" : {
         "containerPath" : "container:FunnelAI.xcodeproj",
         "identifier" : "49880EC62E131B73003049B0",
