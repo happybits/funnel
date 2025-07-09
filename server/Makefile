@@ -30,13 +30,12 @@ help:
 dev:
 	@echo "$(GREEN)Starting development server...$(NC)"
 	@mkdir -p logs
-	@LOG_FILE="logs/server-$(shell date +%Y%m%d-%H%M%S).log" && \
-	deno task dev 2>&1 | tee $$LOG_FILE & \
-	echo $$! > logs/server.pid && \
-	ln -sf $$(basename $$LOG_FILE) logs/latest.log && \
-	echo "$(GREEN)Server logging to: $$LOG_FILE$(NC)" && \
-	echo "$(GREEN)Latest log symlink: logs/latest.log$(NC)" && \
-	wait
+	@TIMESTAMP=$(shell date +%Y%m%d-%H%M%S); \
+	LOG_FILE="logs/server-$$TIMESTAMP.log"; \
+	echo "$(GREEN)Server logging to: $$LOG_FILE$(NC)"; \
+	echo "$(GREEN)Latest log symlink: logs/latest.log$(NC)"; \
+	ln -sf server-$$TIMESTAMP.log logs/latest.log; \
+	exec deno task dev 2>&1 | tee $$LOG_FILE
 
 # Run tests
 test:
