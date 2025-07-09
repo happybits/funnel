@@ -36,13 +36,18 @@ struct SwipeableCardsView: View {
 
             Spacer()
 
-            Button {
-                // TODO: Add voice action
-            } label: {
-                Image("AddBtn")
-            }
+            // Disable for now since not implemented
+            // addButton
         }
         .padding(.top, 10)
+    }
+
+    private var addButton: some View {
+        Button {
+            // TODO: Add voice action
+        } label: {
+            Image("AddBtn")
+        }
     }
 
     private var cardsContainer: some View {
