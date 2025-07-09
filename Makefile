@@ -99,7 +99,7 @@ test:
 	@rm -rf test-results 2>/dev/null || true
 	@xcodebuild test \
 		-project $(PROJECT) \
-		-scheme FunnelAITests \
+		-scheme FunnelAI \
 		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		-resultBundlePath TestOutput.xcresult \
 		| xcpretty
