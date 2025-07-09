@@ -2,7 +2,8 @@
 # Usage: make [command]
 
 # Default simulator device
-SIMULATOR = iPhone 16 Pro
+SIMULATOR_OS=18.2
+SIMULATOR_NAME=iPhone 16
 SCHEME = FunnelAI
 PROJECT = FunnelAI.xcodeproj
 
@@ -44,10 +45,10 @@ help:
 
 # Build the app
 build:
-	@echo "$(GREEN)Building for $(SIMULATOR)...$(NC)"
+	@echo "$(GREEN)Building for $(SIMULATOR_NAME),OS=$(SIMULATOR_OS)...$(NC)"
 	@xcodebuild -project $(PROJECT) \
 		-scheme $(SCHEME) \
-		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		build \
 		-quiet && echo "$(GREEN)✅ Build succeeded$(NC)" || (echo "$(RED)❌ Build failed$(NC)" && exit 1)
 
@@ -70,12 +71,12 @@ install:
 
 # Build and run on simulator
 run: build
-	@echo "$(GREEN)Running on $(SIMULATOR)...$(NC)"
-	@xcrun simctl boot "$(SIMULATOR)" 2>/dev/null || true
+	@echo "$(GREEN)Running on $(SIMULATOR_NAME),OS=$(SIMULATOR_OS)...$(NC)"
+	@xcrun simctl boot "$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)" 2>/dev/null || true
 	@open -a Simulator
 	@xcodebuild -project $(PROJECT) \
 		-scheme $(SCHEME) \
-		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		-derivedDataPath .build \
 		-quiet \
 		build
@@ -84,11 +85,11 @@ run: build
 
 # Build tests without running (equivalent to Cmd-Shift-U in Xcode)
 build-test:
-	@echo "$(GREEN)Building tests for $(SIMULATOR)...$(NC)"
+	@echo "$(GREEN)Building tests for $(SIMULATOR_NAME),OS=$(SIMULATOR_OS)...$(NC)"
 	@xcodebuild build-for-testing \
 		-project $(PROJECT) \
 		-scheme FunnelAITests \
-		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		-quiet && echo "$(GREEN)✅ Test build succeeded$(NC)" || (echo "$(RED)❌ Test build failed$(NC)" && exit 1)
 
 # Run all tests
@@ -99,9 +100,9 @@ test:
 	@xcodebuild test \
 		-project $(PROJECT) \
 		-scheme FunnelAITests \
-		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		-resultBundlePath TestOutput.xcresult \
-		2>&1 | grep -E "(Test Suite|passed|failed)" || true
+		| xcpretty
 	@echo "$(GREEN)✅ Test run complete. Results saved to TestOutput.xcresult$(NC)"
 	@echo "$(YELLOW)Generating HTML report...$(NC)"
 	@xchtmlreport TestOutput.xcresult
@@ -124,10 +125,9 @@ test-class:
 	@xcodebuild test \
 		-project $(PROJECT) \
 		-scheme FunnelAITests \
-		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		-only-testing:FunnelAITests/$(CLASS) \
-		-resultBundlePath TestOutput-$(CLASS).xcresult \
-		2>&1 | grep -E "(Test Suite|passed|failed)" || true
+		-resultBundlePath TestOutput-$(CLASS).xcresult
 	@echo "$(GREEN)✅ Test run complete. Results saved to TestOutput-$(CLASS).xcresult$(NC)"
 
 # Run specific test method
@@ -141,10 +141,9 @@ test-method:
 	@xcodebuild test \
 		-project $(PROJECT) \
 		-scheme FunnelAITests \
-		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		-only-testing:FunnelAITests/$(TEST) \
-		-resultBundlePath TestOutput-method.xcresult \
-		2>&1 | grep -E "(Test Suite|passed|failed)" || true
+		-resultBundlePath TestOutput-method.xcresult
 	@echo "$(GREEN)✅ Test run complete. Results saved to TestOutput-method.xcresult$(NC)"
 
 # Parse test results
@@ -203,10 +202,9 @@ lint:
 quick: 
 	@xcodebuild -project $(PROJECT) \
 		-scheme $(SCHEME) \
-		-destination 'platform=iOS Simulator,name=$(SIMULATOR)' \
+		-destination 'platform=iOS Simulator,name=$(SIMULATOR_NAME),OS=$(SIMULATOR_OS)' \
 		build \
 		-quiet \
-		2>&1 | grep -E "(error:|warning:)" || echo "$(GREEN)✅ Build succeeded$(NC)"
 
 # Watch for changes and rebuild
 watch:
