@@ -35,6 +35,7 @@ class NewRecordingViewModel: ObservableObject {
             recording.diagramTitle = processedData.diagram.title
             recording.diagramDescription = processedData.diagram.description
             recording.diagramContent = processedData.diagram.content
+            recording.thoughtProvokingQuestions = processedData.thoughtProvokingQuestions
             recording.processingStatus = .completed
 
             if let firstBullet = recording.bulletSummary?.first {
@@ -93,11 +94,13 @@ class NewRecordingViewModel: ObservableObject {
             let processedData = try await apiClient.processAudio(fileURL: recording.audioFileURL)
 
             recording.transcript = processedData.transcript
+            recording.lightlyEditedTranscript = processedData.lightlyEditedTranscript
             recording.duration = processedData.duration
             recording.bulletSummary = processedData.bulletSummary
             recording.diagramTitle = processedData.diagram.title
             recording.diagramDescription = processedData.diagram.description
             recording.diagramContent = processedData.diagram.content
+            recording.thoughtProvokingQuestions = processedData.thoughtProvokingQuestions
 
             recording.processingStatus = .completed
             processingStatus = "Processing complete!"

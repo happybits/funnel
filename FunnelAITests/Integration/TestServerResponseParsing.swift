@@ -163,18 +163,21 @@ final class TestServerResponseParsing: XCTestCase {
             questions.append("Question \(i): What about this aspect of the discussion?")
         }
         
+        let bulletsJSON = bullets.map { "\"\($0)\"" }.joined(separator: ", ")
+        let questionsJSON = questions.map { "\"\($0)\"" }.joined(separator: ", ")
+        
         let json = """
         {
             "transcript": "\(String(repeating: "This is a long transcript. ", count: 100))",
             "lightlyEditedTranscript": "\(String(repeating: "This is a long transcript. ", count: 100))",
             "duration": 300.5,
-            "bulletSummary": \(try! JSONEncoder().encode(bullets)),
+            "bulletSummary": [\(bulletsJSON)],
             "diagram": {
                 "title": "Complex System Architecture",
                 "description": "A detailed view of the system components and their interactions",
                 "content": "\(String(repeating: "graph TD\\n  A --> B\\n", count: 50))"
             },
-            "thoughtProvokingQuestions": \(try! JSONEncoder().encode(questions))
+            "thoughtProvokingQuestions": [\(questionsJSON)]
         }
         """
         

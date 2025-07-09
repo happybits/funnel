@@ -32,6 +32,7 @@ final class Recording {
     var diagramTitle: String?
     var diagramDescription: String?
     var diagramContent: String?
+    var thoughtProvokingQuestions: [String]?
 
     // Computed property for diagram
     var diagram: Diagram? {

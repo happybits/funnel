@@ -4,6 +4,7 @@ enum CardType {
     case bulletSummary([String])
     case diagram(Recording.Diagram?)
     case transcript(String)
+    case thoughtProvokingQuestions([String])
 
     var shareContent: String {
         switch self {
@@ -16,6 +17,8 @@ enum CardType {
             return ""
         case let .transcript(text):
             return text
+        case let .thoughtProvokingQuestions(questions):
+            return questions.joined(separator: "\n\n")
         }
     }
 
@@ -31,6 +34,8 @@ enum CardType {
             return diagram != nil
         case let .transcript(text):
             return !text.isEmpty
+        case let .thoughtProvokingQuestions(questions):
+            return !questions.isEmpty
         }
     }
 }

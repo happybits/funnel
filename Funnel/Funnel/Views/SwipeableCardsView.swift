@@ -64,6 +64,10 @@ struct SwipeableCardsView: View {
                         TranscriptCard(transcript: recording.lightlyEditedTranscript ?? recording.transcript ?? "")
                             .frame(width: cardWidth)
                             .id(2)
+                        
+                        QuestionsCard(questions: recording.thoughtProvokingQuestions ?? [])
+                            .frame(width: cardWidth)
+                            .id(3)
                     }
                     .scrollTargetLayout()
                 }
@@ -97,6 +101,8 @@ struct SwipeableCardsView: View {
                 gradientManager.setTheme(.pinkRed)
             case 2:
                 gradientManager.setTheme(.blueTeal)
+            case 3:
+                gradientManager.setTheme(.greenTeal)
             default:
                 gradientManager.setTheme(.defaultTheme)
             }
@@ -278,6 +284,68 @@ struct TranscriptCard: View {
     }
 }
 
+struct QuestionsCard: View {
+    let questions: [String]
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Explore Further")
+                .funnelBodyBold()
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+
+            VStack(alignment: .leading, spacing: 16) {
+                ForEach(Array(questions.enumerated()), id: \.offset) { index, question in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Q\(index + 1)")
+                            .funnelSmall()
+                            .foregroundColor(.white.opacity(0.6))
+                        
+                        Text(question)
+                            .funnelCallout()
+                            .foregroundColor(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+
+            Spacer()
+        }
+        .padding(25)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            LinearGradient(
+                colors: [Color.white.opacity(0.1), Color.white.opacity(0.4)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .opacity(0.6)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 9)
+                .stroke(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white, location: 0),
+                            .init(color: Color.white.opacity(0), location: 0.434),
+                            .init(color: Color.white, location: 1),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.9
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 9))
+        .shadow(color: .black.opacity(0.12), radius: 10.8, x: 0, y: 3.6)
+        .liveGlassmorphicCell(cornerRadius: 9)
+        .padding(.bottom, 100)
+        .overlay(alignment: .bottomLeading) {
+            CardOptions(cardType: .thoughtProvokingQuestions(questions))
+        }
+    }
+}
+
 #Preview {
     SwipeableCardsView(recording: {
         let recording = Recording(audioFileName: "sample.m4a", duration: 60)
@@ -292,6 +360,11 @@ struct TranscriptCard: View {
         recording.diagramTitle = "Key Concepts"
         recording.diagramDescription = "Visual representation of main ideas"
         recording.diagramContent = "Concept A → Concept B → Result"
+        recording.thoughtProvokingQuestions = [
+            "What assumptions are you making that might limit your perspective?",
+            "How could this approach be improved for different contexts?",
+            "What are the potential unintended consequences of this idea?"
+        ]
         return recording
     }())
         .funnelPreviewEnvironment()
