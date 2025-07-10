@@ -205,6 +205,81 @@ class AudioUploadClient {
         }
     }
 
+    /// Upload a complete audio file to the server
+    /// - Parameter audioFileURL: URL of the audio file to upload
+    /// - Returns: The processed recording with transcript, summary, and diagram
+    func uploadFile(audioFileURL: URL) async throws -> ProcessedRecording {
+        onStatusUpdate?("Uploading...")
+        
+        guard let uploadURL = URL(string: "\(serverBaseURL)/api/new-recording") else {
+            throw AudioUploadError.invalidServerURL
+        }
+        
+        // Create multipart form data
+        var request = URLRequest(url: uploadURL)
+        request.httpMethod = "POST"
+        
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        // Read audio file
+        let audioData = try Data(contentsOf: audioFileURL)
+        
+        // Create multipart body
+        var body = Data()
+        
+        // Add audio file part
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"audio\"; filename=\"\(audioFileURL.lastPathComponent)\"\r\n".data(using: .utf8)!)
+        
+        // Determine content type based on file extension
+        let contentType = mimeType(for: audioFileURL.pathExtension)
+        body.append("Content-Type: \(contentType)\r\n\r\n".data(using: .utf8)!)
+        body.append(audioData)
+        body.append("\r\n".data(using: .utf8)!)
+        
+        // Close boundary
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        request.httpBody = body
+        
+        onStatusUpdate?("Processing...")
+        
+        // Make request
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw AudioUploadError.finalizeError("Invalid response type")
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
+            throw AudioUploadError.finalizeError("Status \(httpResponse.statusCode): \(errorMessage)")
+        }
+        
+        do {
+            return try JSONDecoder().decode(ProcessedRecording.self, from: data)
+        } catch {
+            throw AudioUploadError.finalizeError("Failed to decode response: \(error)")
+        }
+    }
+    
+    /// Determine MIME type based on file extension
+    private func mimeType(for pathExtension: String) -> String {
+        switch pathExtension.lowercased() {
+        case "mp3":
+            return "audio/mpeg"
+        case "mp4":
+            return "audio/mp4"
+        case "wav":
+            return "audio/wav"
+        case "m4a":
+            return "audio/m4a"
+        default:
+            return "audio/mpeg" // Default to mp3
+        }
+    }
+    
     /// Calculate audio level from PCM16 data
     private func calculateAudioLevel(from data: Data) -> Float? {
         let int16Array = data.withUnsafeBytes { bytes in
