@@ -17,7 +17,7 @@ struct ContentView: View {
                     .overlay {
                         if newRecordingViewModel.isProcessing {
                             ProcessingOverlay()
-                                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                                .transition(.opacity)
                         }
                     }
                     .animation(.easeInOut(duration: 0.3), value: newRecordingViewModel.isProcessing)
