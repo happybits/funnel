@@ -167,6 +167,8 @@ struct RecordingControlsView: View {
                     }
                 case let .failure(error):
                     recordingError = error
+                    // Hide loading dialog on error
+                    viewModel.isProcessing = false
                 }
             }
 
@@ -185,8 +187,13 @@ struct RecordingControlsView: View {
 
         guard duration >= 0.5 else {
             recordingError = FunnelError.recordingTooShort(minimumDuration: 0.5)
+            isRecording = false
             return
         }
+
+        // Show loading dialog immediately when stopping recording
+        viewModel.isProcessing = true
+        viewModel.processingStatus = "Processing your recording..."
 
         audioRecorder.stopRecording()
         recordingTimer?.invalidate()
