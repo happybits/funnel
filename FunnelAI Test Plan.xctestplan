@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "C94E2288-66F1-4867-BD35-9A090189611B",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:FunnelAI.xcodeproj",
+        "identifier" : "49880EC62E131B73003049B0",
+        "name" : "FunnelAITests"
+      }
+    }
+  ],
+  "version" : 2
+}

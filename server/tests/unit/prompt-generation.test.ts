@@ -17,32 +17,35 @@ import { restore, stub } from "https://deno.land/std@0.208.0/testing/mock.ts";
 import { AnthropicClient } from "../../lib/anthropic.ts";
 
 describe("Prompt Generation Tests", () => {
-  let _readTextFileStub: ReturnType<typeof stub>;
-  let fetchStub: ReturnType<typeof stub>;
+  // deno-lint-ignore no-explicit-any
+  let _readTextFileStub: any;
+  // deno-lint-ignore no-explicit-any
+  let fetchStub: any;
   let client: AnthropicClient;
 
   beforeEach(() => {
     client = new AnthropicClient("test-api-key");
 
     // Mock Deno.readTextFile to return test prompts
-    _readTextFileStub = stub(Deno, "readTextFile", (path: string) => {
-      if (path.includes("summarize-transcript.txt")) {
-        return "Summarize this transcript: {{TRANSCRIPT}}";
-      } else if (path.includes("generate-diagram.txt")) {
-        return "Create a diagram for: {{TRANSCRIPT}}";
-      } else if (path.includes("lightly-edit-transcript.txt")) {
-        return "Edit this transcript: {{TRANSCRIPT}}";
-      } else if (path.includes("thought-provoking-questions.txt")) {
-        return "Generate questions for: {{TRANSCRIPT}}";
+    _readTextFileStub = stub(Deno, "readTextFile", (path: string | URL) => {
+      const pathStr = path.toString();
+      if (pathStr.includes("summarize-prompt.txt")) {
+        return Promise.resolve("Summarize this transcript: {{transcript}}");
+      } else if (pathStr.includes("generate-diagram-prompt.txt")) {
+        return Promise.resolve("Create a diagram for: {{transcript}}");
+      } else if (pathStr.includes("edit-transcript-prompt.txt")) {
+        return Promise.resolve("Edit this transcript: {{transcript}}");
+      } else if (pathStr.includes("thought-provoking-questions-prompt.txt")) {
+        return Promise.resolve("Generate questions for: {{transcript}}");
       }
-      throw new Error(`Unexpected file path: ${path}`);
+      return Promise.reject(new Error(`Unexpected file path: ${pathStr}`));
     });
 
     // Mock fetch to capture the request
     fetchStub = stub(
       globalThis,
       "fetch",
-      (_url: string, init?: RequestInit) => {
+      (_url: string | URL | Request, init?: RequestInit) => {
         const body = JSON.parse(init?.body as string);
 
         // Return different responses based on the prompt content
@@ -72,10 +75,10 @@ describe("Prompt Generation Tests", () => {
           };
         }
 
-        return new Response(JSON.stringify(response), {
+        return Promise.resolve(new Response(JSON.stringify(response), {
           status: 200,
           headers: { "Content-Type": "application/json" },
-        });
+        }));
       },
     );
   });

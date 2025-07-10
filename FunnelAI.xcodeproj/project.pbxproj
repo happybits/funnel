@@ -19,7 +19,7 @@
 /* Begin PBXFileReference section */
 		0A9BC078DD4AC38F123687A2 /* FunnelAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunnelAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49880EC72E131B73003049B0 /* FunnelAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunnelAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4994D53A2E1F2C7E00C18666 /* FunnelAITestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = FunnelAITestPlan.xctestplan; sourceTree = "<group>"; };
+		4994D5562E1F8E7B00C18666 /* FunnelAI Test Plan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "FunnelAI Test Plan.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -82,7 +82,7 @@
 		D9581316AE7A5E7CB95F6728 = {
 			isa = PBXGroup;
 			children = (
-				4994D53A2E1F2C7E00C18666 /* FunnelAITestPlan.xctestplan */,
+				4994D5562E1F8E7B00C18666 /* FunnelAI Test Plan.xctestplan */,
 				49E8777E2E03892C00721933 /* Funnel */,
 				49880EC82E131B73003049B0 /* FunnelAITests */,
 				30EF63C64EAF6A14571B0920 /* Products */,

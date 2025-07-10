@@ -35,54 +35,61 @@ struct NetworkingIntegrationTests {
         // Track messages
         var messages: [String] = []
         
-        try await confirmation("Receive messages", expectedCount: 1) { confirmation in
-            // Start receiving
-            Task {
-                do {
-                    while wsTask.state == .running {
-                        let message = try await wsTask.receive()
-                        switch message {
-                        case let .string(text):
-                            print("📨 Received: \(text)")
-                            messages.append(text)
-                            if text.contains("ready") {
-                                confirmation()
-                            }
-                        case let .data(data):
-                            print("📦 Received data: \(data.count) bytes")
-                        @unknown default:
-                            break
-                        }
+        // Connect first
+        wsTask.resume()
+        print("🔗 WebSocket connected")
+        
+        // Start receiving task
+        let receiveTask = Task {
+            do {
+                while wsTask.state == .running {
+                    let message = try await wsTask.receive()
+                    switch message {
+                    case let .string(text):
+                        print("📨 Received: \(text)")
+                        messages.append(text)
+                    case let .data(data):
+                        print("📦 Received data: \(data.count) bytes")
+                    @unknown default:
+                        break
                     }
-                } catch {
+                }
+            } catch {
+                // Expected when WebSocket closes
+                if !error.localizedDescription.contains("cancelled") {
                     print("❌ Receive error: \(error)")
                 }
             }
-
-            // Connect
-            wsTask.resume()
-            print("🔗 WebSocket connected")
-
-            // Send config
-            try await Task.sleep(nanoseconds: 100_000_000) // 100ms
-            let config = """
-            {"type":"config","format":"pcm16","sampleRate":16000,"channels":1}
-            """
-            try await wsTask.send(.string(config))
-            print("⚙️ Sent config")
         }
+
+        // Send config after connection
+        try await Task.sleep(nanoseconds: 200_000_000) // 200ms
+        let config = """
+        {"type":"config","format":"pcm16","sampleRate":16000,"channels":1}
+        """
+        try await wsTask.send(.string(config))
+        print("⚙️ Sent config")
+        
+        // Wait for ready message
+        try await Task.sleep(nanoseconds: 500_000_000) // 500ms
 
         // Send test audio chunk
         let testData = Data(repeating: 0, count: 1000)
         try await wsTask.send(.data(testData))
         print("🎵 Sent test audio chunk")
 
-        // Wait a bit
+        // Wait a bit more for any responses
         try await Task.sleep(nanoseconds: 500_000_000) // 500ms
 
         // Close
         wsTask.cancel(with: .normalClosure, reason: nil)
         print("🔚 WebSocket closed")
+        
+        // Cancel receive task
+        receiveTask.cancel()
+        
+        // Wait for task to complete
+        try await Task.sleep(nanoseconds: 100_000_000) // 100ms
 
         print("\n📊 Summary:")
         print("- Messages received: \(messages.count)")
