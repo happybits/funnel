@@ -53,7 +53,6 @@ app.get("/api/live-transcription", liveTranscriptionHandler);
 app.get("/api/recordings/:recordingId/stream", streamRecordingWsHandler);
 app.post("/api/recordings/:recordingId/done", finalizeRecordingHandler);
 
-
 // Admin and test pages
 app.get("/api/admin", adminHandler);
 app.get("/api/test", testPageHandler);

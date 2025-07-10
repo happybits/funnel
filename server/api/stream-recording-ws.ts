@@ -87,8 +87,10 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       };
 
       // Cast to our interface type
-      deepgramConnection = deepgram.listen.live(transcriptionOptions) as DeepgramConnection;
-      
+      deepgramConnection = deepgram.listen.live(
+        transcriptionOptions,
+      ) as DeepgramConnection;
+
       // Store the connection for access from finalize endpoint
       activeDeepgramConnections.set(recordingId, deepgramConnection);
 
@@ -110,7 +112,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
             `Deepgram transcript event for recording ${recordingId}:`,
             JSON.stringify(data, null, 2),
           );
-          
+
           // Type guard for Deepgram transcript data
           const transcriptData = data as {
             channel?: {
@@ -123,7 +125,7 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
             start?: number;
             duration?: number;
           };
-          
+
           const transcript = transcriptData.channel?.alternatives?.[0];
 
           if (transcript && transcript.transcript) {
@@ -188,17 +190,20 @@ function handleWebSocketConnection(ws: WebSocket, recordingId: string) {
       });
 
       // Add metadata event handler to forward to client
-      deepgramConnection.on(LiveTranscriptionEvents.Metadata, (data: unknown) => {
-        console.log(`Deepgram metadata for recording ${recordingId}:`, data);
-        
-        // Forward metadata to client, especially the final one with duration: 0
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({
-            type: "Metadata",
-            ...data
-          }));
-        }
-      });
+      deepgramConnection.on(
+        LiveTranscriptionEvents.Metadata,
+        (data: unknown) => {
+          console.log(`Deepgram metadata for recording ${recordingId}:`, data);
+
+          // Forward metadata to client, especially the final one with duration: 0
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: "Metadata",
+              ...data,
+            }));
+          }
+        },
+      );
 
       // Add utterance end event handler
       deepgramConnection.on(

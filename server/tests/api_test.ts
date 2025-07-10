@@ -1,3 +1,7 @@
+/**
+ * Unit tests for API response shapes and business logic validation.
+ * These tests mock API responses and validate data structures without requiring a running server.
+ */
 import {
   assertEquals,
   assertExists,
@@ -172,7 +176,8 @@ Deno.test("Diagram Endpoint - handles empty transcript", () => {
 Deno.test("API Response Shapes - NewRecordingResponse validation", () => {
   // Mock successful new recording response
   const mockResponse: NewRecordingResponse = {
-    transcript: "This is um, you know, a test transcript with like filler words",
+    transcript:
+      "This is um, you know, a test transcript with like filler words",
     lightlyEditedTranscript: "This is a test transcript with filler words",
     duration: 10.5,
     bulletSummary: [
@@ -236,14 +241,22 @@ Deno.test("LightlyEditedTranscript - removes filler words", () => {
 
   // Validate that filler words are removed
   assertEquals(mockResponse.lightlyEditedTranscript!.includes("um,"), false);
-  assertEquals(mockResponse.lightlyEditedTranscript!.includes("you know,"), false);
+  assertEquals(
+    mockResponse.lightlyEditedTranscript!.includes("you know,"),
+    false,
+  );
   assertEquals(mockResponse.lightlyEditedTranscript!.includes("like"), false);
   assertEquals(mockResponse.lightlyEditedTranscript!.includes("uh,"), false);
 
   // Validate that meaningful content is preserved
-  assertEquals(mockResponse.lightlyEditedTranscript!.includes("AI coding"), true);
   assertEquals(
-    mockResponse.lightlyEditedTranscript!.includes("managing junior developers"),
+    mockResponse.lightlyEditedTranscript!.includes("AI coding"),
+    true,
+  );
+  assertEquals(
+    mockResponse.lightlyEditedTranscript!.includes(
+      "managing junior developers",
+    ),
     true,
   );
 });

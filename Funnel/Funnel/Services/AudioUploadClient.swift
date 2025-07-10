@@ -2,7 +2,7 @@ import AVFoundation
 import Foundation
 
 /// Client for streaming audio to our Deno server (which then forwards to Deepgram API)
-class DeepgramClient {
+class AudioUploadClient {
     private let serverBaseURL: String
     private var webSocketTask: URLSessionWebSocketTask?
     private var recordingId: String?
@@ -11,9 +11,9 @@ class DeepgramClient {
     // Callbacks for UI updates
     var onAudioLevel: ((Float) -> Void)?
     var onStatusUpdate: ((String) -> Void)?
-    var onError: ((DeepgramError) -> Void)?
+    var onError: ((AudioUploadError) -> Void)?
 
-    enum DeepgramError: LocalizedError {
+    enum AudioUploadError: LocalizedError {
         case invalidServerURL
         case noRecordingId
         case webSocketError(String)
@@ -47,7 +47,7 @@ class DeepgramClient {
 
     init(serverBaseURL: String) {
         self.serverBaseURL = serverBaseURL
-        print("DeepgramClient: Initialized with server URL: \(self.serverBaseURL)")
+        print("AudioUploadClient: Initialized with server URL: \(self.serverBaseURL)")
     }
 
     /// Get the current recording ID
@@ -67,7 +67,7 @@ class DeepgramClient {
         // Generate new recording ID
         recordingId = UUID().uuidString
         guard let recordingId = recordingId else {
-            throw DeepgramError.noRecordingId
+            throw AudioUploadError.noRecordingId
         }
 
         onStatusUpdate?("Connecting...")
@@ -76,7 +76,7 @@ class DeepgramClient {
         let wsURLString = serverBaseURL.replacingOccurrences(of: "http://", with: "ws://")
             .replacingOccurrences(of: "https://", with: "wss://")
         guard let wsURL = URL(string: "\(wsURLString)/api/recordings/\(recordingId)/stream") else {
-            throw DeepgramError.invalidServerURL
+            throw AudioUploadError.invalidServerURL
         }
 
         // Create WebSocket task
@@ -181,7 +181,7 @@ class DeepgramClient {
 
     private func finalizeRecording(recordingId: String) async throws -> ProcessedRecording {
         guard let finalizeURL = URL(string: "\(serverBaseURL)/api/recordings/\(recordingId)/done") else {
-            throw DeepgramError.invalidServerURL
+            throw AudioUploadError.invalidServerURL
         }
 
         var request = URLRequest(url: finalizeURL)
@@ -190,18 +190,18 @@ class DeepgramClient {
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw DeepgramError.finalizeError("Invalid response type")
+            throw AudioUploadError.finalizeError("Invalid response type")
         }
 
         guard httpResponse.statusCode == 200 else {
             let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw DeepgramError.finalizeError("Status \(httpResponse.statusCode): \(errorMessage)")
+            throw AudioUploadError.finalizeError("Status \(httpResponse.statusCode): \(errorMessage)")
         }
 
         do {
             return try JSONDecoder().decode(ProcessedRecording.self, from: data)
         } catch {
-            throw DeepgramError.finalizeError("Failed to decode response: \(error)")
+            throw AudioUploadError.finalizeError("Failed to decode response: \(error)")
         }
     }
 

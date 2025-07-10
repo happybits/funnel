@@ -1,17 +1,21 @@
 # Deepgram Real-Time Transcription Integration
 
-This document describes how Funnel uses Deepgram's real-time transcription API for processing audio streams.
+This document describes how Funnel uses Deepgram's real-time transcription API
+for processing audio streams.
 
 ## Overview
 
-Funnel uses Deepgram's WebSocket-based real-time transcription API to convert streaming audio into text transcripts. The integration follows a specific flow to ensure complete and accurate transcription of audio recordings.
+Funnel uses Deepgram's WebSocket-based real-time transcription API to convert
+streaming audio into text transcripts. The integration follows a specific flow
+to ensure complete and accurate transcription of audio recordings.
 
 ## Architecture
 
 ### Components
 
 1. **iOS Client**: Streams PCM audio data via WebSocket to our Deno server
-2. **Deno Server**: Acts as a proxy, forwarding audio to Deepgram and returning transcripts
+2. **Deno Server**: Acts as a proxy, forwarding audio to Deepgram and returning
+   transcripts
 3. **Deepgram API**: Processes audio and returns incremental transcript segments
 
 ### Data Flow
@@ -46,6 +50,7 @@ When a client connects to `/api/recordings/{recordingId}/stream`, the server:
 ### 2. Audio Streaming
 
 The client sends audio in chunks:
+
 - Format: 16-bit PCM, 16kHz, mono
 - Chunk size: Typically 16000 bytes (1 second of audio)
 - The server forwards each chunk directly to Deepgram
@@ -64,6 +69,7 @@ Deepgram sends two types of transcript segments:
    - These are stored and used for the final transcript
 
 Example transcript message:
+
 ```json
 {
   "type": "transcript",
@@ -82,7 +88,8 @@ Example transcript message:
 
 This is the critical part for ensuring complete transcripts:
 
-1. **Client signals completion** by calling `POST /api/recordings/{recordingId}/done`
+1. **Client signals completion** by calling
+   `POST /api/recordings/{recordingId}/done`
 
 2. **Server sends CloseStream** to Deepgram:
    ```json
@@ -97,7 +104,7 @@ This is the critical part for ensuring complete transcripts:
      "request_id": "8c8ebea9-dbec-45fa-a035-e4632cb05b5f",
      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
      "created": "2024-08-29T22:37:55.202Z",
-     "duration": 32.5,  // Total audio duration processed
+     "duration": 32.5, // Total audio duration processed
      "channels": 1
    }
    ```
@@ -112,29 +119,37 @@ This is the critical part for ensuring complete transcripts:
 
 #### Why the Finalization Flow Matters
 
-- **Problem**: If you close the connection too early, you may miss final transcript segments
-- **Solution**: The CloseStream → Metadata flow ensures all audio has been processed
+- **Problem**: If you close the connection too early, you may miss final
+  transcript segments
+- **Solution**: The CloseStream → Metadata flow ensures all audio has been
+  processed
 
 #### Metadata Response Interpretation
 
-- The `duration` field in the Metadata response represents the total duration of audio processed
+- The `duration` field in the Metadata response represents the total duration of
+  audio processed
 - It will NOT be 0 - it will be the actual duration (e.g., 32.5 seconds)
 - Any Metadata response after CloseStream indicates completion
 
 #### Active Connection Management
 
 The server maintains a Map of active Deepgram connections:
+
 ```typescript
 const activeDeepgramConnections = new Map<string, any>();
 ```
 
-This allows the finalize endpoint to access and close the Deepgram connection for a specific recording.
+This allows the finalize endpoint to access and close the Deepgram connection
+for a specific recording.
 
 ## Error Handling
 
-1. **Timeout**: If Metadata isn't received within 30 seconds, the server continues anyway
-2. **Connection Loss**: If the WebSocket disconnects, the server calls `deepgramConnection.finish()`
-3. **Missing Connection**: If finalize is called but no active connection exists, it proceeds with available data
+1. **Timeout**: If Metadata isn't received within 30 seconds, the server
+   continues anyway
+2. **Connection Loss**: If the WebSocket disconnects, the server calls
+   `deepgramConnection.finish()`
+3. **Missing Connection**: If finalize is called but no active connection
+   exists, it proceeds with available data
 
 ## Testing Considerations
 
@@ -146,12 +161,18 @@ When testing the integration:
 
 ## API Reference
 
-- Deepgram CloseStream Documentation: https://developers.deepgram.com/docs/close-stream
-- Deepgram Real-time Transcription: https://developers.deepgram.com/docs/getting-started-with-live-streaming-audio
+- Deepgram CloseStream Documentation:
+  https://developers.deepgram.com/docs/close-stream
+- Deepgram Real-time Transcription:
+  https://developers.deepgram.com/docs/getting-started-with-live-streaming-audio
 
 ## Common Pitfalls
 
-1. **Closing too early**: Don't close the WebSocket immediately after streaming audio
-2. **Not waiting for Metadata**: The finalize endpoint must wait for Deepgram's confirmation
-3. **Expecting duration: 0**: The Metadata duration is the total audio duration, not 0
-4. **Missing final segments**: Always use the CloseStream flow to ensure completeness
+1. **Closing too early**: Don't close the WebSocket immediately after streaming
+   audio
+2. **Not waiting for Metadata**: The finalize endpoint must wait for Deepgram's
+   confirmation
+3. **Expecting duration: 0**: The Metadata duration is the total audio duration,
+   not 0
+4. **Missing final segments**: Always use the CloseStream flow to ensure
+   completeness

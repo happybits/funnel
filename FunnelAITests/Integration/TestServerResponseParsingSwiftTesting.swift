@@ -1,3 +1,9 @@
+
+/**
+ * Unit tests for JSON parsing of ProcessedRecording API responses
+ * Tests decoding/encoding of server response models without making actual network calls
+ */
+
 import Testing
 import Foundation
 @testable import FunnelAI

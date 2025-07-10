@@ -19,7 +19,7 @@
   "testTargets" : [
     {
       "skippedTests" : [
-        "DeepgramClientTests\/testStreamAudioDataWithDeepgramClient()",
+        "AudioUploadClientTests\/testStreamAudioDataWithAudioUploadClient()",
         "SimpleWebSocketTest\/testBasicWebSocketConnection()",
         "TestFileUploadEndpoint\/testFileUploadHandlesErrors()",
         "TestFileUploadEndpoint\/testFileUploadReturnsAllRequiredData()",

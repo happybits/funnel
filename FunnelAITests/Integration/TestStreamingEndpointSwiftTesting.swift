@@ -1,9 +1,14 @@
+/**
+ * Integration tests for the WebSocket streaming endpoint.
+ * These tests require a local development server running.
+ * Tests verify that audio streaming and real-time processing work correctly.
+ */
 import Testing
 import Foundation
 @testable import FunnelAI
 
 final class TestStreamingEndpointSwiftTesting {
-    let serverURL = "ws://localhost:9000/api/stream-recording-ws"
+    let serverURL = "\(Constants.API.webSocketScheme)://\(Constants.API.webSocketHost)/api/stream-recording-ws"
     var webSocketTask: URLSessionWebSocketTask?
     
     init() {
@@ -102,7 +107,7 @@ final class TestStreamingEndpointSwiftTesting {
     
     @Test
     func streamingHandlesConnectionErrors() async throws {
-        let badURL = "ws://localhost:9999/api/stream-recording-ws" // Wrong port
+        let badURL = "\(Constants.API.webSocketScheme)://\(Constants.API.localHost):9999/api/stream-recording-ws" // Wrong port
         let session = URLSession(configuration: .default)
         let badTask = session.webSocketTask(with: URL(string: badURL)!)
         badTask.resume()

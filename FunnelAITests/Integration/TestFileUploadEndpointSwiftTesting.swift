@@ -1,9 +1,12 @@
+/**
+ * Integration tests for the file upload endpoint that require a running development server.
+ * Tests the complete audio processing pipeline including transcription, summarization, and content generation.
+ */
 import Testing
 import Foundation
 @testable import FunnelAI
-
 struct TestFileUploadEndpointSwiftTesting {
-    let serverURL = "http://localhost:9000"
+    let serverURL = Constants.API.localBaseURL
     
     @Test
     func fileUploadReturnsAllRequiredData() async throws {

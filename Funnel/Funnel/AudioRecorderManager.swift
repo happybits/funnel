@@ -15,7 +15,7 @@ class AudioRecorderManager: NSObject, ObservableObject {
 
     // Live streaming properties
     private var audioEngine = AVAudioEngine()
-    private let deepgramClient = DeepgramClient(serverBaseURL: APIClient.shared.baseURL)
+    private let audioUploadClient = AudioUploadClient(serverBaseURL: APIClient.shared.baseURL)
     private(set) var recordingId: String?
     private(set) var isLiveStreaming = false
     private var audioDataContinuation: AsyncStream<Data?>.Continuation?
@@ -113,18 +113,18 @@ class AudioRecorderManager: NSObject, ObservableObject {
         audioFileURL = documentsPath.appendingPathComponent("recording-\(UUID().uuidString).m4a")
         currentRecordingURL = audioFileURL // Store for compatibility
 
-        // Setup DeepgramClient callbacks
-        deepgramClient.onAudioLevel = { [weak self] level in
+        // Setup AudioUploadClient callbacks
+        audioUploadClient.onAudioLevel = { [weak self] level in
             DispatchQueue.main.async {
                 self?.audioLevel = level
             }
         }
 
-        deepgramClient.onStatusUpdate = { [weak self] status in
-            print("AudioRecorderManager: DeepgramClient status: \(status)")
+        audioUploadClient.onStatusUpdate = { [weak self] status in
+            print("AudioRecorderManager: AudioUploadClient status: \(status)")
         }
 
-        deepgramClient.onError = { [weak self] error in
+        audioUploadClient.onError = { [weak self] error in
             self?.recordingCompletion?(.failure(error))
             self?.recordingCompletion = nil
         }
@@ -138,17 +138,17 @@ class AudioRecorderManager: NSObject, ObservableObject {
         let (stream, continuation) = AsyncStream.makeStream(of: Data?.self)
         audioDataContinuation = continuation
 
-        // Start streaming with DeepgramClient
+        // Start streaming with AudioUploadClient
         Task {
             do {
                 var isFirstChunk = true
                 // Get the device's sample rate
                 let sampleRate = AVAudioSession.sharedInstance().sampleRate
-                let processedRecording = try await deepgramClient.streamRecording(sampleRate: sampleRate) {
-                    // Update recordingId only once after DeepgramClient creates it
+                let processedRecording = try await audioUploadClient.streamRecording(sampleRate: sampleRate) {
+                    // Update recordingId only once after AudioUploadClient creates it
                     if isFirstChunk {
                         await MainActor.run {
-                            self.recordingId = self.deepgramClient.currentRecordingId
+                            self.recordingId = self.audioUploadClient.currentRecordingId
                             print("AudioRecorderManager: Recording ID set to: \(self.recordingId ?? "nil")")
                         }
                         isFirstChunk = false

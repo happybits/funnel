@@ -1,3 +1,8 @@
+/**
+ * Integration test that verifies WebSocket streaming functionality against a running development server.
+ * This test requires the local server to be running and tests the full WebSocket connection lifecycle
+ * including configuration, audio data transmission, and message reception.
+ */
 import AVFoundation
 @testable import FunnelAI
 import Testing

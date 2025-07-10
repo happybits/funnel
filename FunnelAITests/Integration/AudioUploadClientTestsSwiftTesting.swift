@@ -1,3 +1,10 @@
+
+/**
+ * Integration tests for AudioUploadClient that require a running development server.
+ * Tests audio streaming functionality by sending PCM audio data to the server's Deepgram endpoint
+ * and verifying the returned transcription, summary, and diagram results.
+ */
+
 import AVFoundation
 @testable import FunnelAI
 import Testing
@@ -6,15 +13,13 @@ import Foundation
 enum TestError: Error {
     case fileNotFound
 }
-
-/// Integration test for DeepgramClient
-struct DeepgramClientTestsSwiftTesting {
-    let client: DeepgramClient
+struct AudioUploadClientTestsSwiftTesting {
+    let client: AudioUploadClient
     let testAudioURL: URL
     
     init() throws {
         // Initialize client
-        client = DeepgramClient(serverBaseURL: Constants.API.localBaseURL)
+        client = AudioUploadClient(serverBaseURL: Constants.API.localBaseURL)
         
         // Get test audio file from the test bundle
         let bundle = Bundle(identifier: "co.happybits.FunnelAITests") ?? Bundle.main
@@ -30,10 +35,10 @@ struct DeepgramClientTestsSwiftTesting {
         print("📦 Using audio file from test bundle: \(url)")
     }
     
-    /// Test streaming audio data using DeepgramClient
+    /// Test streaming audio data using AudioUploadClient
     @Test
-    func streamAudioDataWithDeepgramClient() async throws {
-        print("\n🎤 === DEEPGRAM CLIENT AUDIO STREAMING TEST START ===")
+    func streamAudioDataWithAudioUploadClient() async throws {
+        print("\n🎤 === AUDIO UPLOAD CLIENT AUDIO STREAMING TEST START ===")
         
         // Load audio data (convertToPCM converts to 16kHz)
         let audioFile = try AVAudioFile(forReading: testAudioURL)
@@ -95,6 +100,6 @@ struct DeepgramClientTestsSwiftTesting {
             "Transcript should contain words from Mary Had a Little Lamb"
         )
         
-        print("✅ DeepgramClient test completed successfully!")
+        print("✅ AudioUploadClient test completed successfully!")
     }
 }

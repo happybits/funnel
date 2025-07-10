@@ -1,5 +1,5 @@
 import { Context } from "@hono/hono";
-import { DeepgramClient, TranscriptResponse } from "../lib/deepgram.ts";
+import { AudioUploadClient, TranscriptResponse } from "../lib/deepgram.ts";
 
 interface LiveTranscriptionMessage {
   type: "audio" | "config" | "stop";
@@ -84,7 +84,7 @@ function handleWebSocketConnection(clientWs: WebSocket) {
     }
 
     try {
-      const deepgramClient = new DeepgramClient({ apiKey: deepgramApiKey });
+      const deepgramClient = new AudioUploadClient({ apiKey: deepgramApiKey });
       deepgramWs = deepgramClient.connectLive({
         model: "nova-3",
         language: "en-US",

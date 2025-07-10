@@ -46,7 +46,7 @@ Funnel is an audio note summarizer with an iOS client and Deno server that proce
 
 ### Services
 - `APIClient.swift` - Network layer
-- `DeepgramClient.swift` - WebSocket client
+- `AudioUploadClient.swift` - WebSocket client for audio upload
 - `AudioRecorderManager.swift` - Audio recording orchestration
 
 ### Audio Sources

@@ -35,7 +35,7 @@ export interface LiveTranscriptionOptions {
 }
 
 // Legacy export for compatibility with existing code
-export class DeepgramClient {
+export class AudioUploadClient {
   private apiKey: string;
   private baseUrl = "wss://api.deepgram.com/v1/listen";
 
