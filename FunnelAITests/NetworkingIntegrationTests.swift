@@ -8,8 +8,8 @@ import AVFoundation
 import Testing
 import Foundation
 
-/// Simplified test to debug WebSocket streaming
-struct SimpleWebSocketTestSwiftTesting {
+/// Basic connectivity and WebSocket lifecycle tests
+struct NetworkingIntegrationTests {
     @Test
     func basicWebSocketConnection() async throws {
         print("\n🚀 === SIMPLE WEBSOCKET TEST START ===")

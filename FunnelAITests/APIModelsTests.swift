@@ -8,7 +8,7 @@ import Testing
 import Foundation
 @testable import FunnelAI
 
-struct TestServerResponseParsingSwiftTesting {
+struct APIModelsTests {
     
     @Test func completeResponseParsing() throws {
         let json = """
