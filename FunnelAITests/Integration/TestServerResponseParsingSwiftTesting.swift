@@ -1,9 +1,10 @@
-import XCTest
+import Testing
+import Foundation
 @testable import FunnelAI
 
-final class TestServerResponseParsing: XCTestCase {
+struct TestServerResponseParsingSwiftTesting {
     
-    func testCompleteResponseParsing() throws {
+    @Test func completeResponseParsing() throws {
         let json = """
         {
             "transcript": "This is a test transcript with some content",
@@ -32,19 +33,18 @@ final class TestServerResponseParsing: XCTestCase {
         
         let response = try decoder.decode(ProcessedRecording.self, from: data)
         
-        XCTAssertEqual(response.transcript, "This is a test transcript with some content")
-        XCTAssertEqual(response.lightlyEditedTranscript, "This is a test transcript with some content")
-        XCTAssertEqual(response.duration, 45.5, accuracy: 0.01)
-        XCTAssertEqual(response.bulletSummary.count, 3)
-        XCTAssertEqual(response.bulletSummary[0], "First key point from the transcript")
-        XCTAssertEqual(response.diagram.title, "Test Diagram")
-        XCTAssertEqual(response.diagram.description, "A visual representation of the content")
-        XCTAssertTrue(response.diagram.content.contains("graph TD"))
-        XCTAssertEqual(response.thoughtProvokingQuestions.count, 3)
+        #expect(response.transcript == "This is a test transcript with some content")
+        #expect(response.lightlyEditedTranscript == "This is a test transcript with some content")
+        #expect(abs(response.duration - 45.5) < 0.01)
+        #expect(response.bulletSummary.count == 3)
+        #expect(response.bulletSummary[0] == "First key point from the transcript")
+        #expect(response.diagram.title == "Test Diagram")
+        #expect(response.diagram.description == "A visual representation of the content")
+        #expect(response.diagram.content.contains("graph TD"))
+        #expect(response.thoughtProvokingQuestions.count == 3)
     }
     
-    func testMissingOptionalFields() throws {
-        // Test minimal valid response
+    @Test func missingOptionalFields() throws {
         let json = """
         {
             "transcript": "Minimal transcript",
@@ -65,14 +65,13 @@ final class TestServerResponseParsing: XCTestCase {
         
         let response = try decoder.decode(ProcessedRecording.self, from: data)
         
-        XCTAssertEqual(response.transcript, "Minimal transcript")
-        XCTAssertEqual(response.bulletSummary.count, 1)
-        XCTAssertTrue(response.thoughtProvokingQuestions.isEmpty)
+        #expect(response.transcript == "Minimal transcript")
+        #expect(response.bulletSummary.count == 1)
+        #expect(response.thoughtProvokingQuestions.isEmpty)
     }
     
-    func testMalformedJSON() {
+    @Test func malformedJSON() {
         let malformedCases = [
-            // Missing required field
             """
             {
                 "transcript": "Test",
@@ -80,7 +79,6 @@ final class TestServerResponseParsing: XCTestCase {
                 "bulletSummary": ["Point"]
             }
             """,
-            // Wrong type for duration
             """
             {
                 "transcript": "Test",
@@ -95,7 +93,6 @@ final class TestServerResponseParsing: XCTestCase {
                 "thoughtProvokingQuestions": []
             }
             """,
-            // bulletSummary not an array
             """
             {
                 "transcript": "Test",
@@ -114,15 +111,16 @@ final class TestServerResponseParsing: XCTestCase {
         
         let decoder = JSONDecoder()
         
-        for (index, malformed) in malformedCases.enumerated() {
+        for malformed in malformedCases {
             let data = malformed.data(using: .utf8)!
             
-            XCTAssertThrowsError(try decoder.decode(ProcessedRecording.self, from: data),
-                                "Malformed case \(index) should throw decoding error")
+            #expect(throws: (any Error).self) {
+                try decoder.decode(ProcessedRecording.self, from: data)
+            }
         }
     }
     
-    func testEdgeCases() throws {
+    @Test func edgeCases() throws {
         let json = """
         {
             "transcript": "",
@@ -141,17 +139,15 @@ final class TestServerResponseParsing: XCTestCase {
         let data = json.data(using: .utf8)!
         let decoder = JSONDecoder()
         
-        // Should parse without throwing
         let response = try decoder.decode(ProcessedRecording.self, from: data)
         
-        XCTAssertTrue(response.transcript.isEmpty)
-        XCTAssertEqual(response.duration, 0.0)
-        XCTAssertTrue(response.bulletSummary.isEmpty)
-        XCTAssertTrue(response.diagram.title.isEmpty)
+        #expect(response.transcript.isEmpty)
+        #expect(response.duration == 0.0)
+        #expect(response.bulletSummary.isEmpty)
+        #expect(response.diagram.title.isEmpty)
     }
     
-    func testLargeResponse() throws {
-        // Test with realistic large content
+    @Test func largeResponse() throws {
         var bullets = [String]()
         var questions = [String]()
         
@@ -163,14 +159,12 @@ final class TestServerResponseParsing: XCTestCase {
             questions.append("Question \(i): What about this aspect of the discussion?")
         }
         
-        // Create large content in a more memory-efficient way
         let transcriptPart = "This is a long transcript. "
         let transcriptContent = String(repeating: transcriptPart, count: 100)
         
         let diagramPart = "graph TD\\n  A --> B\\n"
         let diagramContent = String(repeating: diagramPart, count: 50)
         
-        // Build JSON using JSONEncoder to avoid string interpolation issues
         let processedRecording = ProcessedRecording(
             transcript: transcriptContent,
             lightlyEditedTranscript: transcriptContent,
@@ -184,24 +178,20 @@ final class TestServerResponseParsing: XCTestCase {
             thoughtProvokingQuestions: questions
         )
         
-        // First encode to verify the object can be encoded
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         let encodedData = try encoder.encode(processedRecording)
         
-        // Now decode it back to test the decoding
         let decoder = JSONDecoder()
         let response = try decoder.decode(ProcessedRecording.self, from: encodedData)
         
-        // Verify the decoded data
-        XCTAssertTrue(response.transcript.count > 2000, "Transcript should be longer than 2000 characters")
-        XCTAssertEqual(response.bulletSummary.count, 6, "Should have 6 bullet points")
-        XCTAssertEqual(response.thoughtProvokingQuestions.count, 5, "Should have 5 questions")
-        XCTAssertTrue(response.diagram.content.contains("graph TD"), "Diagram should contain 'graph TD'")
+        #expect(response.transcript.count > 2000)
+        #expect(response.bulletSummary.count == 6)
+        #expect(response.thoughtProvokingQuestions.count == 5)
+        #expect(response.diagram.content.contains("graph TD"))
         
-        // Additional checks for data integrity
-        XCTAssertEqual(response.transcript, transcriptContent, "Transcript content should match")
-        XCTAssertEqual(response.duration, 300.5, accuracy: 0.01, "Duration should match")
-        XCTAssertEqual(response.diagram.title, "Complex System Architecture", "Diagram title should match")
+        #expect(response.transcript == transcriptContent)
+        #expect(abs(response.duration - 300.5) < 0.01)
+        #expect(response.diagram.title == "Complex System Architecture")
     }
 }

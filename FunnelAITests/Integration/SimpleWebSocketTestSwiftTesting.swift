@@ -1,10 +1,12 @@
 import AVFoundation
 @testable import FunnelAI
-import XCTest
+import Testing
+import Foundation
 
 /// Simplified test to debug WebSocket streaming
-class SimpleWebSocketTest: XCTestCase {
-    func testBasicWebSocketConnection() async throws {
+struct SimpleWebSocketTestSwiftTesting {
+    @Test
+    func basicWebSocketConnection() async throws {
         print("\n🚀 === SIMPLE WEBSOCKET TEST START ===")
 
         // Check server
@@ -13,7 +15,7 @@ class SimpleWebSocketTest: XCTestCase {
             let (_, response) = try await URLSession.shared.data(for: URLRequest(url: serverURL))
             print("✅ Server responded with status: \((response as? HTTPURLResponse)?.statusCode ?? -1)")
         } catch {
-            XCTFail("❌ Server not running: \(error)")
+            Issue.record("❌ Server not running: \(error)")
             return
         }
 
@@ -27,45 +29,43 @@ class SimpleWebSocketTest: XCTestCase {
 
         // Track messages
         var messages: [String] = []
-        let expectation = XCTestExpectation(description: "Receive messages")
-
-        // Start receiving
-        Task {
-            do {
-                while wsTask.state == .running {
-                    let message = try await wsTask.receive()
-                    switch message {
-                    case let .string(text):
-                        print("📨 Received: \(text)")
-                        messages.append(text)
-                        if text.contains("ready") {
-                            expectation.fulfill()
+        
+        try await confirmation("Receive messages", expectedCount: 1) { confirmation in
+            // Start receiving
+            Task {
+                do {
+                    while wsTask.state == .running {
+                        let message = try await wsTask.receive()
+                        switch message {
+                        case let .string(text):
+                            print("📨 Received: \(text)")
+                            messages.append(text)
+                            if text.contains("ready") {
+                                confirmation()
+                            }
+                        case let .data(data):
+                            print("📦 Received data: \(data.count) bytes")
+                        @unknown default:
+                            break
                         }
-                    case let .data(data):
-                        print("📦 Received data: \(data.count) bytes")
-                    @unknown default:
-                        break
                     }
+                } catch {
+                    print("❌ Receive error: \(error)")
                 }
-            } catch {
-                print("❌ Receive error: \(error)")
             }
+
+            // Connect
+            wsTask.resume()
+            print("🔗 WebSocket connected")
+
+            // Send config
+            try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+            let config = """
+            {"type":"config","format":"pcm16","sampleRate":16000,"channels":1}
+            """
+            try await wsTask.send(.string(config))
+            print("⚙️ Sent config")
         }
-
-        // Connect
-        wsTask.resume()
-        print("🔗 WebSocket connected")
-
-        // Send config
-        try await Task.sleep(nanoseconds: 100_000_000) // 100ms
-        let config = """
-        {"type":"config","format":"pcm16","sampleRate":16000,"channels":1}
-        """
-        try await wsTask.send(.string(config))
-        print("⚙️ Sent config")
-
-        // Wait for ready
-        await fulfillment(of: [expectation], timeout: 2.0)
 
         // Send test audio chunk
         let testData = Data(repeating: 0, count: 1000)
@@ -85,7 +85,7 @@ class SimpleWebSocketTest: XCTestCase {
             print("  [\(i + 1)] \(msg)")
         }
 
-        XCTAssertFalse(messages.isEmpty, "Should receive at least one message")
+        #expect(!messages.isEmpty, "Should receive at least one message")
         print("✅ Test passed!")
     }
 }
